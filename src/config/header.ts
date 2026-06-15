@@ -24,6 +24,7 @@ export const STATE_ICONS: Record<string, string> = {
 }
 
 export const MODE_ICONS: Record<string, string> = {
+  // HVAC 模式
   auto: 'hass:autorenew',
   cool: 'hass:snowflake',
   dry: 'hass:water-percent',
@@ -31,9 +32,26 @@ export const MODE_ICONS: Record<string, string> = {
   heat_cool: 'hass:autorenew',
   heat: 'hass:fire',
   off: 'hass:power',
-  // 新增 swing_horizontal 模式
-  swing_horizontal: 'mdi:fan',
-  swing: 'mdi:fan-sync',
+  // 预设模式
+  none: 'mdi:cancel',
+  eco: 'mdi:leaf',
+  away: 'mdi:home-alert',
+  boost: 'mdi:rocket-launch',
+  comfort: 'mdi:sofa',
+  home: 'mdi:home',
+  sleep: 'mdi:power-sleep',
+  activity: 'mdi:run',
+  // 风速模式
+  low: 'mdi:fan-speed-1',
+  medium: 'mdi:fan-speed-2',
+  high: 'mdi:fan-speed-3',
+  auto_mode: 'mdi:fan-auto',
+  // swing 模式
+  vertical: 'mdi:arrow-up-down',
+  horizontal: 'mdi:arrow-left-right',
+  both: 'mdi:arrow-all',
+  swing_horizontal: 'mdi:arrow-left-right',
+  swing: 'mdi:arrow-up-down',
 }
 
 type Icon = string | false | LooseObject

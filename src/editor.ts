@@ -92,13 +92,14 @@ export default class SimpleThermostatEditor extends LitElement {
           <div class="side-by-side">
             <ha-select
               label="小数位数（可选）"
-              @selected=${(ev) => this._configChanged('decimals', ev.target.value)}
+              .value=${config.decimals ?? ''}
+              @selected=${(ev) => this._configChanged('decimals', ev.detail.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
               ${OptionsDecimals.map(
                 (item) =>
-                  html`<ha-list-item .value=${String(item)} ?selected=${config.decimals === item}>${item}</ha-list-item>`
+                  html`<ha-list-item .value=${String(item)}>${item}</ha-list-item>`
               )}
             </ha-select>
 
@@ -112,25 +113,27 @@ export default class SimpleThermostatEditor extends LitElement {
           <div class="side-by-side">
             <ha-select
               label="布局方向（可选）"
-              @selected=${(ev) => this._configChanged('layout.step', ev.target.value)}
+              .value=${(config as any).layout?.step ?? ''}
+              @selected=${(ev) => this._configChanged('layout.step', ev.detail.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
               ${OptionsStepLayout.map(
                 (item) =>
-                  html`<ha-list-item .value=${item} ?selected=${(config as any).layout?.step === item}>${item}</ha-list-item>`
+                  html`<ha-list-item .value=${item}>${item === 'column' ? '上下' : '左右'}</ha-list-item>`
               )}
             </ha-select>
 
             <ha-select
               label="步进值（可选）"
-              @selected=${(ev) => this._configChanged('step_size', ev.target.value)}
+              .value=${config.step_size ?? ''}
+              @selected=${(ev) => this._configChanged('step_size', ev.detail.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
               ${OptionsStepSize.map(
                 (item) =>
-                  html`<ha-list-item .value=${String(item)} ?selected=${config.step_size === item}>${item}</ha-list-item>`
+                  html`<ha-list-item .value=${String(item)}>${item}</ha-list-item>`
               )}
             </ha-select>
           </div>

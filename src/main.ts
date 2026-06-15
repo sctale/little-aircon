@@ -352,7 +352,7 @@ export default class SimpleThermostat extends LitElement {
     } = this.entity
 
     const unit = this.getUnit()
-    const stepLayout = this.config?.layout?.step ?? 'column'
+    const stepLayout = this.config?.layout?.step ?? 'row'
     const row = stepLayout === 'row'
     const classes = [!this.header && 'no-header', action].filter((cx) => !!cx)
 
@@ -403,12 +403,12 @@ export default class SimpleThermostat extends LitElement {
             return html`
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
-                  label="升温"
-                  ?disabled=${maxTemp !== null && value >= maxTemp}
+                  label="降温"
+                  ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
-                  @click=${() => this.setTemperature(this.stepSize, field)}
+                  @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -420,12 +420,12 @@ export default class SimpleThermostat extends LitElement {
                 </h3>
 
                 <ha-icon-button
-                  label="降温"
-                  ?disabled=${minTemp !== null && value <= minTemp}
+                  label="升温"
+                  ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
-                  @click=${() => this.setTemperature(-this.stepSize, field)}
+                  @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
               </div>
             `

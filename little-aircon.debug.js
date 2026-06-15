@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.13";
+var version = "3.0.14";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -228,7 +228,7 @@ header {
   flex-wrap: wrap;
 }
 .current-wrapper.row {
-    flex-direction: row-reverse;
+    flex-direction: row;
   }
 .current--value {
   display: flex;
@@ -427,11 +427,12 @@ class SimpleThermostatEditor extends i$1 {
           <div class="side-by-side">
             <ha-select
               label="小数位数（可选）"
-              @selected=${(ev) => this._configChanged('decimals', ev.target.value)}
+              .value=${config.decimals ?? ''}
+              @selected=${(ev) => this._configChanged('decimals', ev.detail.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
-              ${OptionsDecimals.map((item) => b `<ha-list-item .value=${String(item)} ?selected=${config.decimals === item}>${item}</ha-list-item>`)}
+              ${OptionsDecimals.map((item) => b `<ha-list-item .value=${String(item)}>${item}</ha-list-item>`)}
             </ha-select>
 
             <ha-textfield
@@ -444,20 +445,22 @@ class SimpleThermostatEditor extends i$1 {
           <div class="side-by-side">
             <ha-select
               label="布局方向（可选）"
-              @selected=${(ev) => this._configChanged('layout.step', ev.target.value)}
+              .value=${config.layout?.step ?? ''}
+              @selected=${(ev) => this._configChanged('layout.step', ev.detail.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
-              ${OptionsStepLayout.map((item) => b `<ha-list-item .value=${item} ?selected=${config.layout?.step === item}>${item}</ha-list-item>`)}
+              ${OptionsStepLayout.map((item) => b `<ha-list-item .value=${item}>${item === 'column' ? '上下' : '左右'}</ha-list-item>`)}
             </ha-select>
 
             <ha-select
               label="步进值（可选）"
-              @selected=${(ev) => this._configChanged('step_size', ev.target.value)}
+              .value=${config.step_size ?? ''}
+              @selected=${(ev) => this._configChanged('step_size', ev.detail.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
-              ${OptionsStepSize.map((item) => b `<ha-list-item .value=${String(item)} ?selected=${config.step_size === item}>${item}</ha-list-item>`)}
+              ${OptionsStepSize.map((item) => b `<ha-list-item .value=${String(item)}>${item}</ha-list-item>`)}
             </ha-select>
           </div>
 
@@ -1060,6 +1063,7 @@ const STATE_ICONS = {
     off: 'mdi:radiator-off',
 };
 const MODE_ICONS = {
+    // HVAC 模式
     auto: 'hass:autorenew',
     cool: 'hass:snowflake',
     dry: 'hass:water-percent',
@@ -1067,9 +1071,26 @@ const MODE_ICONS = {
     heat_cool: 'hass:autorenew',
     heat: 'hass:fire',
     off: 'hass:power',
-    // 新增 swing_horizontal 模式
-    swing_horizontal: 'mdi:fan',
-    swing: 'mdi:fan-sync',
+    // 预设模式
+    none: 'mdi:cancel',
+    eco: 'mdi:leaf',
+    away: 'mdi:home-alert',
+    boost: 'mdi:rocket-launch',
+    comfort: 'mdi:sofa',
+    home: 'mdi:home',
+    sleep: 'mdi:power-sleep',
+    activity: 'mdi:run',
+    // 风速模式
+    low: 'mdi:fan-speed-1',
+    medium: 'mdi:fan-speed-2',
+    high: 'mdi:fan-speed-3',
+    auto_mode: 'mdi:fan-auto',
+    // swing 模式
+    vertical: 'mdi:arrow-up-down',
+    horizontal: 'mdi:arrow-left-right',
+    both: 'mdi:arrow-all',
+    swing_horizontal: 'mdi:arrow-left-right',
+    swing: 'mdi:arrow-up-down',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1450,7 +1471,7 @@ class SimpleThermostat extends i$1 {
         }
         const { attributes: { min_temp: minTemp = null, max_temp: maxTemp = null, hvac_action: action, }, } = this.entity;
         const unit = this.getUnit();
-        const stepLayout = this.config?.layout?.step ?? 'column';
+        const stepLayout = this.config?.layout?.step ?? 'row';
         const row = stepLayout === 'row';
         const classes = [!this.header && 'no-header', action].filter((cx) => !!cx);
         let sensorsHtml;
@@ -1500,12 +1521,12 @@ class SimpleThermostat extends i$1 {
             return b `
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
-                  label="升温"
-                  ?disabled=${maxTemp !== null && value >= maxTemp}
+                  label="降温"
+                  ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
-                  @click=${() => this.setTemperature(this.stepSize, field)}
+                  @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -1517,12 +1538,12 @@ class SimpleThermostat extends i$1 {
                 </h3>
 
                 <ha-icon-button
-                  label="降温"
-                  ?disabled=${minTemp !== null && value <= minTemp}
+                  label="升温"
+                  ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
-                  @click=${() => this.setTemperature(-this.stepSize, field)}
+                  @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
               </div>
             `;
