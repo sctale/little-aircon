@@ -145,6 +145,9 @@ export default class SimpleThermostat extends LitElement {
   }
 
   setConfig(config: CardConfig) {
+    if (!config.entity || !config.entity.startsWith('climate.')) {
+      throw new Error('需要指定 climate 域的实体')
+    }
     this.config = {
       decimals: DECIMALS,
       ...config,
@@ -336,8 +339,8 @@ export default class SimpleThermostat extends LitElement {
       `)
     }
 
-    if (!this.entity) {
-      return html`<hui-warning> 实体不可用: ${this.config.entity} </hui-warning>`
+    if (!this.entity || !this.entity.attributes) {
+      return html`<hui-warning .hass=${this._hass}> 实体不可用: ${this.config.entity} </hui-warning>`
     }
 
     const {

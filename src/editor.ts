@@ -1,21 +1,10 @@
-import { LitElement, html } from 'lit'
-import { property } from 'lit/decorators.js'
+import { LitElement, html, nothing } from 'lit'
+import { property, state } from 'lit/decorators.js'
 import styles from './styles.css'
 import fireEvent from './fireEvent'
 import { name } from '../package.json'
 import { CardConfig } from './config/card'
 import { HASS } from './types'
-
-function setValue(obj: any, path: string, value: any) {
-  const pathFragments = path.split('.')
-  let o = obj
-  while (pathFragments.length - 1) {
-    const fragment = pathFragments.shift()!
-    if (!o.hasOwnProperty(fragment)) o[fragment] = {}
-    o = o[fragment]
-  }
-  o[pathFragments[0]] = value
-}
 
 const OptionsDecimals = [0, 1]
 const OptionsStepSize = [0.5, 1]
@@ -23,33 +12,32 @@ const OptionsStepLayout = ['column', 'row']
 const includeDomains = ['climate']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
-const stub: any = {
-  header: {},
-  layout: { mode: {} },
-}
-
 const cloneDeep = (obj: any) => JSON.parse(JSON.stringify(obj))
 
 export default class SimpleThermostatEditor extends LitElement {
-  @property({ type: Object }) config: CardConfig = {} as CardConfig
-  @property({ type: Object }) hass!: HASS
+  @property({ attribute: false }) hass!: HASS
+  @state() private _config!: CardConfig
 
   static styles = styles
 
   static getStubConfig() {
-    return { ...stub }
+    return { header: {}, layout: { mode: {} } }
   }
 
   setConfig(config: CardConfig) {
-    this.config = config || { ...stub }
+    this._config = config
   }
 
   _openLink() {
     window.open(GithubReadMe)
   }
 
-  render() {
-    if (!this.hass) return html``
+  protected render() {
+    if (!this.hass || !this._config) {
+      return nothing
+    }
+
+    const config = this._config
 
     return html`
       <div class="card-config">
@@ -58,10 +46,9 @@ export default class SimpleThermostatEditor extends LitElement {
             <ha-entity-picker
               label="实体（必选）"
               .hass=${this.hass}
-              .value=${this.config.entity || ''}
-              .configValue="entity"
+              .value=${config.entity || ''}
               .includeDomains=${includeDomains}
-              @change=${this.valueChanged}
+              @value-changed=${this._entityPicked}
               allow-custom-entity
             ></ha-entity-picker>
           </div>
@@ -69,15 +56,13 @@ export default class SimpleThermostatEditor extends LitElement {
           <div class="side-by-side">
             <ha-textfield
               label="名称（可选）"
-              .value=${this.config.header?.name || ''}
-              .configValue="header.name"
-              @input=${this.valueChanged}
+              .value=${(config as any).header?.name || ''}
+              @input=${(ev) => this._configChanged('header.name', ev.target.value)}
             ></ha-textfield>
             <ha-textfield
               label="图标（可选）"
-              .value=${this.config.header?.icon || ''}
-              .configValue="header.icon"
-              @input=${this.valueChanged}
+              .value=${(config as any).header?.icon || ''}
+              @input=${(ev) => this._configChanged('header.icon', ev.target.value)}
             ></ha-textfield>
           </div>
 
@@ -85,74 +70,67 @@ export default class SimpleThermostatEditor extends LitElement {
             <ha-entity-picker
               label="开关实体（可选）"
               .hass=${this.hass}
-              .value=${this.config?.header?.toggle?.entity || ''}
-              .configValue="header.toggle.entity"
-              @change=${this.valueChanged}
+              .value=${(config as any)?.header?.toggle?.entity || ''}
+              @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
               allow-custom-entity
             ></ha-entity-picker>
             <ha-textfield
               label="开关标签"
-              .value=${this.config?.header?.toggle?.name || ''}
-              .configValue="header.toggle.name"
-              @input=${this.valueChanged}
+              .value=${(config as any)?.header?.toggle?.name || ''}
+              @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
             ></ha-textfield>
           </div>
 
           <div class="side-by-side">
             <ha-textfield
               label="占位文本（可选）"
-              .value=${this.config.fallback || ''}
-              .configValue="fallback"
-              @input=${this.valueChanged}
+              .value=${config.fallback || ''}
+              @input=${(ev) => this._configChanged('fallback', ev.target.value)}
             ></ha-textfield>
           </div>
 
           <div class="side-by-side">
             <ha-select
               label="小数位数（可选）"
-              .configValue="decimals"
-              @selected=${this.valueChanged}
+              @selected=${(ev) => this._configChanged('decimals', ev.target.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
               ${OptionsDecimals.map(
                 (item) =>
-                  html`<ha-list-item .value=${String(item)} ?selected=${this.config.decimals === item}>${item}</ha-list-item>`
+                  html`<ha-list-item .value=${String(item)} ?selected=${config.decimals === item}>${item}</ha-list-item>`
               )}
             </ha-select>
 
             <ha-textfield
               label="单位（可选）"
-              .value=${this.config.unit || ''}
-              .configValue="unit"
-              @input=${this.valueChanged}
+              .value=${config.unit || ''}
+              @input=${(ev) => this._configChanged('unit', ev.target.value)}
             ></ha-textfield>
           </div>
 
           <div class="side-by-side">
             <ha-select
               label="布局方向（可选）"
-              .configValue="layout.step"
-              @selected=${this.valueChanged}
+              @selected=${(ev) => this._configChanged('layout.step', ev.target.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
               ${OptionsStepLayout.map(
                 (item) =>
-                  html`<ha-list-item .value=${item} ?selected=${this.config.layout?.step === item}>${item}</ha-list-item>`
+                  html`<ha-list-item .value=${item} ?selected=${(config as any).layout?.step === item}>${item}</ha-list-item>`
               )}
             </ha-select>
 
             <ha-select
               label="步进值（可选）"
-              .configValue="step_size"
-              @selected=${this.valueChanged}
+              @selected=${(ev) => this._configChanged('step_size', ev.target.value)}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
               ${OptionsStepSize.map(
                 (item) =>
-                  html`<ha-list-item .value=${String(item)} ?selected=${this.config.step_size === item}>${item}</ha-list-item>`
+                  html`<ha-list-item .value=${String(item)} ?selected=${config.step_size === item}>${item}</ha-list-item>`
               )}
             </ha-select>
           </div>
@@ -168,30 +146,47 @@ export default class SimpleThermostatEditor extends LitElement {
     `
   }
 
-  valueChanged(ev: any) {
-    if (!this.config || !this.hass) return
-    const { target } = ev
-    const copy = cloneDeep(this.config)
+  private _entityPicked(ev: any) {
+    const value = ev.detail?.value ?? ev.target?.value
+    if (value === undefined) return
+    this._configChanged('entity', value)
+  }
 
-    // ha-select uses @selected event, value is in target.value
-    // ha-textfield uses @input event, value is in target.value
-    // ha-entity-picker uses @change event, value is in target.value
-    const configValue = target.configValue
-    if (configValue) {
-      const value = target.value
-      if (value === '' || value === undefined) {
-        // For ha-select, don't delete on empty - only for text fields
-        if (target.tagName !== 'HA-SELECT') {
-          delete copy[configValue]
-        }
-      } else {
-        setValue(
-          copy,
-          configValue,
-          target.checked !== undefined ? target.checked : value
-        )
+  private _configChanged(path: string, value: any) {
+    if (!this._config || !this.hass) return
+    const copy = cloneDeep(this._config)
+
+    if (value === '' || value === undefined || value === null) {
+      // Don't delete entity - it's required
+      if (path !== 'entity') {
+        deleteNestedKey(copy, path)
       }
+    } else {
+      setNestedValue(copy, path, value)
     }
+
     fireEvent(this, 'config-changed', { config: copy })
   }
+}
+
+function setNestedValue(obj: any, path: string, value: any) {
+  const parts = path.split('.')
+  let o = obj
+  while (parts.length > 1) {
+    const part = parts.shift()!
+    if (!o[part]) o[part] = {}
+    o = o[part]
+  }
+  o[parts[0]] = value
+}
+
+function deleteNestedKey(obj: any, path: string) {
+  const parts = path.split('.')
+  let o = obj
+  while (parts.length > 1) {
+    const part = parts.shift()!
+    if (!o[part]) return
+    o = o[part]
+  }
+  delete o[parts[0]]
 }
