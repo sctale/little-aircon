@@ -92,8 +92,8 @@ export default class SimpleThermostatEditor extends LitElement {
           <div class="side-by-side">
             <ha-select
               label="小数位数（可选）"
-              .value=${config.decimals ?? ''}
-              @selected=${(ev) => this._configChanged('decimals', ev.detail.value)}
+              .value=${config.decimals != null ? String(config.decimals) : ''}
+              @selected=${(ev) => this._configChanged('decimals', Number(ev.detail.value))}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
@@ -126,8 +126,8 @@ export default class SimpleThermostatEditor extends LitElement {
 
             <ha-select
               label="步进值（可选）"
-              .value=${config.step_size ?? ''}
-              @selected=${(ev) => this._configChanged('step_size', ev.detail.value)}
+              .value=${config.step_size != null ? String(config.step_size) : ''}
+              @selected=${(ev) => this._configChanged('step_size', Number(ev.detail.value))}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >

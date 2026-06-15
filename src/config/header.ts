@@ -44,7 +44,12 @@ export const MODE_ICONS: Record<string, string> = {
   // 风速模式
   low: 'mdi:fan-speed-1',
   medium: 'mdi:fan-speed-2',
+  medium_low: 'mdi:fan-speed-2',
+  medium_high: 'mdi:fan-speed-3',
   high: 'mdi:fan-speed-3',
+  highest: 'mdi:fan-speed-3',
+  full: 'mdi:fan-speed-3',
+  silent: 'mdi:fan-speed-1',
   auto_mode: 'mdi:fan-auto',
   // swing 模式
   vertical: 'mdi:arrow-up-down',
@@ -52,6 +57,7 @@ export const MODE_ICONS: Record<string, string> = {
   both: 'mdi:arrow-all',
   swing_horizontal: 'mdi:arrow-left-right',
   swing: 'mdi:arrow-up-down',
+  on: 'mdi:toggle-switch',
 }
 
 type Icon = string | false | LooseObject

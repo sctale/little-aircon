@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.14";
+var version = "3.0.17";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -343,12 +343,12 @@ styleInject(css_248z);
 function fireEvent(node, type, detail, options = {}) {
     options = options || {};
     detail = detail === null || detail === undefined ? {} : detail;
-    const event = new Event(type, {
+    const event = new CustomEvent(type, {
         bubbles: options.bubbles === undefined ? true : options.bubbles,
         cancelable: Boolean(options.cancelable),
         composed: options.composed === undefined ? true : options.composed,
+        detail,
     });
-    event.detail = detail;
     node.dispatchEvent(event);
     return event;
 }
@@ -427,8 +427,8 @@ class SimpleThermostatEditor extends i$1 {
           <div class="side-by-side">
             <ha-select
               label="小数位数（可选）"
-              .value=${config.decimals ?? ''}
-              @selected=${(ev) => this._configChanged('decimals', ev.detail.value)}
+              .value=${config.decimals != null ? String(config.decimals) : ''}
+              @selected=${(ev) => this._configChanged('decimals', Number(ev.detail.value))}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
@@ -455,8 +455,8 @@ class SimpleThermostatEditor extends i$1 {
 
             <ha-select
               label="步进值（可选）"
-              .value=${config.step_size ?? ''}
-              @selected=${(ev) => this._configChanged('step_size', ev.detail.value)}
+              .value=${config.step_size != null ? String(config.step_size) : ''}
+              @selected=${(ev) => this._configChanged('step_size', Number(ev.detail.value))}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             >
@@ -997,10 +997,16 @@ const ZH_MODE_NAMES = {
     vertical: '上下摆风',
     horizontal: '左右摆风',
     both: '全方位摆风',
+    on: '开启',
     // fan 模式
     low: '低速',
     medium: '中速',
+    medium_low: '中低速',
+    medium_high: '中高速',
     high: '高速',
+    highest: '最高速',
+    full: '满速',
+    silent: '静音',
     auto_mode: '自动',
 };
 function renderModeType({ state, mode: options, modeOptions, localize, setMode, }) {
@@ -1083,7 +1089,12 @@ const MODE_ICONS = {
     // 风速模式
     low: 'mdi:fan-speed-1',
     medium: 'mdi:fan-speed-2',
+    medium_low: 'mdi:fan-speed-2',
+    medium_high: 'mdi:fan-speed-3',
     high: 'mdi:fan-speed-3',
+    highest: 'mdi:fan-speed-3',
+    full: 'mdi:fan-speed-3',
+    silent: 'mdi:fan-speed-1',
     auto_mode: 'mdi:fan-auto',
     // swing 模式
     vertical: 'mdi:arrow-up-down',
@@ -1091,6 +1102,7 @@ const MODE_ICONS = {
     both: 'mdi:arrow-all',
     swing_horizontal: 'mdi:arrow-left-right',
     swing: 'mdi:arrow-up-down',
+    on: 'mdi:toggle-switch',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1218,6 +1230,19 @@ function shouldShowModeControl(modeOption, config) {
     }
     return config?.[modeOption] ?? true;
 }
+const MODE_FALLBACK_ICONS = {
+    hvac: 'hass:radiator',
+    preset: 'mdi:tune',
+    fan: 'mdi:fan',
+    swing: 'mdi:arrow-up-down',
+    swing_horizontal: 'mdi:arrow-left-right',
+};
+function getModeIcon(type, modeOption) {
+    // fan 模式下的 auto 用风扇图标，而非 HVAC 的 autorenew
+    if (type === 'fan' && modeOption === 'auto')
+        return 'mdi:fan-auto';
+    return MODE_ICONS[modeOption] || MODE_FALLBACK_ICONS[type] || 'hass:radiator';
+}
 function getModeList(type, attributes, specification = {}) {
     return attributes[`${type}_modes`]
         .filter((modeOption) => shouldShowModeControl(modeOption, specification))
@@ -1226,7 +1251,7 @@ function getModeList(type, attributes, specification = {}) {
             ? specification[modeOption]
             : {};
         return {
-            icon: MODE_ICONS[modeOption] || 'hass:radiator',
+            icon: getModeIcon(type, modeOption),
             value: modeOption,
             name: modeOption,
             ...values,
