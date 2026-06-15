@@ -139,6 +139,43 @@ export default class SimpleThermostatEditor extends LitElement {
           </div>
 
           <div class="side-by-side">
+            <ha-select
+              label="模式文字"
+              .value=${(config as any).layout?.mode?.names !== false ? 'show' : 'hide'}
+              @selected=${(ev) => this._configChanged('layout.mode.names', ev.detail.value === 'hide' ? false : true)}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            >
+              <ha-list-item .value="show">显示</ha-list-item>
+              <ha-list-item .value="hide">隐藏</ha-list-item>
+            </ha-select>
+
+            <ha-select
+              label="模式图标"
+              .value=${(config as any).layout?.mode?.icons !== false ? 'show' : 'hide'}
+              @selected=${(ev) => this._configChanged('layout.mode.icons', ev.detail.value === 'hide' ? false : true)}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            >
+              <ha-list-item .value="show">显示</ha-list-item>
+              <ha-list-item .value="hide">隐藏</ha-list-item>
+            </ha-select>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
+              label="模式标题"
+              .value=${(config as any).layout?.mode?.headings !== false ? 'show' : 'hide'}
+              @selected=${(ev) => this._configChanged('layout.mode.headings', ev.detail.value === 'hide' ? false : true)}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            >
+              <ha-list-item .value="show">显示</ha-list-item>
+              <ha-list-item .value="hide">隐藏</ha-list-item>
+            </ha-select>
+          </div>
+
+          <div class="side-by-side">
             <ha-button @click=${this._openLink}>
               配置选项说明
             </ha-button>
@@ -168,6 +205,8 @@ export default class SimpleThermostatEditor extends LitElement {
       setNestedValue(copy, path, value)
     }
 
+    // 立即本地更新 _config，确保 UI 即时反映变更
+    this._config = copy
     fireEvent(this, 'config-changed', { config: copy })
   }
 }
