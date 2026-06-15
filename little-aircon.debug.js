@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.10";
+var version = "3.0.12";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -738,8 +738,8 @@ function renderFaults(faults, openEntityPopover) {
             : hide_inactive
                 ? ' hide'
                 : ''}"
-      icon="${icon || state.attributes.icon}"
-      @click="${() => openEntityPopover(state.entity_id)}"
+      .icon=${icon || state.attributes.icon}
+      @click=${() => openEntityPopover(state.entity_id)}
     ></ha-icon>`;
     });
     return b ` <div class="faults">${faultHtml}</div>`;
@@ -1221,7 +1221,6 @@ class SimpleThermostat extends i$1 {
         this.service = {};
         this.modes = [];
         this._hass = {};
-        this.entity = {};
         this.sensors = [];
         this.showSensors = true;
         this.name = '';
@@ -1499,11 +1498,12 @@ class SimpleThermostat extends i$1 {
             return b `
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
+                  label="升温"
                   ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -1515,11 +1515,12 @@ class SimpleThermostat extends i$1 {
                 </h3>
 
                 <ha-icon-button
+                  label="降温"
                   ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `;

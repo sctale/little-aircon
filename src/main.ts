@@ -106,7 +106,7 @@ export default class SimpleThermostat extends LitElement {
   _hass: HASS = {}
 
   @property({ type: Object })
-  entity: LooseObject = {}
+  entity: LooseObject | undefined
 
   @property({ type: Array })
   sensors: Array<Sensor | PreparedSensor> = []
@@ -400,11 +400,12 @@ export default class SimpleThermostat extends LitElement {
             return html`
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
+                  label="升温"
                   ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -416,11 +417,12 @@ export default class SimpleThermostat extends LitElement {
                 </h3>
 
                 <ha-icon-button
+                  label="降温"
                   ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `

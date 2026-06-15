@@ -63,8 +63,8 @@ function renderFaults(faults, openEntityPopover) {
         : hide_inactive
         ? ' hide'
         : ''}"
-      icon="${icon || state.attributes.icon}"
-      @click="${() => openEntityPopover(state.entity_id)}"
+      .icon=${icon || state.attributes.icon}
+      @click=${() => openEntityPopover(state.entity_id)}
     ></ha-icon>`
   })
 
