@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.9";
+var version = "3.0.10";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -88,10 +88,10 @@ var css_248z = i$4`:host {
   --st-default-spacing: 4px;
 }
 ha-card {
-  -webkit-font-smoothing: var(--paper-font-body1_-_-webkit-font-smoothing);
-  font-size: var(--paper-font-body1_-_font-size);
-  font-weight: var(--paper-font-body1_-_font-weight);
-  line-height: var(--paper-font-body1_-_line-height);
+  font-smoothing: var(--ha-font-smoothing);
+  font-size: var(--ha-font-size-m);
+  font-weight: var(--ha-font-weight-body);
+  line-height: var(--ha-line-height-normal);
 
   padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
 
@@ -123,10 +123,9 @@ ha-card.no-header {
 .toggle-label {
   color: var(--st-toggle-label-color, var(--primary-text-color));
   margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
-  font-size: 16px;
   font-size: var(
     --st-font-size-toggle-label,
-    var(--paper-font-subhead_-_font-size, 16px)
+    var(--ha-font-size-m)
   );
 }
 
@@ -150,10 +149,9 @@ ha-card.no-header {
 .sensors {
   display: grid;
   grid-gap: var(--st-spacing, var(--st-default-spacing));
-  font-size: 16px;
   font-size: var(
     --st-font-size-sensors,
-    var(--paper-font-subhead_-_font-size, 16px)
+    var(--ha-font-size-m)
   );
 }
 .sensors.as-list {
@@ -204,15 +202,13 @@ header {
 .header__icon {
   margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
   color: #44739e;
-  color: var(--paper-item-icon-color, #44739e);
+  color: var(--state-icon-color, #44739e);
 }
 .header__title {
-  font-size: 24px;
-  font-size: var(--st-font-size-title, var(--ha-card-header-font-size, 24px));
-  line-height: 24px;
-  line-height: var(--st-font-size-title, var(--ha-card-header-font-size, 24px));
-  -webkit-font-smoothing: var(--paper-font-headline_-_-webkit-font-smoothing);
-  font-weight: normal;
+  font-size: var(--st-font-size-title, var(--ha-card-header-font-size, var(--ha-font-size-2xl)));
+  line-height: var(--st-font-size-title, var(--ha-card-header-font-size, var(--ha-font-size-2xl)));
+  font-smoothing: var(--ha-font-smoothing);
+  font-weight: var(--ha-font-weight-heading);
   margin: 0;
   align-self: left;
 }
@@ -233,20 +229,20 @@ header {
   align-items: center;
   margin: 0;
   font-weight: 400;
-  line-height: var(--st-font-size-l, var(--paper-font-display1_-_font-size));
-  font-size: var(--st-font-size-l, var(--paper-font-display1_-_font-size));
+  line-height: var(--st-font-size-l, var(--ha-font-size-3xl));
+  font-size: var(--st-font-size-l, var(--ha-font-size-3xl));
 }
 @media (min-width: 768px) {
 .current--value {
-    font-size: var(--st-font-size-xl, var(--paper-font-display2_-_font-size));
-    line-height: var(--st-font-size-xl, var(--paper-font-display2_-_font-size));
+    font-size: var(--st-font-size-xl, var(--ha-font-size-4xl));
+    line-height: var(--st-font-size-xl, var(--ha-font-size-4xl));
 }
   }
 .current--value.updating {
     color: var(--error-color);
   }
 .current--unit {
-  font-size: var(--st-font-size-m, var(--paper-font-title_-_font-size));
+  font-size: var(--st-font-size-m, var(--ha-font-size-l));
 }
 .thermostat-trigger {
   padding: 0px;
@@ -270,10 +266,9 @@ header {
   align-self: center;
   justify-self: center;
   place-self: center;
-  font-size: 16px;
   font-size: var(
     --st-font-size-sensors,
-    var(--paper-font-subhead_-_font-size, 16px)
+    var(--ha-font-size-m)
   );
   font-weight: 300;
   white-space: nowrap;
@@ -406,18 +401,18 @@ class SimpleThermostatEditor extends i$1 {
           </div>
 
           <div class="side-by-side">
-            <paper-input
+            <ha-textfield
               label="名称（可选）"
               .value=${this.config.header?.name || ''}
               .configValue="header.name"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
-            <paper-input
+              @input=${this.valueChanged}
+            ></ha-textfield>
+            <ha-textfield
               label="图标（可选）"
               .value=${this.config.header?.icon || ''}
               .configValue="header.icon"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
@@ -429,80 +424,68 @@ class SimpleThermostatEditor extends i$1 {
               @change=${this.valueChanged}
               allow-custom-entity
             ></ha-entity-picker>
-            <paper-input
+            <ha-textfield
               label="开关标签"
               .value=${this.config?.header?.toggle?.name || ''}
               .configValue="header.toggle.name"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-input
+            <ha-textfield
               label="占位文本（可选）"
               .value=${this.config.fallback || ''}
               .configValue="fallback"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-dropdown-menu
+            <ha-select
               label="小数位数（可选）"
               .configValue="decimals"
-              @value-changed=${this.valueChanged}
-              class="dropdown"
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsDecimals).indexOf(+this.config.decimals)}
-              >
-                ${Object.values(OptionsDecimals).map((item) => b `<paper-item>${item}</paper-item>`)}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${OptionsDecimals.map((item) => b `<ha-list-item .value=${String(item)} ?selected=${this.config.decimals === item}>${item}</ha-list-item>`)}
+            </ha-select>
 
-            <paper-input
+            <ha-textfield
               label="单位（可选）"
               .value=${this.config.unit || ''}
               .configValue="unit"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-dropdown-menu
+            <ha-select
               label="布局方向（可选）"
               .configValue="layout.step"
-              @value-changed=${this.valueChanged}
-              class="dropdown"
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsStepLayout).indexOf(this.config.layout?.step)}
-              >
-                ${Object.values(OptionsStepLayout).map((item) => b `<paper-item>${item}</paper-item>`)}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${OptionsStepLayout.map((item) => b `<ha-list-item .value=${item} ?selected=${this.config.layout?.step === item}>${item}</ha-list-item>`)}
+            </ha-select>
 
-            <paper-dropdown-menu
+            <ha-select
               label="步进值（可选）"
               .configValue="step_size"
-              @value-changed=${this.valueChanged}
-              class="dropdown"
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsStepSize).indexOf(+this.config.step_size)}
-              >
-                ${Object.values(OptionsStepSize).map((item) => b `<paper-item>${item}</paper-item>`)}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${OptionsStepSize.map((item) => b `<ha-list-item .value=${String(item)} ?selected=${this.config.step_size === item}>${item}</ha-list-item>`)}
+            </ha-select>
           </div>
 
           <div class="side-by-side">
-            <mwc-button @click=${this._openLink}>
+            <ha-button @click=${this._openLink}>
               配置选项说明
-            </mwc-button>
+            </ha-button>
             <span>标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
           </div>
         </div>
@@ -514,12 +497,20 @@ class SimpleThermostatEditor extends i$1 {
             return;
         const { target } = ev;
         const copy = cloneDeep(this.config);
-        if (target.configValue) {
-            if (target.value === '') {
-                delete copy[target.configValue];
+        // ha-select uses @selected event, value is in target.value
+        // ha-textfield uses @input event, value is in target.value
+        // ha-entity-picker uses @change event, value is in target.value
+        const configValue = target.configValue;
+        if (configValue) {
+            const value = target.value;
+            if (value === '' || value === undefined) {
+                // For ha-select, don't delete on empty - only for text fields
+                if (target.tagName !== 'HA-SELECT') {
+                    delete copy[configValue];
+                }
             }
             else {
-                setValue(copy, target.configValue, target.checked !== undefined ? target.checked : target.value);
+                setValue(copy, configValue, target.checked !== undefined ? target.checked : value);
             }
         }
         fireEvent(this, 'config-changed', { config: copy });
@@ -737,7 +728,7 @@ function renderName(name) {
     return name ? b `<h2 class="header__title">${name}</h2>` : A;
 }
 function renderFaults(faults, openEntityPopover) {
-    if (faults.length === 0) {
+    if (!faults || faults.length === 0) {
         return A;
     }
     const faultHtml = faults.map(({ icon, hide_inactive, state }) => {
@@ -1026,6 +1017,7 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
             preset: '预设模式',
             fan: '风速模式',
             swing: '摆风模式',
+            swing_horizontal: '左右摆风',
         };
         return headingMap[type] ?? `${type}_mode`;
     };
@@ -1378,7 +1370,7 @@ class SimpleThermostat extends i$1 {
         if (this.config.sensors === false) {
             this.showSensors = false;
         }
-        else if (this.config.version === 3) {
+        else if (this.config.version === 3 && Array.isArray(this.config.sensors)) {
             this.sensors = [];
             const customSensors = this.config.sensors.map((sensor, index) => {
                 const entityId = sensor?.entity ?? this.config.entity;
@@ -1509,9 +1501,9 @@ class SimpleThermostat extends i$1 {
                 <ha-icon-button
                   ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
-                  .icon=${row ? ICONS.PLUS : ICONS.UP}
                   @click=${() => this.setTemperature(this.stepSize, field)}
                 >
+                  <ha-icon icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -1525,9 +1517,9 @@ class SimpleThermostat extends i$1 {
                 <ha-icon-button
                   ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
-                  .icon=${row ? ICONS.MINUS : ICONS.DOWN}
                   @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
+                  <ha-icon icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `;

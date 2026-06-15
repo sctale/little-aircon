@@ -62,6 +62,7 @@ export default function renderModeType({
       preset: '预设模式',
       fan: '风速模式',
       swing: '摆风模式',
+      swing_horizontal: '左右摆风',
     }
     return headingMap[type] ?? `${type}_mode`
   }

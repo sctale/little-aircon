@@ -158,10 +158,10 @@ export default class SimpleThermostat extends LitElement {
     for (const child of Array.from(patchHass)) {
       Array.from(child.attributes).forEach((attr) => {
         if (attr.name.startsWith('fwd-')) {
-          child[attr.name.replace('fwd-', '')] = attr.value
+          ;(child as any)[attr.name.replace('fwd-', '')] = attr.value
         }
       })
-      child.hass = this._hass
+      ;(child as any).hass = this._hass
     }
   }
 
@@ -253,7 +253,7 @@ export default class SimpleThermostat extends LitElement {
 
     if (this.config.sensors === false) {
       this.showSensors = false
-    } else if (this.config.version === 3) {
+    } else if (this.config.version === 3 && Array.isArray(this.config.sensors)) {
       this.sensors = []
       const customSensors = this.config.sensors.map((sensor, index) => {
         const entityId = sensor?.entity ?? this.config.entity
@@ -402,9 +402,9 @@ export default class SimpleThermostat extends LitElement {
                 <ha-icon-button
                   ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
-                  .icon=${row ? ICONS.PLUS : ICONS.UP}
                   @click=${() => this.setTemperature(this.stepSize, field)}
                 >
+                  <ha-icon icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -418,9 +418,9 @@ export default class SimpleThermostat extends LitElement {
                 <ha-icon-button
                   ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
-                  .icon=${row ? ICONS.MINUS : ICONS.DOWN}
                   @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
+                  <ha-icon icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `

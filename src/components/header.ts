@@ -53,7 +53,7 @@ function renderName(name) {
 }
 
 function renderFaults(faults, openEntityPopover) {
-  if (faults.length === 0) {
+  if (!faults || faults.length === 0) {
     return nothing
   }
   const faultHtml = faults.map(({ icon, hide_inactive, state }) => {

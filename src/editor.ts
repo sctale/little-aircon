@@ -67,18 +67,18 @@ export default class SimpleThermostatEditor extends LitElement {
           </div>
 
           <div class="side-by-side">
-            <paper-input
+            <ha-textfield
               label="名称（可选）"
               .value=${this.config.header?.name || ''}
               .configValue="header.name"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
-            <paper-input
+              @input=${this.valueChanged}
+            ></ha-textfield>
+            <ha-textfield
               label="图标（可选）"
               .value=${this.config.header?.icon || ''}
               .configValue="header.icon"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
@@ -90,86 +90,77 @@ export default class SimpleThermostatEditor extends LitElement {
               @change=${this.valueChanged}
               allow-custom-entity
             ></ha-entity-picker>
-            <paper-input
+            <ha-textfield
               label="开关标签"
               .value=${this.config?.header?.toggle?.name || ''}
               .configValue="header.toggle.name"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-input
+            <ha-textfield
               label="占位文本（可选）"
               .value=${this.config.fallback || ''}
               .configValue="fallback"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-dropdown-menu
+            <ha-select
               label="小数位数（可选）"
               .configValue="decimals"
-              @value-changed=${this.valueChanged}
-              class="dropdown"
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsDecimals).indexOf(+this.config.decimals)}
-              >
-                ${Object.values(OptionsDecimals).map(
-                  (item) => html`<paper-item>${item}</paper-item>`
-                )}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${OptionsDecimals.map(
+                (item) =>
+                  html`<ha-list-item .value=${String(item)} ?selected=${this.config.decimals === item}>${item}</ha-list-item>`
+              )}
+            </ha-select>
 
-            <paper-input
+            <ha-textfield
               label="单位（可选）"
               .value=${this.config.unit || ''}
               .configValue="unit"
-              @value-changed=${this.valueChanged}
-            ></paper-input>
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
 
           <div class="side-by-side">
-            <paper-dropdown-menu
+            <ha-select
               label="布局方向（可选）"
               .configValue="layout.step"
-              @value-changed=${this.valueChanged}
-              class="dropdown"
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsStepLayout).indexOf(this.config.layout?.step)}
-              >
-                ${Object.values(OptionsStepLayout).map(
-                  (item) => html`<paper-item>${item}</paper-item>`
-                )}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${OptionsStepLayout.map(
+                (item) =>
+                  html`<ha-list-item .value=${item} ?selected=${this.config.layout?.step === item}>${item}</ha-list-item>`
+              )}
+            </ha-select>
 
-            <paper-dropdown-menu
+            <ha-select
               label="步进值（可选）"
               .configValue="step_size"
-              @value-changed=${this.valueChanged}
-              class="dropdown"
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
             >
-              <paper-listbox
-                slot="dropdown-content"
-                .selected=${Object.values(OptionsStepSize).indexOf(+this.config.step_size)}
-              >
-                ${Object.values(OptionsStepSize).map(
-                  (item) => html`<paper-item>${item}</paper-item>`
-                )}
-              </paper-listbox>
-            </paper-dropdown-menu>
+              ${OptionsStepSize.map(
+                (item) =>
+                  html`<ha-list-item .value=${String(item)} ?selected=${this.config.step_size === item}>${item}</ha-list-item>`
+              )}
+            </ha-select>
           </div>
 
           <div class="side-by-side">
-            <mwc-button @click=${this._openLink}>
+            <ha-button @click=${this._openLink}>
               配置选项说明
-            </mwc-button>
+            </ha-button>
             <span>标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
           </div>
         </div>
@@ -181,14 +172,23 @@ export default class SimpleThermostatEditor extends LitElement {
     if (!this.config || !this.hass) return
     const { target } = ev
     const copy = cloneDeep(this.config)
-    if (target.configValue) {
-      if (target.value === '') {
-        delete copy[target.configValue]
+
+    // ha-select uses @selected event, value is in target.value
+    // ha-textfield uses @input event, value is in target.value
+    // ha-entity-picker uses @change event, value is in target.value
+    const configValue = target.configValue
+    if (configValue) {
+      const value = target.value
+      if (value === '' || value === undefined) {
+        // For ha-select, don't delete on empty - only for text fields
+        if (target.tagName !== 'HA-SELECT') {
+          delete copy[configValue]
+        }
       } else {
         setValue(
           copy,
-          target.configValue,
-          target.checked !== undefined ? target.checked : target.value
+          configValue,
+          target.checked !== undefined ? target.checked : value
         )
       }
     }
