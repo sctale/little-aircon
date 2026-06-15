@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.19";
+var version = "3.0.23";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -353,12 +353,25 @@ function fireEvent(node, type, detail, options = {}) {
     return event;
 }
 
-const OptionsDecimals = [0, 1];
-const OptionsStepSize = [0.5, 1];
-const OptionsStepLayout = ['column', 'row'];
 const includeDomains = ['climate'];
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md';
 const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
+const OPTIONS_DECIMALS = [
+    { value: '0', label: '0' },
+    { value: '1', label: '1' },
+];
+const OPTIONS_STEP_SIZE = [
+    { value: '0.5', label: '0.5' },
+    { value: '1', label: '1' },
+];
+const OPTIONS_STEP_LAYOUT = [
+    { value: 'column', label: '上下' },
+    { value: 'row', label: '左右' },
+];
+const OPTIONS_SHOW_HIDE = [
+    { value: 'show', label: '显示' },
+    { value: 'hide', label: '隐藏' },
+];
 class SimpleThermostatEditor extends i$1 {
     static getStubConfig() {
         return { header: {}, layout: { mode: {} } };
@@ -405,13 +418,13 @@ class SimpleThermostatEditor extends i$1 {
             <ha-entity-picker
               label="开关实体（可选）"
               .hass=${this.hass}
-              .value=${config?.header?.toggle?.entity || ''}
+              .value=${config.header?.toggle?.entity || ''}
               @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
               allow-custom-entity
             ></ha-entity-picker>
             <ha-textfield
               label="开关标签"
-              .value=${config?.header?.toggle?.name || ''}
+              .value=${config.header?.toggle?.name || ''}
               @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
             ></ha-textfield>
           </div>
@@ -426,14 +439,13 @@ class SimpleThermostatEditor extends i$1 {
 
           <div class="side-by-side">
             <ha-select
-              label="小数位数（可选）"
+              label="小数位数"
               .value=${config.decimals != null ? String(config.decimals) : ''}
-              @selected=${(ev) => this._configChanged('decimals', Number(ev.detail.value))}
+              .options=${OPTIONS_DECIMALS}
+              @selected=${this._decimalsChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsDecimals.map((item) => b `<ha-list-item .value=${String(item)}>${item}</ha-list-item>`)}
-            </ha-select>
+            ></ha-select>
 
             <ha-textfield
               label="单位（可选）"
@@ -444,61 +456,53 @@ class SimpleThermostatEditor extends i$1 {
 
           <div class="side-by-side">
             <ha-select
-              label="布局方向（可选）"
+              label="布局方向"
               .value=${config.layout?.step ?? ''}
-              @selected=${(ev) => this._configChanged('layout.step', ev.detail.value)}
+              .options=${OPTIONS_STEP_LAYOUT}
+              @selected=${this._stepLayoutChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsStepLayout.map((item) => b `<ha-list-item .value=${item}>${item === 'column' ? '上下' : '左右'}</ha-list-item>`)}
-            </ha-select>
+            ></ha-select>
 
             <ha-select
-              label="步进值（可选）"
+              label="步进值"
               .value=${config.step_size != null ? String(config.step_size) : ''}
-              @selected=${(ev) => this._configChanged('step_size', Number(ev.detail.value))}
+              .options=${OPTIONS_STEP_SIZE}
+              @selected=${this._stepSizeChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsStepSize.map((item) => b `<ha-list-item .value=${String(item)}>${item}</ha-list-item>`)}
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
             <ha-select
               label="模式文字"
               .value=${config.layout?.mode?.names !== false ? 'show' : 'hide'}
-              @selected=${(ev) => this._configChanged('layout.mode.names', ev.detail.value === 'hide' ? false : true)}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._modeNamesChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              <ha-list-item .value="show">显示</ha-list-item>
-              <ha-list-item .value="hide">隐藏</ha-list-item>
-            </ha-select>
+            ></ha-select>
 
             <ha-select
               label="模式图标"
               .value=${config.layout?.mode?.icons !== false ? 'show' : 'hide'}
-              @selected=${(ev) => this._configChanged('layout.mode.icons', ev.detail.value === 'hide' ? false : true)}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._modeIconsChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              <ha-list-item .value="show">显示</ha-list-item>
-              <ha-list-item .value="hide">隐藏</ha-list-item>
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
             <ha-select
               label="模式标题"
               .value=${config.layout?.mode?.headings !== false ? 'show' : 'hide'}
-              @selected=${(ev) => this._configChanged('layout.mode.headings', ev.detail.value === 'hide' ? false : true)}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._modeHeadingsChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              <ha-list-item .value="show">显示</ha-list-item>
-              <ha-list-item .value="hide">隐藏</ha-list-item>
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
@@ -517,12 +521,47 @@ class SimpleThermostatEditor extends i$1 {
             return;
         this._configChanged('entity', value);
     }
+    _decimalsChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('decimals', Number(value));
+    }
+    _stepLayoutChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('layout.step', value);
+    }
+    _stepSizeChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('step_size', Number(value));
+    }
+    _modeNamesChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('layout.mode.names', value === 'hide' ? false : true);
+    }
+    _modeIconsChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('layout.mode.icons', value === 'hide' ? false : true);
+    }
+    _modeHeadingsChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('layout.mode.headings', value === 'hide' ? false : true);
+    }
     _configChanged(path, value) {
         if (!this._config || !this.hass)
             return;
         const copy = cloneDeep(this._config);
         if (value === '' || value === undefined || value === null) {
-            // Don't delete entity - it's required
             if (path !== 'entity') {
                 deleteNestedKey(copy, path);
             }
@@ -530,7 +569,6 @@ class SimpleThermostatEditor extends i$1 {
         else {
             setNestedValue(copy, path, value);
         }
-        // 立即本地更新 _config，确保 UI 即时反映变更
         this._config = copy;
         fireEvent(this, 'config-changed', { config: copy });
     }

@@ -6,13 +6,30 @@ import { name } from '../package.json'
 import { CardConfig } from './config/card'
 import { HASS } from './types'
 
-const OptionsDecimals = [0, 1]
-const OptionsStepSize = [0.5, 1]
-const OptionsStepLayout = ['column', 'row']
 const includeDomains = ['climate']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
 const cloneDeep = (obj: any) => JSON.parse(JSON.stringify(obj))
+
+const OPTIONS_DECIMALS = [
+  { value: '0', label: '0' },
+  { value: '1', label: '1' },
+]
+
+const OPTIONS_STEP_SIZE = [
+  { value: '0.5', label: '0.5' },
+  { value: '1', label: '1' },
+]
+
+const OPTIONS_STEP_LAYOUT = [
+  { value: 'column', label: '上下' },
+  { value: 'row', label: '左右' },
+]
+
+const OPTIONS_SHOW_HIDE = [
+  { value: 'show', label: '显示' },
+  { value: 'hide', label: '隐藏' },
+]
 
 export default class SimpleThermostatEditor extends LitElement {
   @property({ attribute: false }) hass!: HASS
@@ -37,7 +54,7 @@ export default class SimpleThermostatEditor extends LitElement {
       return nothing
     }
 
-    const config = this._config
+    const config = this._config as any
 
     return html`
       <div class="card-config">
@@ -56,12 +73,12 @@ export default class SimpleThermostatEditor extends LitElement {
           <div class="side-by-side">
             <ha-textfield
               label="名称（可选）"
-              .value=${(config as any).header?.name || ''}
+              .value=${config.header?.name || ''}
               @input=${(ev) => this._configChanged('header.name', ev.target.value)}
             ></ha-textfield>
             <ha-textfield
               label="图标（可选）"
-              .value=${(config as any).header?.icon || ''}
+              .value=${config.header?.icon || ''}
               @input=${(ev) => this._configChanged('header.icon', ev.target.value)}
             ></ha-textfield>
           </div>
@@ -70,13 +87,13 @@ export default class SimpleThermostatEditor extends LitElement {
             <ha-entity-picker
               label="开关实体（可选）"
               .hass=${this.hass}
-              .value=${(config as any)?.header?.toggle?.entity || ''}
+              .value=${config.header?.toggle?.entity || ''}
               @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
               allow-custom-entity
             ></ha-entity-picker>
             <ha-textfield
               label="开关标签"
-              .value=${(config as any)?.header?.toggle?.name || ''}
+              .value=${config.header?.toggle?.name || ''}
               @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
             ></ha-textfield>
           </div>
@@ -91,17 +108,13 @@ export default class SimpleThermostatEditor extends LitElement {
 
           <div class="side-by-side">
             <ha-select
-              label="小数位数（可选）"
+              label="小数位数"
               .value=${config.decimals != null ? String(config.decimals) : ''}
-              @selected=${(ev) => this._configChanged('decimals', Number(ev.detail.value))}
+              .options=${OPTIONS_DECIMALS}
+              @selected=${this._decimalsChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsDecimals.map(
-                (item) =>
-                  html`<ha-list-item .value=${String(item)}>${item}</ha-list-item>`
-              )}
-            </ha-select>
+            ></ha-select>
 
             <ha-textfield
               label="单位（可选）"
@@ -112,67 +125,53 @@ export default class SimpleThermostatEditor extends LitElement {
 
           <div class="side-by-side">
             <ha-select
-              label="布局方向（可选）"
-              .value=${(config as any).layout?.step ?? ''}
-              @selected=${(ev) => this._configChanged('layout.step', ev.detail.value)}
+              label="布局方向"
+              .value=${config.layout?.step ?? ''}
+              .options=${OPTIONS_STEP_LAYOUT}
+              @selected=${this._stepLayoutChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsStepLayout.map(
-                (item) =>
-                  html`<ha-list-item .value=${item}>${item === 'column' ? '上下' : '左右'}</ha-list-item>`
-              )}
-            </ha-select>
+            ></ha-select>
 
             <ha-select
-              label="步进值（可选）"
+              label="步进值"
               .value=${config.step_size != null ? String(config.step_size) : ''}
-              @selected=${(ev) => this._configChanged('step_size', Number(ev.detail.value))}
+              .options=${OPTIONS_STEP_SIZE}
+              @selected=${this._stepSizeChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsStepSize.map(
-                (item) =>
-                  html`<ha-list-item .value=${String(item)}>${item}</ha-list-item>`
-              )}
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
             <ha-select
               label="模式文字"
-              .value=${(config as any).layout?.mode?.names !== false ? 'show' : 'hide'}
-              @selected=${(ev) => this._configChanged('layout.mode.names', ev.detail.value === 'hide' ? false : true)}
+              .value=${config.layout?.mode?.names !== false ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._modeNamesChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              <ha-list-item .value="show">显示</ha-list-item>
-              <ha-list-item .value="hide">隐藏</ha-list-item>
-            </ha-select>
+            ></ha-select>
 
             <ha-select
               label="模式图标"
-              .value=${(config as any).layout?.mode?.icons !== false ? 'show' : 'hide'}
-              @selected=${(ev) => this._configChanged('layout.mode.icons', ev.detail.value === 'hide' ? false : true)}
+              .value=${config.layout?.mode?.icons !== false ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._modeIconsChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              <ha-list-item .value="show">显示</ha-list-item>
-              <ha-list-item .value="hide">隐藏</ha-list-item>
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
             <ha-select
               label="模式标题"
-              .value=${(config as any).layout?.mode?.headings !== false ? 'show' : 'hide'}
-              @selected=${(ev) => this._configChanged('layout.mode.headings', ev.detail.value === 'hide' ? false : true)}
+              .value=${config.layout?.mode?.headings !== false ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._modeHeadingsChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              <ha-list-item .value="show">显示</ha-list-item>
-              <ha-list-item .value="hide">隐藏</ha-list-item>
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
@@ -192,12 +191,47 @@ export default class SimpleThermostatEditor extends LitElement {
     this._configChanged('entity', value)
   }
 
+  private _decimalsChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('decimals', Number(value))
+  }
+
+  private _stepLayoutChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('layout.step', value)
+  }
+
+  private _stepSizeChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('step_size', Number(value))
+  }
+
+  private _modeNamesChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('layout.mode.names', value === 'hide' ? false : true)
+  }
+
+  private _modeIconsChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('layout.mode.icons', value === 'hide' ? false : true)
+  }
+
+  private _modeHeadingsChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('layout.mode.headings', value === 'hide' ? false : true)
+  }
+
   private _configChanged(path: string, value: any) {
     if (!this._config || !this.hass) return
     const copy = cloneDeep(this._config)
 
     if (value === '' || value === undefined || value === null) {
-      // Don't delete entity - it's required
       if (path !== 'entity') {
         deleteNestedKey(copy, path)
       }
@@ -205,7 +239,6 @@ export default class SimpleThermostatEditor extends LitElement {
       setNestedValue(copy, path, value)
     }
 
-    // 立即本地更新 _config，确保 UI 即时反映变更
     this._config = copy
     fireEvent(this, 'config-changed', { config: copy })
   }
