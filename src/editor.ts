@@ -55,6 +55,7 @@ export default class SimpleThermostatEditor extends LitElement {
     }
 
     const config = this._config as any
+    const controlList: string[] = Array.isArray(config.control) ? config.control : []
 
     return html`
       <div class="card-config">
@@ -145,6 +146,26 @@ export default class SimpleThermostatEditor extends LitElement {
 
           <div class="side-by-side">
             <ha-select
+              label="预设模式"
+              .value=${controlList.includes('preset') ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._presetControlChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+
+            <ha-select
+              label="风速模式"
+              .value=${controlList.includes('fan') ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._fanControlChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
               label="模式文字"
               .value=${config.layout?.mode?.names !== false ? 'show' : 'hide'}
               .options=${OPTIONS_SHOW_HIDE}
@@ -225,6 +246,39 @@ export default class SimpleThermostatEditor extends LitElement {
     const value = ev.detail?.value
     if (value === undefined) return
     this._configChanged('layout.mode.headings', value === 'hide' ? false : true)
+  }
+
+  private _presetControlChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._updateControlList('preset', value === 'show')
+  }
+
+  private _fanControlChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._updateControlList('fan', value === 'show')
+  }
+
+  private _updateControlList(modeType: string, show: boolean) {
+    if (!this._config || !this.hass) return
+    const config = this._config as any
+    let controlList: string[] = Array.isArray(config.control)
+      ? [...config.control]
+      : ['hvac', 'preset']  // 默认值
+
+    if (show && !controlList.includes(modeType)) {
+      controlList.push(modeType)
+    } else if (!show) {
+      controlList = controlList.filter((m) => m !== modeType)
+    }
+
+    // 确保 hvac 始终存在
+    if (!controlList.includes('hvac')) {
+      controlList.unshift('hvac')
+    }
+
+    this._configChanged('control', controlList)
   }
 
   private _configChanged(path: string, value: any) {

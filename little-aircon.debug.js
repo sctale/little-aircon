@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.23";
+var version = "3.0.26";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -387,6 +387,7 @@ class SimpleThermostatEditor extends i$1 {
             return A;
         }
         const config = this._config;
+        const controlList = Array.isArray(config.control) ? config.control : [];
         return b `
       <div class="card-config">
         <div class="overall-config">
@@ -476,6 +477,26 @@ class SimpleThermostatEditor extends i$1 {
 
           <div class="side-by-side">
             <ha-select
+              label="预设模式"
+              .value=${controlList.includes('preset') ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._presetControlChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+
+            <ha-select
+              label="风速模式"
+              .value=${controlList.includes('fan') ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._fanControlChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
               label="模式文字"
               .value=${config.layout?.mode?.names !== false ? 'show' : 'hide'}
               .options=${OPTIONS_SHOW_HIDE}
@@ -556,6 +577,37 @@ class SimpleThermostatEditor extends i$1 {
         if (value === undefined)
             return;
         this._configChanged('layout.mode.headings', value === 'hide' ? false : true);
+    }
+    _presetControlChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._updateControlList('preset', value === 'show');
+    }
+    _fanControlChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._updateControlList('fan', value === 'show');
+    }
+    _updateControlList(modeType, show) {
+        if (!this._config || !this.hass)
+            return;
+        const config = this._config;
+        let controlList = Array.isArray(config.control)
+            ? [...config.control]
+            : ['hvac', 'preset']; // 默认值
+        if (show && !controlList.includes(modeType)) {
+            controlList.push(modeType);
+        }
+        else if (!show) {
+            controlList = controlList.filter((m) => m !== modeType);
+        }
+        // 确保 hvac 始终存在
+        if (!controlList.includes('hvac')) {
+            controlList.unshift('hvac');
+        }
+        this._configChanged('control', controlList);
     }
     _configChanged(path, value) {
         if (!this._config || !this.hass)
@@ -1000,8 +1052,11 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
         return map[a] ?? a;
     };
     let stateString = getZhState(state);
-    if (action) {
+    if (action && action !== state) {
         stateString = `${getZhAction(action)} (${stateString})`;
+    }
+    else if (action) {
+        stateString = getZhAction(action);
     }
     const sensorHtml = [
         renderInfoItem({
