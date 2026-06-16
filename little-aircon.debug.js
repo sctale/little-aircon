@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.26";
+var version = "3.0.29";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -387,7 +387,17 @@ class SimpleThermostatEditor extends i$1 {
             return A;
         }
         const config = this._config;
-        const controlList = Array.isArray(config.control) ? config.control : [];
+        // 获取当前 control 列表（用于判断预设/风速是否显示）
+        let controlList;
+        if (Array.isArray(config.control)) {
+            controlList = config.control;
+        }
+        else if (typeof config.control === 'object' && config.control !== null) {
+            controlList = Object.keys(config.control);
+        }
+        else {
+            controlList = ['hvac', 'preset']; // 默认值
+        }
         return b `
       <div class="card-config">
         <div class="overall-config">
@@ -594,9 +604,19 @@ class SimpleThermostatEditor extends i$1 {
         if (!this._config || !this.hass)
             return;
         const config = this._config;
-        let controlList = Array.isArray(config.control)
-            ? [...config.control]
-            : ['hvac', 'preset']; // 默认值
+        // 获取当前 control 列表
+        let controlList;
+        if (Array.isArray(config.control)) {
+            controlList = [...config.control];
+        }
+        else if (typeof config.control === 'object' && config.control !== null) {
+            // 对象格式：提取 key 列表
+            controlList = Object.keys(config.control);
+        }
+        else {
+            // 未设置或 false：使用默认值
+            controlList = ['hvac', 'preset'];
+        }
         if (show && !controlList.includes(modeType)) {
             controlList.push(modeType);
         }

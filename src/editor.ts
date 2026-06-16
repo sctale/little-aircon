@@ -55,7 +55,15 @@ export default class SimpleThermostatEditor extends LitElement {
     }
 
     const config = this._config as any
-    const controlList: string[] = Array.isArray(config.control) ? config.control : []
+    // 获取当前 control 列表（用于判断预设/风速是否显示）
+    let controlList: string[]
+    if (Array.isArray(config.control)) {
+      controlList = config.control
+    } else if (typeof config.control === 'object' && config.control !== null) {
+      controlList = Object.keys(config.control)
+    } else {
+      controlList = ['hvac', 'preset']  // 默认值
+    }
 
     return html`
       <div class="card-config">
@@ -263,9 +271,18 @@ export default class SimpleThermostatEditor extends LitElement {
   private _updateControlList(modeType: string, show: boolean) {
     if (!this._config || !this.hass) return
     const config = this._config as any
-    let controlList: string[] = Array.isArray(config.control)
-      ? [...config.control]
-      : ['hvac', 'preset']  // 默认值
+
+    // 获取当前 control 列表
+    let controlList: string[]
+    if (Array.isArray(config.control)) {
+      controlList = [...config.control]
+    } else if (typeof config.control === 'object' && config.control !== null) {
+      // 对象格式：提取 key 列表
+      controlList = Object.keys(config.control)
+    } else {
+      // 未设置或 false：使用默认值
+      controlList = ['hvac', 'preset']
+    }
 
     if (show && !controlList.includes(modeType)) {
       controlList.push(modeType)
