@@ -43,14 +43,14 @@ export const MODE_ICONS: Record<string, string> = {
   sleep: 'mdi:power-sleep',
   activity: 'mdi:run',
   // 风速模式（按低/中/高映射数字图标）
-  silent: 'mdi:fan-speed-1',
+  silent: 'mdi:fan-chevron-down',
   low: 'mdi:fan-speed-1',
-  medium_low: 'mdi:fan-speed-2',
+  medium_low: 'mdi:fan-speed-1',
   medium: 'mdi:fan-speed-2',
-  medium_high: 'mdi:fan-speed-3',
+  medium_high: 'mdi:fan-speed-2',
   high: 'mdi:fan-speed-3',
   highest: 'mdi:fan-speed-3',
-  full: 'mdi:fan-speed-3',
+  full: 'mdi:fan-chevron-up',
   auto_mode: 'mdi:fan-auto',
   // swing 模式
   vertical: 'mdi:arrow-up-down',
