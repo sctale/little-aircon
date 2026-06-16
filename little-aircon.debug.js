@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.29";
+var version = "3.0.32";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1213,22 +1213,23 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
 }
 
 const STATE_ICONS = {
-    auto: 'mdi:radiator',
+    auto: 'mdi:hvac',
     cooling: 'mdi:snowflake',
     fan: 'mdi:fan',
-    heating: 'mdi:radiator',
-    idle: 'mdi:radiator-disabled',
-    off: 'mdi:radiator-off',
+    heating: 'mdi:fire',
+    idle: 'mdi:hvac',
+    off: 'mdi:power',
+    drying: 'mdi:water-percent',
 };
 const MODE_ICONS = {
     // HVAC 模式
-    auto: 'hass:autorenew',
-    cool: 'hass:snowflake',
-    dry: 'hass:water-percent',
-    fan_only: 'hass:fan',
-    heat_cool: 'hass:autorenew',
-    heat: 'hass:fire',
-    off: 'hass:power',
+    auto: 'mdi:hvac',
+    cool: 'mdi:snowflake',
+    dry: 'mdi:water-percent',
+    fan_only: 'mdi:fan',
+    heat_cool: 'mdi:autorenew',
+    heat: 'mdi:fire',
+    off: 'mdi:power',
     // 预设模式
     none: 'mdi:cancel',
     eco: 'mdi:leaf',
@@ -1383,17 +1384,17 @@ function shouldShowModeControl(modeOption, config) {
     return config?.[modeOption] ?? true;
 }
 const MODE_FALLBACK_ICONS = {
-    hvac: 'hass:radiator',
+    hvac: 'mdi:hvac',
     preset: 'mdi:tune',
     fan: 'mdi:fan',
     swing: 'mdi:arrow-up-down',
     swing_horizontal: 'mdi:arrow-left-right',
 };
 function getModeIcon(type, modeOption) {
-    // fan 模式下的 auto 用风扇图标，而非 HVAC 的 autorenew
+    // fan 模式下的 auto 用风扇图标，而非 HVAC 的 hvac
     if (type === 'fan' && modeOption === 'auto')
         return 'mdi:fan-auto';
-    return MODE_ICONS[modeOption] || MODE_FALLBACK_ICONS[type] || 'hass:radiator';
+    return MODE_ICONS[modeOption] || MODE_FALLBACK_ICONS[type] || 'mdi:hvac';
 }
 function getModeList(type, attributes, specification = {}) {
     return attributes[`${type}_modes`]

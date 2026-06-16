@@ -60,7 +60,7 @@ function shouldShowModeControl(
 }
 
 const MODE_FALLBACK_ICONS: Record<string, string> = {
-  hvac: 'hass:radiator',
+  hvac: 'mdi:hvac',
   preset: 'mdi:tune',
   fan: 'mdi:fan',
   swing: 'mdi:arrow-up-down',
@@ -68,9 +68,9 @@ const MODE_FALLBACK_ICONS: Record<string, string> = {
 }
 
 function getModeIcon(type: string, modeOption: string): string {
-  // fan 模式下的 auto 用风扇图标，而非 HVAC 的 autorenew
+  // fan 模式下的 auto 用风扇图标，而非 HVAC 的 hvac
   if (type === 'fan' && modeOption === 'auto') return 'mdi:fan-auto'
-  return MODE_ICONS[modeOption] || MODE_FALLBACK_ICONS[type] || 'hass:radiator'
+  return MODE_ICONS[modeOption] || MODE_FALLBACK_ICONS[type] || 'mdi:hvac'
 }
 
 function getModeList(
