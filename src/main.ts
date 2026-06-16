@@ -409,7 +409,7 @@ export default class SimpleThermostat extends LitElement {
           entity: this.entity,
           openEntityPopover: this.openEntityPopover,
         })}
-        <section class="body">
+        <section class="body ${row ? 'row-layout' : ''}">
           ${sensorsHtml}
           ${Object.entries(this._values).map(([field, value]) => {
             const hasValue = ['string', 'number'].includes(typeof value)

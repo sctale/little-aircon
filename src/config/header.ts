@@ -15,12 +15,12 @@ export interface Fault {
 }
 
 export const STATE_ICONS: Record<string, string> = {
-  auto: 'mdi:hvac',
+  auto: 'mdi:air-conditioner',
   cooling: 'mdi:snowflake',
   fan: 'mdi:fan',
   heating: 'mdi:fire',
-  idle: 'mdi:hvac',
-  off: 'mdi:power',
+  idle: 'mdi:air-conditioner',
+  off: 'mdi:air-conditioner',
   drying: 'mdi:water-percent',
 }
 
@@ -32,7 +32,7 @@ export const MODE_ICONS: Record<string, string> = {
   fan_only: 'mdi:fan',
   heat_cool: 'mdi:autorenew',
   heat: 'mdi:fire',
-  off: 'mdi:power',
+  off: 'mdi:air-conditioner',
   // 预设模式
   none: 'mdi:cancel',
   eco: 'mdi:leaf',

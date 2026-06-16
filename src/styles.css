@@ -35,6 +35,11 @@ ha-card.no-header {
   place-items: center;
   padding: 0 calc(var(--st-spacing, var(--st-default-spacing)) * 4);
   padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+
+  &.row-layout {
+    padding-top: 0;
+    padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 1);
+  }
 }
 
 .toggle-label {
@@ -136,6 +141,16 @@ header {
 
   &.row {
     flex-direction: row;
+    gap: 4px;
+
+    .current--value {
+      font-size: var(--st-font-size-l, var(--ha-font-size-2xl));
+      line-height: var(--st-font-size-l, var(--ha-font-size-2xl));
+      @media (--vp-m) {
+        font-size: var(--st-font-size-xl, var(--ha-font-size-3xl));
+        line-height: var(--st-font-size-xl, var(--ha-font-size-3xl));
+      }
+    }
   }
 }
 .current--value {

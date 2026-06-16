@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.32";
+var version = "3.0.37";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -126,6 +126,11 @@ ha-card.no-header {
   padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
 }
 
+.body.row-layout {
+    padding-top: 0;
+    padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 1);
+  }
+
 .toggle-label {
   color: var(--st-toggle-label-color, var(--primary-text-color));
   margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
@@ -229,7 +234,18 @@ header {
 }
 .current-wrapper.row {
     flex-direction: row;
+    gap: 4px;
   }
+.current-wrapper.row .current--value {
+      font-size: var(--st-font-size-l, var(--ha-font-size-2xl));
+      line-height: var(--st-font-size-l, var(--ha-font-size-2xl));
+    }
+@media (min-width: 768px) {
+.current-wrapper.row .current--value {
+        font-size: var(--st-font-size-xl, var(--ha-font-size-3xl));
+        line-height: var(--st-font-size-xl, var(--ha-font-size-3xl));
+    }
+      }
 .current--value {
   display: flex;
   align-items: center;
@@ -1213,12 +1229,12 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
 }
 
 const STATE_ICONS = {
-    auto: 'mdi:hvac',
+    auto: 'mdi:air-conditioner',
     cooling: 'mdi:snowflake',
     fan: 'mdi:fan',
     heating: 'mdi:fire',
-    idle: 'mdi:hvac',
-    off: 'mdi:power',
+    idle: 'mdi:air-conditioner',
+    off: 'mdi:air-conditioner',
     drying: 'mdi:water-percent',
 };
 const MODE_ICONS = {
@@ -1229,7 +1245,7 @@ const MODE_ICONS = {
     fan_only: 'mdi:fan',
     heat_cool: 'mdi:autorenew',
     heat: 'mdi:fire',
-    off: 'mdi:power',
+    off: 'mdi:air-conditioner',
     // 预设模式
     none: 'mdi:cancel',
     eco: 'mdi:leaf',
@@ -1691,7 +1707,7 @@ class SimpleThermostat extends i$1 {
             entity: this.entity,
             openEntityPopover: this.openEntityPopover,
         })}
-        <section class="body">
+        <section class="body ${row ? 'row-layout' : ''}">
           ${sensorsHtml}
           ${Object.entries(this._values).map(([field, value]) => {
             const hasValue = ['string', 'number'].includes(typeof value);
