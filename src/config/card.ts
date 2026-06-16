@@ -65,6 +65,7 @@ interface CardConfig {
     temperature?: string
     state?: string
   }
+  sensor_entity?: string
 }
 
 export { CardConfig }

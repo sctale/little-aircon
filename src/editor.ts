@@ -7,6 +7,7 @@ import { CardConfig } from './config/card'
 import { HASS } from './types'
 
 const includeDomains = ['climate']
+const sensorIncludeDomains = ['sensor']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
 const cloneDeep = (obj: any) => JSON.parse(JSON.stringify(obj))
@@ -113,6 +114,17 @@ export default class SimpleThermostatEditor extends LitElement {
               .value=${config.fallback || ''}
               @input=${(ev) => this._configChanged('fallback', ev.target.value)}
             ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="室内温度传感器（可选）"
+              .hass=${this.hass}
+              .value=${config.sensor_entity || ''}
+              .includeDomains=${sensorIncludeDomains}
+              @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
+              allow-custom-entity
+            ></ha-entity-picker>
           </div>
 
           <div class="side-by-side">

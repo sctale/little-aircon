@@ -27,6 +27,12 @@ export default function renderSensors({
     attributes: { hvac_action: action, current_temperature: current },
   } = entity
 
+  // 优先使用外部温度传感器的值
+  let currentTemp = current
+  if (config?.sensor_entity && hass?.states[config.sensor_entity]) {
+    currentTemp = hass.states[config.sensor_entity].state
+  }
+
   const showLabels = config?.layout?.sensors?.labels ?? true
 
   // 获取中文状态名
@@ -71,7 +77,7 @@ export default function renderSensors({
   const sensorHtml = [
     renderInfoItem({
       hide: _hide.temperature,
-      state: `${formatNumber(current, config)}${unit || ''}`,
+      state: `${formatNumber(currentTemp, config)}${unit || ''}`,
       hass,
       details: {
         heading: showLabels

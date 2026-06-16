@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.37";
+var version = "3.0.40";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -370,6 +370,7 @@ function fireEvent(node, type, detail, options = {}) {
 }
 
 const includeDomains = ['climate'];
+const sensorIncludeDomains = ['sensor'];
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md';
 const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
 const OPTIONS_DECIMALS = [
@@ -462,6 +463,17 @@ class SimpleThermostatEditor extends i$1 {
               .value=${config.fallback || ''}
               @input=${(ev) => this._configChanged('fallback', ev.target.value)}
             ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="室内温度传感器（可选）"
+              .hass=${this.hass}
+              .value=${config.sensor_entity || ''}
+              .includeDomains=${sensorIncludeDomains}
+              @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
+              allow-custom-entity
+            ></ha-entity-picker>
           </div>
 
           <div class="side-by-side">
@@ -1056,6 +1068,11 @@ function renderInfoItem({ hide = false, hass, state, details, localize, openEnti
 
 function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, openEntityPopover, }) {
     const { state, attributes: { hvac_action: action, current_temperature: current }, } = entity;
+    // 优先使用外部温度传感器的值
+    let currentTemp = current;
+    if (config?.sensor_entity && hass?.states[config.sensor_entity]) {
+        currentTemp = hass.states[config.sensor_entity].state;
+    }
     const showLabels = config?.layout?.sensors?.labels ?? true;
     // 获取中文状态名
     const getZhState = (s) => {
@@ -1097,7 +1114,7 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
     const sensorHtml = [
         renderInfoItem({
             hide: _hide.temperature,
-            state: `${formatNumber(current, config)}${unit || ''}`,
+            state: `${formatNumber(currentTemp, config)}${unit || ''}`,
             hass,
             details: {
                 heading: showLabels
@@ -1229,7 +1246,7 @@ function renderModeType({ state, mode: options, modeOptions, localize, setMode, 
 }
 
 const STATE_ICONS = {
-    auto: 'mdi:air-conditioner',
+    auto: 'mdi:autorenew',
     cooling: 'mdi:snowflake',
     fan: 'mdi:fan',
     heating: 'mdi:fire',
@@ -1239,7 +1256,7 @@ const STATE_ICONS = {
 };
 const MODE_ICONS = {
     // HVAC 模式
-    auto: 'mdi:hvac',
+    auto: 'mdi:autorenew',
     cool: 'mdi:snowflake',
     dry: 'mdi:water-percent',
     fan_only: 'mdi:fan',
@@ -1255,15 +1272,15 @@ const MODE_ICONS = {
     home: 'mdi:home',
     sleep: 'mdi:power-sleep',
     activity: 'mdi:run',
-    // 风速模式
-    low: 'mdi:fan-speed-1',
+    // 风速模式（按低/中/高三级映射图标）
+    silent: 'mdi:fan-chevron-down',
+    low: 'mdi:fan-chevron-down',
+    medium_low: 'mdi:fan-speed-1',
     medium: 'mdi:fan-speed-2',
-    medium_low: 'mdi:fan-speed-2',
-    medium_high: 'mdi:fan-speed-3',
+    medium_high: 'mdi:fan-speed-2',
     high: 'mdi:fan-speed-3',
-    highest: 'mdi:fan-speed-3',
-    full: 'mdi:fan-speed-3',
-    silent: 'mdi:fan-speed-1',
+    highest: 'mdi:fan-chevron-up',
+    full: 'mdi:fan-chevron-up',
     auto_mode: 'mdi:fan-auto',
     // swing 模式
     vertical: 'mdi:arrow-up-down',
