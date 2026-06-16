@@ -490,7 +490,7 @@ ha-switch {
                   class="thermostat-trigger"
                   @click=${()=>this.setTemperature(-this.stepSize,t)}
                 >
-                  <ha-icon .icon=${r?Qt:Kt}></ha-icon>
+                  <ha-icon .icon=${r?Qt:Gt}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -507,7 +507,7 @@ ha-switch {
                   class="thermostat-trigger"
                   @click=${()=>this.setTemperature(this.stepSize,t)}
                 >
-                  <ha-icon .icon=${r?Zt:Gt}></ha-icon>
+                  <ha-icon .icon=${r?Zt:Kt}></ha-icon>
                 </ha-icon-button>
               </div>
             `})}
@@ -515,4 +515,4 @@ ha-switch {
 
         ${this.modes.map(t=>Lt({state:this.entity.state,mode:t,localize:this.localize,modeOptions:this.config?.layout?.mode??{},setMode:this.setMode}))}
       </ha-card>
-    `}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],s=Number(i)+t,{decimals:n}=this.config;this._values={...this._values,[e]:+Pt(s,{decimals:n})},this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){return["boolean","string"].includes(typeof this.config.unit)?this.config?.unit:this._hass.config?.unit_system?.temperature??!1}}se.styles=ut,e([dt({type:Object})],se.prototype,"config",void 0),e([dt({type:Object})],se.prototype,"header",void 0),e([dt({type:Object})],se.prototype,"service",void 0),e([dt({type:Array})],se.prototype,"modes",void 0),e([dt({type:Object})],se.prototype,"entity",void 0),e([dt({type:Array})],se.prototype,"sensors",void 0),e([dt({type:Boolean})],se.prototype,"showSensors",void 0),e([dt({type:String})],se.prototype,"name",void 0),e([dt({type:Object})],se.prototype,"_values",void 0),e([dt({type:Boolean})],se.prototype,"_updatingValues",void 0),e([dt({type:Object})],se.prototype,"_hide",void 0),customElements.define(t,se),customElements.define(`${t}-editor`,$t),console.info(`%c${t}: 3.0.42`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"小空调",preview:!1,description:"Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）"});
+    `}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],s=Number(i)+t,{decimals:n}=this.config;this._values={...this._values,[e]:+Pt(s,{decimals:n})},this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){return["boolean","string"].includes(typeof this.config.unit)?this.config?.unit:this._hass.config?.unit_system?.temperature??!1}}se.styles=ut,e([dt({type:Object})],se.prototype,"config",void 0),e([dt({type:Object})],se.prototype,"header",void 0),e([dt({type:Object})],se.prototype,"service",void 0),e([dt({type:Array})],se.prototype,"modes",void 0),e([dt({type:Object})],se.prototype,"entity",void 0),e([dt({type:Array})],se.prototype,"sensors",void 0),e([dt({type:Boolean})],se.prototype,"showSensors",void 0),e([dt({type:String})],se.prototype,"name",void 0),e([dt({type:Object})],se.prototype,"_values",void 0),e([dt({type:Boolean})],se.prototype,"_updatingValues",void 0),e([dt({type:Object})],se.prototype,"_hide",void 0),customElements.define(t,se),customElements.define(`${t}-editor`,$t),console.info(`%c${t}: 3.0.43`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"小空调",preview:!1,description:"Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）"});

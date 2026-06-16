@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.42";
+var version = "3.0.43";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1737,7 +1737,7 @@ class SimpleThermostat extends i$1 {
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -1754,7 +1754,7 @@ class SimpleThermostat extends i$1 {
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `;
