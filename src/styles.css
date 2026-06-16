@@ -261,3 +261,37 @@ ha-switch {
   flex: 1;
   padding-right: 4px;
 }
+.card-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--secondary-background-color);
+  border-radius: 8px;
+}
+.group-title {
+  font-size: var(--ha-font-size-m);
+  font-weight: var(--ha-font-weight-heading);
+  color: var(--primary-text-color);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--divider-color);
+  margin-bottom: 4px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+}
+.row > * {
+  flex: 1;
+  min-width: 0;
+}
+.hint {
+  font-size: var(--ha-font-size-s);
+  color: var(--secondary-text-color);
+  padding-top: 4px;
+}

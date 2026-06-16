@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.43";
+var version = "3.0.44";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -353,6 +353,40 @@ ha-switch {
   flex: 1;
   padding-right: 4px;
 }
+.card-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--secondary-background-color);
+  border-radius: 8px;
+}
+.group-title {
+  font-size: var(--ha-font-size-m);
+  font-weight: var(--ha-font-weight-heading);
+  color: var(--primary-text-color);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--divider-color);
+  margin-bottom: 4px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+}
+.row > * {
+  flex: 1;
+  min-width: 0;
+}
+.hint {
+  font-size: var(--ha-font-size-s);
+  color: var(--secondary-text-color);
+  padding-top: 4px;
+}
 `;
 styleInject(css_248z);
 
@@ -417,66 +451,53 @@ class SimpleThermostatEditor extends i$1 {
         }
         return b `
       <div class="card-config">
-        <div class="overall-config">
-          <div class="side-by-side">
-            <ha-entity-picker
-              label="实体（必选）"
-              .hass=${this.hass}
-              .value=${config.entity || ''}
-              .includeDomains=${includeDomains}
-              @value-changed=${this._entityPicked}
-              allow-custom-entity
-            ></ha-entity-picker>
-          </div>
-
-          <div class="side-by-side">
+        <div class="form-group">
+          <div class="group-title">基本设置</div>
+          <ha-entity-picker
+            label="实体（必选）"
+            .hass=${this.hass}
+            .value=${config.entity || ''}
+            .includeDomains=${includeDomains}
+            @value-changed=${this._entityPicked}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <div class="row">
             <ha-textfield
-              label="名称（可选）"
+              label="名称"
               .value=${config.header?.name || ''}
               @input=${(ev) => this._configChanged('header.name', ev.target.value)}
             ></ha-textfield>
             <ha-textfield
-              label="图标（可选）"
+              label="图标"
               .value=${config.header?.icon || ''}
               @input=${(ev) => this._configChanged('header.icon', ev.target.value)}
             ></ha-textfield>
           </div>
-
-          <div class="side-by-side">
-            <ha-entity-picker
-              label="开关实体（可选）"
-              .hass=${this.hass}
-              .value=${config.header?.toggle?.entity || ''}
-              @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
-              allow-custom-entity
-            ></ha-entity-picker>
+          <ha-entity-picker
+            label="室内温度传感器（可选）"
+            .hass=${this.hass}
+            .value=${config.sensor_entity || ''}
+            .includeDomains=${sensorIncludeDomains}
+            @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <div class="row">
             <ha-textfield
-              label="开关标签"
-              .value=${config.header?.toggle?.name || ''}
-              @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
-            ></ha-textfield>
-          </div>
-
-          <div class="side-by-side">
-            <ha-textfield
-              label="占位文本（可选）"
+              label="占位文本"
               .value=${config.fallback || ''}
               @input=${(ev) => this._configChanged('fallback', ev.target.value)}
             ></ha-textfield>
+            <ha-textfield
+              label="单位"
+              .value=${config.unit || ''}
+              @input=${(ev) => this._configChanged('unit', ev.target.value)}
+            ></ha-textfield>
           </div>
+        </div>
 
-          <div class="side-by-side">
-            <ha-entity-picker
-              label="室内温度传感器（可选）"
-              .hass=${this.hass}
-              .value=${config.sensor_entity || ''}
-              .includeDomains=${sensorIncludeDomains}
-              @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
-              allow-custom-entity
-            ></ha-entity-picker>
-          </div>
-
-          <div class="side-by-side">
+        <div class="form-group">
+          <div class="group-title">温度与布局</div>
+          <div class="row">
             <ha-select
               label="小数位数"
               .value=${config.decimals != null ? String(config.decimals) : ''}
@@ -485,24 +506,6 @@ class SimpleThermostatEditor extends i$1 {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-
-            <ha-textfield
-              label="单位（可选）"
-              .value=${config.unit || ''}
-              @input=${(ev) => this._configChanged('unit', ev.target.value)}
-            ></ha-textfield>
-          </div>
-
-          <div class="side-by-side">
-            <ha-select
-              label="布局方向"
-              .value=${config.layout?.step ?? ''}
-              .options=${OPTIONS_STEP_LAYOUT}
-              @selected=${this._stepLayoutChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
-
             <ha-select
               label="步进值"
               .value=${config.step_size != null ? String(config.step_size) : ''}
@@ -512,8 +515,21 @@ class SimpleThermostatEditor extends i$1 {
               fixedMenuPosition
             ></ha-select>
           </div>
+          <div class="row">
+            <ha-select
+              label="布局方向"
+              .value=${config.layout?.step ?? ''}
+              .options=${OPTIONS_STEP_LAYOUT}
+              @selected=${this._stepLayoutChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+        </div>
 
-          <div class="side-by-side">
+        <div class="form-group">
+          <div class="group-title">模式控制</div>
+          <div class="row">
             <ha-select
               label="预设模式"
               .value=${controlList.includes('preset') ? 'show' : 'hide'}
@@ -522,7 +538,6 @@ class SimpleThermostatEditor extends i$1 {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-
             <ha-select
               label="风速模式"
               .value=${controlList.includes('fan') ? 'show' : 'hide'}
@@ -532,8 +547,7 @@ class SimpleThermostatEditor extends i$1 {
               fixedMenuPosition
             ></ha-select>
           </div>
-
-          <div class="side-by-side">
+          <div class="row">
             <ha-select
               label="模式文字"
               .value=${config.layout?.mode?.names !== false ? 'show' : 'hide'}
@@ -542,7 +556,6 @@ class SimpleThermostatEditor extends i$1 {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-
             <ha-select
               label="模式图标"
               .value=${config.layout?.mode?.icons !== false ? 'show' : 'hide'}
@@ -552,8 +565,7 @@ class SimpleThermostatEditor extends i$1 {
               fixedMenuPosition
             ></ha-select>
           </div>
-
-          <div class="side-by-side">
+          <div class="row">
             <ha-select
               label="模式标题"
               .value=${config.layout?.mode?.headings !== false ? 'show' : 'hide'}
@@ -563,13 +575,31 @@ class SimpleThermostatEditor extends i$1 {
               fixedMenuPosition
             ></ha-select>
           </div>
+        </div>
 
-          <div class="side-by-side">
-            <ha-button @click=${this._openLink}>
-              配置选项说明
-            </ha-button>
-            <span>标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
+        <div class="form-group">
+          <div class="group-title">开关</div>
+          <ha-entity-picker
+            label="开关实体（可选）"
+            .hass=${this.hass}
+            .value=${config.header?.toggle?.entity || ''}
+            @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <div class="row">
+            <ha-textfield
+              label="开关标签"
+              .value=${config.header?.toggle?.name || ''}
+              @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
+            ></ha-textfield>
           </div>
+        </div>
+
+        <div class="form-group">
+          <ha-button @click=${this._openLink}>
+            配置选项说明
+          </ha-button>
+          <span class="hint">标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
         </div>
       </div>
     `;

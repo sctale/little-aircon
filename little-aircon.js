@@ -261,68 +261,89 @@ ha-switch {
   flex: 1;
   padding-right: 4px;
 }
+.card-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--secondary-background-color);
+  border-radius: 8px;
+}
+.group-title {
+  font-size: var(--ha-font-size-m);
+  font-weight: var(--ha-font-weight-heading);
+  color: var(--primary-text-color);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--divider-color);
+  margin-bottom: 4px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+}
+.row > * {
+  flex: 1;
+  min-width: 0;
+}
+.hint {
+  font-size: var(--ha-font-size-s);
+  color: var(--secondary-text-color);
+  padding-top: 4px;
+}
 `;function pt(t,e,i,s={}){s=s||{},i=null==i?{}:i;const n=new CustomEvent(e,{bubbles:void 0===s.bubbles||s.bubbles,cancelable:Boolean(s.cancelable),composed:void 0===s.composed||s.composed,detail:i});return t.dispatchEvent(n),n}!function(t,e){void 0===e&&(e={});var i=e.insertAt;if(t&&"undefined"!=typeof document){var s=document.head||document.getElementsByTagName("head")[0],n=document.createElement("style");n.type="text/css","top"===i&&s.firstChild?s.insertBefore(n,s.firstChild):s.appendChild(n),n.styleSheet?n.styleSheet.cssText=t:n.appendChild(document.createTextNode(t))}}(ut);const ft=["climate"],gt=["sensor"],mt=[{value:"0",label:"0"},{value:"1",label:"1"}],vt=[{value:"0.5",label:"0.5"},{value:"1",label:"1"}],yt=[{value:"column",label:"上下"},{value:"row",label:"左右"}],_t=[{value:"show",label:"显示"},{value:"hide",label:"隐藏"}];class $t extends at{static getStubConfig(){return{header:{},layout:{mode:{}}}}setConfig(t){this._config=t}_openLink(){window.open("https://github.com/sctale/little-aircon/blob/master/README.md")}render(){if(!this.hass||!this._config)return V;const t=this._config;let e;return e=Array.isArray(t.control)?t.control:"object"==typeof t.control&&null!==t.control?Object.keys(t.control):["hvac","preset"],B`
       <div class="card-config">
-        <div class="overall-config">
-          <div class="side-by-side">
-            <ha-entity-picker
-              label="实体（必选）"
-              .hass=${this.hass}
-              .value=${t.entity||""}
-              .includeDomains=${ft}
-              @value-changed=${this._entityPicked}
-              allow-custom-entity
-            ></ha-entity-picker>
-          </div>
-
-          <div class="side-by-side">
+        <div class="form-group">
+          <div class="group-title">基本设置</div>
+          <ha-entity-picker
+            label="实体（必选）"
+            .hass=${this.hass}
+            .value=${t.entity||""}
+            .includeDomains=${ft}
+            @value-changed=${this._entityPicked}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <div class="row">
             <ha-textfield
-              label="名称（可选）"
+              label="名称"
               .value=${t.header?.name||""}
               @input=${t=>this._configChanged("header.name",t.target.value)}
             ></ha-textfield>
             <ha-textfield
-              label="图标（可选）"
+              label="图标"
               .value=${t.header?.icon||""}
               @input=${t=>this._configChanged("header.icon",t.target.value)}
             ></ha-textfield>
           </div>
-
-          <div class="side-by-side">
-            <ha-entity-picker
-              label="开关实体（可选）"
-              .hass=${this.hass}
-              .value=${t.header?.toggle?.entity||""}
-              @value-changed=${t=>this._configChanged("header.toggle.entity",t.detail.value)}
-              allow-custom-entity
-            ></ha-entity-picker>
+          <ha-entity-picker
+            label="室内温度传感器（可选）"
+            .hass=${this.hass}
+            .value=${t.sensor_entity||""}
+            .includeDomains=${gt}
+            @value-changed=${t=>this._configChanged("sensor_entity",t.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <div class="row">
             <ha-textfield
-              label="开关标签"
-              .value=${t.header?.toggle?.name||""}
-              @input=${t=>this._configChanged("header.toggle.name",t.target.value)}
-            ></ha-textfield>
-          </div>
-
-          <div class="side-by-side">
-            <ha-textfield
-              label="占位文本（可选）"
+              label="占位文本"
               .value=${t.fallback||""}
               @input=${t=>this._configChanged("fallback",t.target.value)}
             ></ha-textfield>
+            <ha-textfield
+              label="单位"
+              .value=${t.unit||""}
+              @input=${t=>this._configChanged("unit",t.target.value)}
+            ></ha-textfield>
           </div>
+        </div>
 
-          <div class="side-by-side">
-            <ha-entity-picker
-              label="室内温度传感器（可选）"
-              .hass=${this.hass}
-              .value=${t.sensor_entity||""}
-              .includeDomains=${gt}
-              @value-changed=${t=>this._configChanged("sensor_entity",t.detail.value)}
-              allow-custom-entity
-            ></ha-entity-picker>
-          </div>
-
-          <div class="side-by-side">
+        <div class="form-group">
+          <div class="group-title">温度与布局</div>
+          <div class="row">
             <ha-select
               label="小数位数"
               .value=${null!=t.decimals?String(t.decimals):""}
@@ -331,24 +352,6 @@ ha-switch {
               @closed=${t=>t.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-
-            <ha-textfield
-              label="单位（可选）"
-              .value=${t.unit||""}
-              @input=${t=>this._configChanged("unit",t.target.value)}
-            ></ha-textfield>
-          </div>
-
-          <div class="side-by-side">
-            <ha-select
-              label="布局方向"
-              .value=${t.layout?.step??""}
-              .options=${yt}
-              @selected=${this._stepLayoutChanged}
-              @closed=${t=>t.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
-
             <ha-select
               label="步进值"
               .value=${null!=t.step_size?String(t.step_size):""}
@@ -358,8 +361,21 @@ ha-switch {
               fixedMenuPosition
             ></ha-select>
           </div>
+          <div class="row">
+            <ha-select
+              label="布局方向"
+              .value=${t.layout?.step??""}
+              .options=${yt}
+              @selected=${this._stepLayoutChanged}
+              @closed=${t=>t.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+        </div>
 
-          <div class="side-by-side">
+        <div class="form-group">
+          <div class="group-title">模式控制</div>
+          <div class="row">
             <ha-select
               label="预设模式"
               .value=${e.includes("preset")?"show":"hide"}
@@ -368,7 +384,6 @@ ha-switch {
               @closed=${t=>t.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-
             <ha-select
               label="风速模式"
               .value=${e.includes("fan")?"show":"hide"}
@@ -378,8 +393,7 @@ ha-switch {
               fixedMenuPosition
             ></ha-select>
           </div>
-
-          <div class="side-by-side">
+          <div class="row">
             <ha-select
               label="模式文字"
               .value=${!1!==t.layout?.mode?.names?"show":"hide"}
@@ -388,7 +402,6 @@ ha-switch {
               @closed=${t=>t.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-
             <ha-select
               label="模式图标"
               .value=${!1!==t.layout?.mode?.icons?"show":"hide"}
@@ -398,8 +411,7 @@ ha-switch {
               fixedMenuPosition
             ></ha-select>
           </div>
-
-          <div class="side-by-side">
+          <div class="row">
             <ha-select
               label="模式标题"
               .value=${!1!==t.layout?.mode?.headings?"show":"hide"}
@@ -409,13 +421,31 @@ ha-switch {
               fixedMenuPosition
             ></ha-select>
           </div>
+        </div>
 
-          <div class="side-by-side">
-            <ha-button @click=${this._openLink}>
-              配置选项说明
-            </ha-button>
-            <span>标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
+        <div class="form-group">
+          <div class="group-title">开关</div>
+          <ha-entity-picker
+            label="开关实体（可选）"
+            .hass=${this.hass}
+            .value=${t.header?.toggle?.entity||""}
+            @value-changed=${t=>this._configChanged("header.toggle.entity",t.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <div class="row">
+            <ha-textfield
+              label="开关标签"
+              .value=${t.header?.toggle?.name||""}
+              @input=${t=>this._configChanged("header.toggle.name",t.target.value)}
+            ></ha-textfield>
           </div>
+        </div>
+
+        <div class="form-group">
+          <ha-button @click=${this._openLink}>
+            配置选项说明
+          </ha-button>
+          <span class="hint">标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
         </div>
       </div>
     `}_entityPicked(t){const e=t.detail?.value??t.target?.value;void 0!==e&&this._configChanged("entity",e)}_decimalsChanged(t){const e=t.detail?.value;void 0!==e&&this._configChanged("decimals",Number(e))}_stepLayoutChanged(t){const e=t.detail?.value;void 0!==e&&this._configChanged("layout.step",e)}_stepSizeChanged(t){const e=t.detail?.value;void 0!==e&&this._configChanged("step_size",Number(e))}_modeNamesChanged(t){const e=t.detail?.value;void 0!==e&&this._configChanged("layout.mode.names","hide"!==e)}_modeIconsChanged(t){const e=t.detail?.value;void 0!==e&&this._configChanged("layout.mode.icons","hide"!==e)}_modeHeadingsChanged(t){const e=t.detail?.value;void 0!==e&&this._configChanged("layout.mode.headings","hide"!==e)}_presetControlChanged(t){const e=t.detail?.value;void 0!==e&&this._updateControlList("preset","show"===e)}_fanControlChanged(t){const e=t.detail?.value;void 0!==e&&this._updateControlList("fan","show"===e)}_updateControlList(t,e){if(!this._config||!this.hass)return;const i=this._config;let s;s=Array.isArray(i.control)?[...i.control]:"object"==typeof i.control&&null!==i.control?Object.keys(i.control):["hvac","preset"],e&&!s.includes(t)?s.push(t):e||(s=s.filter(e=>e!==t)),s.includes("hvac")||s.unshift("hvac"),this._configChanged("control",s)}_configChanged(t,e){if(!this._config||!this.hass)return;const i=(s=this._config,JSON.parse(JSON.stringify(s)));var s;""===e||null==e?"entity"!==t&&function(t,e){const i=e.split(".");let s=t;for(;i.length>1;){const t=i.shift();if(!s[t])return;s=s[t]}delete s[i[0]]}(i,t):function(t,e,i){const s=e.split(".");let n=t;for(;s.length>1;){const t=s.shift();n[t]||(n[t]={}),n=n[t]}n[s[0]]=i}(i,t,e),this._config=i,pt(this,"config-changed",{config:i})}}$t.styles=ut,e([dt({attribute:!1})],$t.prototype,"hass",void 0),e([function(t){return dt({...t,state:!0,attribute:!1})}()],$t.prototype,"_config",void 0);const bt=(t,e,i,s)=>{if("length"===i||"prototype"===i)return;if("arguments"===i||"caller"===i)return;const n=Object.getOwnPropertyDescriptor(t,i),o=Object.getOwnPropertyDescriptor(e,i);!wt(n,o)&&s||Object.defineProperty(t,i,o)},wt=function(t,e){return void 0===t||t.configurable||t.writable===e.writable&&t.enumerable===e.enumerable&&t.configurable===e.configurable&&(t.writable||t.value===e.value)},xt=(t,e)=>`/* Wrapped ${t}*/\n${e}`,At=Object.getOwnPropertyDescriptor(Function.prototype,"toString"),Et=Object.getOwnPropertyDescriptor(Function.prototype.toString,"name");function St(t,e,{ignoreNonConfigurable:i=!1}={}){const{name:s}=t;for(const s of Reflect.ownKeys(e))bt(t,e,s,i);return((t,e)=>{const i=Object.getPrototypeOf(e);i!==Object.getPrototypeOf(t)&&Object.setPrototypeOf(t,i)})(t,e),((t,e,i)=>{const s=""===i?"":`with ${i.trim()}() `,n=xt.bind(null,s,e.toString());Object.defineProperty(n,"name",Et),Object.defineProperty(t,"toString",{...At,value:n})})(t,e,s),t}const Ct=(t,e={})=>{if("function"!=typeof t)throw new TypeError(`Expected the first argument to be a function, got \`${typeof t}\``);const{wait:i=0,maxWait:s=Number.POSITIVE_INFINITY,before:n=!1,after:o=!0}=e;if(!n&&!o)throw new Error("Both `before` and `after` are false, function wouldn't be called.");let r,a,l;const c=function(...e){const c=this,h=()=>{a=void 0,r&&(clearTimeout(r),r=void 0),o&&(l=t.apply(c,e))},d=n&&!r;return clearTimeout(r),r=setTimeout(()=>{r=void 0,a&&(clearTimeout(a),a=void 0),o&&(l=t.apply(c,e))},i),s>0&&s!==Number.POSITIVE_INFINITY&&!a&&(a=setTimeout(h,s)),d&&(l=t.apply(c,e)),l};return St(c,t),c.cancel=()=>{r&&(clearTimeout(r),r=void 0),a&&(clearTimeout(a),a=void 0)},c};function Pt(t,{decimals:e=1,fallback:i="N/A"}={}){return null===t||""===t||["boolean","undefined"].includes(typeof t)?i:Number(t).toFixed(e)}function Ot({header:t,toggleEntityChanged:e,entity:i,openEntityPopover:s}){if(!1===t)return V;const n=i.attributes.hvac_action||i.state;let o=t.icon;"object"==typeof t.icon&&(o=o?.[n]??!1);const r=t?.name??!1;return B`
@@ -515,4 +545,4 @@ ha-switch {
 
         ${this.modes.map(t=>Lt({state:this.entity.state,mode:t,localize:this.localize,modeOptions:this.config?.layout?.mode??{},setMode:this.setMode}))}
       </ha-card>
-    `}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],s=Number(i)+t,{decimals:n}=this.config;this._values={...this._values,[e]:+Pt(s,{decimals:n})},this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){return["boolean","string"].includes(typeof this.config.unit)?this.config?.unit:this._hass.config?.unit_system?.temperature??!1}}se.styles=ut,e([dt({type:Object})],se.prototype,"config",void 0),e([dt({type:Object})],se.prototype,"header",void 0),e([dt({type:Object})],se.prototype,"service",void 0),e([dt({type:Array})],se.prototype,"modes",void 0),e([dt({type:Object})],se.prototype,"entity",void 0),e([dt({type:Array})],se.prototype,"sensors",void 0),e([dt({type:Boolean})],se.prototype,"showSensors",void 0),e([dt({type:String})],se.prototype,"name",void 0),e([dt({type:Object})],se.prototype,"_values",void 0),e([dt({type:Boolean})],se.prototype,"_updatingValues",void 0),e([dt({type:Object})],se.prototype,"_hide",void 0),customElements.define(t,se),customElements.define(`${t}-editor`,$t),console.info(`%c${t}: 3.0.43`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"小空调",preview:!1,description:"Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）"});
+    `}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],s=Number(i)+t,{decimals:n}=this.config;this._values={...this._values,[e]:+Pt(s,{decimals:n})},this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){return["boolean","string"].includes(typeof this.config.unit)?this.config?.unit:this._hass.config?.unit_system?.temperature??!1}}se.styles=ut,e([dt({type:Object})],se.prototype,"config",void 0),e([dt({type:Object})],se.prototype,"header",void 0),e([dt({type:Object})],se.prototype,"service",void 0),e([dt({type:Array})],se.prototype,"modes",void 0),e([dt({type:Object})],se.prototype,"entity",void 0),e([dt({type:Array})],se.prototype,"sensors",void 0),e([dt({type:Boolean})],se.prototype,"showSensors",void 0),e([dt({type:String})],se.prototype,"name",void 0),e([dt({type:Object})],se.prototype,"_values",void 0),e([dt({type:Boolean})],se.prototype,"_updatingValues",void 0),e([dt({type:Object})],se.prototype,"_hide",void 0),customElements.define(t,se),customElements.define(`${t}-editor`,$t),console.info(`%c${t}: 3.0.44`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"小空调",preview:!1,description:"Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）"});
