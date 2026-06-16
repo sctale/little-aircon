@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.40";
+var version = "3.0.41";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1272,15 +1272,15 @@ const MODE_ICONS = {
     home: 'mdi:home',
     sleep: 'mdi:power-sleep',
     activity: 'mdi:run',
-    // 风速模式（按低/中/高三级映射图标）
-    silent: 'mdi:fan-chevron-down',
-    low: 'mdi:fan-chevron-down',
-    medium_low: 'mdi:fan-speed-1',
+    // 风速模式（按低/中/高映射数字图标）
+    silent: 'mdi:fan-speed-1',
+    low: 'mdi:fan-speed-1',
+    medium_low: 'mdi:fan-speed-2',
     medium: 'mdi:fan-speed-2',
-    medium_high: 'mdi:fan-speed-2',
+    medium_high: 'mdi:fan-speed-3',
     high: 'mdi:fan-speed-3',
-    highest: 'mdi:fan-chevron-up',
-    full: 'mdi:fan-chevron-up',
+    highest: 'mdi:fan-speed-3',
+    full: 'mdi:fan-speed-3',
     auto_mode: 'mdi:fan-auto',
     // swing 模式
     vertical: 'mdi:arrow-up-down',
