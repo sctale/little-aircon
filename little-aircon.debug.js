@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.16";
+var version = "3.0.17";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1338,11 +1338,11 @@ const MODE_ICONS = {
     swing: 'mdi:arrow-up-down',
     on: 'mdi:toggle-switch',
     // 定时器
-    timer_off: 'mdi:timer-off-outline',
-    timer_30: 'mdi:timer-outline',
-    timer_60: 'mdi:timer-outline',
-    timer_90: 'mdi:timer-outline',
-    timer_120: 'mdi:timer-outline',
+    timer_off: 'mdi:close',
+    timer_30: '',
+    timer_60: '',
+    timer_90: '',
+    timer_120: '',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1460,11 +1460,11 @@ const ICONS = {
     MINUS: 'mdi:minus',
 };
 const TIMER_OPTIONS = [
-    { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off-outline' },
-    { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-outline' },
-    { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-outline' },
-    { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-outline' },
-    { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-outline' },
+    { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:close' },
+    { value: 'timer_30', label: '30', minutes: 30, icon: '' },
+    { value: 'timer_60', label: '60', minutes: 60, icon: '' },
+    { value: 'timer_90', label: '90', minutes: 90, icon: '' },
+    { value: 'timer_120', label: '120', minutes: 120, icon: '' },
 ];
 const DEFAULT_HIDE = {
     temperature: false,
@@ -1865,7 +1865,6 @@ class SimpleThermostat extends i$1 {
         })}
         ${this._timerRemaining > 0
             ? b `<div class="mode-item active timer-countdown">
-              <ha-icon class="mode-icon" .icon=${'mdi:timer-sand'}></ha-icon>
               <span class="mode-name">${this._formatRemaining(this._timerRemaining)}</span>
             </div>`
             : A}

@@ -44,11 +44,11 @@ const ICONS = {
 }
 
 const TIMER_OPTIONS = [
-  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off-outline' },
-  { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-outline' },
-  { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-outline' },
-  { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-outline' },
-  { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-outline' },
+  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:close' },
+  { value: 'timer_30', label: '30', minutes: 30, icon: '' },
+  { value: 'timer_60', label: '60', minutes: 60, icon: '' },
+  { value: 'timer_90', label: '90', minutes: 90, icon: '' },
+  { value: 'timer_120', label: '120', minutes: 120, icon: '' },
 ]
 
 const DEFAULT_HIDE = {
@@ -505,7 +505,6 @@ export default class SimpleThermostat extends LitElement {
         })}
         ${this._timerRemaining > 0
           ? html`<div class="mode-item active timer-countdown">
-              <ha-icon class="mode-icon" .icon=${'mdi:timer-sand'}></ha-icon>
               <span class="mode-name">${this._formatRemaining(this._timerRemaining)}</span>
             </div>`
           : nothing

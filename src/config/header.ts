@@ -60,11 +60,11 @@ export const MODE_ICONS: Record<string, string> = {
   swing: 'mdi:arrow-up-down',
   on: 'mdi:toggle-switch',
   // 定时器
-  timer_off: 'mdi:timer-off-outline',
-  timer_30: 'mdi:timer-outline',
-  timer_60: 'mdi:timer-outline',
-  timer_90: 'mdi:timer-outline',
-  timer_120: 'mdi:timer-outline',
+  timer_off: 'mdi:close',
+  timer_30: '',
+  timer_60: '',
+  timer_90: '',
+  timer_120: '',
 }
 
 type Icon = string | false | LooseObject
