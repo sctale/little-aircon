@@ -121,7 +121,7 @@ sensors:
 
 ## 更新日志
 
-### v3.0.18
+### v3.0.19
 
 - 全面升级至 lit v3，兼容 Home Assistant 2026.x
 - 升级 TypeScript 5.3 + Rollup 4.x

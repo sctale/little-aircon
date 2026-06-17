@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.18";
+var version = "3.0.19";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1537,6 +1537,14 @@ class SimpleThermostat extends i$1 {
             const translations = this._hass.resources[lang];
             return translations?.[key] ?? label;
         };
+        this._onTimerClick = (ev) => {
+            const target = ev.currentTarget;
+            const value = target.dataset.value;
+            const disabled = target.dataset.disabled === 'true';
+            if (disabled || !value)
+                return;
+            this._setTimer(value);
+        };
         this.toggleEntityChanged = (ev) => {
             if (!this.header || !this?.header?.toggle)
                 return;
@@ -1855,17 +1863,18 @@ class SimpleThermostat extends i$1 {
             return b `
             <div
               class="mode-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}"
-              @click=${() => { if (!disabled)
-                this._setTimer(opt.value); }}
+              @click=${this._onTimerClick}
+              data-value=${opt.value}
+              data-disabled=${disabled ? 'true' : 'false'}
             >
-              ${showIcons ? b `<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : A}
-              ${showNames ? b `<span class="mode-name">${opt.label}</span>` : A}
+              ${showIcons && opt.icon ? b `<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : A}
+              ${showNames ? opt.label : A}
             </div>
           `;
         })}
         ${this._timerRemaining > 0
             ? b `<div class="mode-item active timer-countdown">
-              <span class="mode-name">${this._formatRemaining(this._timerRemaining)}</span>
+              ${this._formatRemaining(this._timerRemaining)}
             </div>`
             : A}
       </div>

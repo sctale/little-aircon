@@ -496,21 +496,31 @@ export default class SimpleThermostat extends LitElement {
           return html`
             <div
               class="mode-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}"
-              @click=${() => { if (!disabled) this._setTimer(opt.value) }}
+              @click=${this._onTimerClick}
+              data-value=${opt.value}
+              data-disabled=${disabled ? 'true' : 'false'}
             >
-              ${showIcons ? html`<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : nothing}
-              ${showNames ? html`<span class="mode-name">${opt.label}</span>` : nothing}
+              ${showIcons && opt.icon ? html`<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : nothing}
+              ${showNames ? opt.label : nothing}
             </div>
           `
         })}
         ${this._timerRemaining > 0
           ? html`<div class="mode-item active timer-countdown">
-              <span class="mode-name">${this._formatRemaining(this._timerRemaining)}</span>
+              ${this._formatRemaining(this._timerRemaining)}
             </div>`
           : nothing
         }
       </div>
     `
+  }
+
+  private _onTimerClick = (ev: Event) => {
+    const target = ev.currentTarget as HTMLElement
+    const value = target.dataset.value
+    const disabled = target.dataset.disabled === 'true'
+    if (disabled || !value) return
+    this._setTimer(value)
   }
 
   private _setTimer(value: string) {
