@@ -45,10 +45,10 @@ const ICONS = {
 
 const TIMER_OPTIONS = [
   { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
-  { value: 'timer_30', label: '30分钟', minutes: 30, icon: '' },
-  { value: 'timer_60', label: '60分钟', minutes: 60, icon: '' },
-  { value: 'timer_90', label: '90分钟', minutes: 90, icon: '' },
-  { value: 'timer_120', label: '120分钟', minutes: 120, icon: '' },
+  { value: 'timer_30', label: '30分', minutes: 30, icon: 'mdi:timer-outline' },
+  { value: 'timer_60', label: '1时', minutes: 60, icon: 'mdi:timer-outline' },
+  { value: 'timer_90', label: '1.5时', minutes: 90, icon: 'mdi:timer-outline' },
+  { value: 'timer_120', label: '2时', minutes: 120, icon: 'mdi:timer-outline' },
 ]
 
 const DEFAULT_HIDE = {
@@ -155,6 +155,9 @@ export default class SimpleThermostat extends LitElement {
 
   @property({ type: Number })
   _timerRemaining: number = 0
+
+  @property({ type: Number })
+  _timerTotal: number = 0
 
   _timerInterval: ReturnType<typeof setInterval> | null = null
 
@@ -485,14 +488,15 @@ export default class SimpleThermostat extends LitElement {
     const showNames = this.config?.layout?.mode?.names !== false
     const showIcons = this.config?.layout?.mode?.icons !== false
 
-    // 倒计时中：标题显示剩余时间
-    const timerTitle = this._timerRemaining > 0
-      ? `${this._formatRemaining(this._timerRemaining)} 后关机`
-      : '定时关机'
+    // 进度条：倒计时中显示
+    const showProgress = this._timerRemaining > 0 && this._timerTotal > 0
+    const progressPercent = showProgress
+      ? Math.max(0, (this._timerRemaining / this._timerTotal) * 100)
+      : 0
 
     return html`
       <div class="modes ${headings ? 'heading' : ''}">
-        ${headings ? html`<div class="mode-title ${this._timerRemaining > 0 ? 'timer-active' : ''}">${timerTitle}</div>` : nothing}
+        ${headings ? html`<div class="mode-title">定时关机</div>` : nothing}
         ${TIMER_OPTIONS.map((opt) => {
           const isActive = this._timerValue === opt.value
           return html`
@@ -506,6 +510,13 @@ export default class SimpleThermostat extends LitElement {
           `
         })}
       </div>
+      ${showProgress ? html`
+        <div class="timer-progress-bar">
+          <div class="timer-progress-fill" style="width: ${progressPercent}%">
+            <span class="timer-progress-text">${this._formatRemaining(this._timerRemaining)} 后关机</span>
+          </div>
+        </div>
+      ` : nothing}
     `
   }
 
@@ -520,6 +531,7 @@ export default class SimpleThermostat extends LitElement {
 
     if (value === 'timer_off') {
       this._timerRemaining = 0
+      this._timerTotal = 0
       this.requestUpdate()
       return
     }
@@ -527,7 +539,8 @@ export default class SimpleThermostat extends LitElement {
     const opt = TIMER_OPTIONS.find((o) => o.value === value)
     if (!opt) return
 
-    this._timerRemaining = opt.minutes * 60
+    this._timerTotal = opt.minutes * 60
+    this._timerRemaining = this._timerTotal
     this.requestUpdate()
 
     this._timerInterval = setInterval(() => {
@@ -540,6 +553,7 @@ export default class SimpleThermostat extends LitElement {
         }
         this._timerValue = 'timer_off'
         this._timerRemaining = 0
+        this._timerTotal = 0
         this._hass.callService('climate', 'turn_off', {
           entity_id: this.config.entity,
         })

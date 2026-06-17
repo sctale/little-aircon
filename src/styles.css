@@ -299,9 +299,28 @@ ha-switch {
   opacity: 0.4;
   pointer-events: none;
 }
-.timer-countdown {
-  background: var(--st-mode-active-background, var(--accent-color)) !important;
-  color: var(--text-primary-color) !important;
+.timer-progress-bar {
+  margin: 4px 16px 0;
+  background: var(--secondary-background-color);
+  border-radius: 10px;
+  overflow: hidden;
+  height: 22px;
+}
+.timer-progress-fill {
+  height: 100%;
+  background: var(--st-mode-active-background, var(--primary-color));
+  border-radius: 10px;
+  transition: width 1s linear;
+  display: flex;
+  align-items: center;
+  min-width: 80px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+.timer-progress-text {
+  color: var(--text-primary-color);
+  font-size: var(--ha-font-size-s);
+  white-space: nowrap;
   font-weight: 500;
 }
 .mode-title.timer-active {
