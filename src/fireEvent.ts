@@ -13,12 +13,12 @@ export default function fireEvent(
 ): HAEvent {
   options = options || {}
   detail = detail === null || detail === undefined ? {} : detail
-  const event = new CustomEvent(type, {
+  const event = new Event(type, {
     bubbles: options.bubbles === undefined ? true : options.bubbles,
     cancelable: Boolean(options.cancelable),
     composed: options.composed === undefined ? true : options.composed,
-    detail,
   }) as HAEvent
+  event.detail = detail
   node.dispatchEvent(event)
   return event
 }

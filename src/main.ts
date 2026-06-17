@@ -59,20 +59,6 @@ function shouldShowModeControl(
   return config?.[modeOption] ?? true
 }
 
-const MODE_FALLBACK_ICONS: Record<string, string> = {
-  hvac: 'mdi:hvac',
-  preset: 'mdi:tune',
-  fan: 'mdi:fan',
-  swing: 'mdi:arrow-up-down',
-  swing_horizontal: 'mdi:arrow-left-right',
-}
-
-function getModeIcon(type: string, modeOption: string): string {
-  // fan 模式下的 auto 用风扇图标，而非 HVAC 的 hvac
-  if (type === 'fan' && modeOption === 'auto') return 'mdi:fan-auto'
-  return MODE_ICONS[modeOption] || MODE_FALLBACK_ICONS[type] || 'mdi:hvac'
-}
-
 function getModeList(
   type: string,
   attributes: LooseObject,
@@ -86,7 +72,7 @@ function getModeList(
           ? specification[modeOption]
           : {}
       return {
-        icon: getModeIcon(type, modeOption),
+        icon: MODE_ICONS[modeOption] || 'hass:radiator',
         value: modeOption,
         name: modeOption,
         ...values,
@@ -120,7 +106,7 @@ export default class SimpleThermostat extends LitElement {
   _hass: HASS = {}
 
   @property({ type: Object })
-  entity: LooseObject | undefined
+  entity: LooseObject = {}
 
   @property({ type: Array })
   sensors: Array<Sensor | PreparedSensor> = []
@@ -159,9 +145,6 @@ export default class SimpleThermostat extends LitElement {
   }
 
   setConfig(config: CardConfig) {
-    if (!config.entity || !config.entity.startsWith('climate.')) {
-      throw new Error('需要指定 climate 域的实体')
-    }
     this.config = {
       decimals: DECIMALS,
       ...config,
@@ -353,8 +336,8 @@ export default class SimpleThermostat extends LitElement {
       `)
     }
 
-    if (!this.entity || !this.entity.attributes) {
-      return html`<hui-warning .hass=${this._hass}> 实体不可用: ${this.config.entity} </hui-warning>`
+    if (!this.entity) {
+      return html`<hui-warning> 实体不可用: ${this.config.entity} </hui-warning>`
     }
 
     const {
@@ -366,7 +349,7 @@ export default class SimpleThermostat extends LitElement {
     } = this.entity
 
     const unit = this.getUnit()
-    const stepLayout = this.config?.layout?.step ?? 'row'
+    const stepLayout = this.config?.layout?.step ?? 'column'
     const row = stepLayout === 'row'
     const classes = [!this.header && 'no-header', action].filter((cx) => !!cx)
 
@@ -409,7 +392,7 @@ export default class SimpleThermostat extends LitElement {
           entity: this.entity,
           openEntityPopover: this.openEntityPopover,
         })}
-        <section class="body ${row ? 'row-layout' : ''}">
+        <section class="body">
           ${sensorsHtml}
           ${Object.entries(this._values).map(([field, value]) => {
             const hasValue = ['string', 'number'].includes(typeof value)
@@ -417,12 +400,11 @@ export default class SimpleThermostat extends LitElement {
             return html`
               <div class="current-wrapper ${stepLayout}">
                 <ha-icon-button
-                  label="降温"
-                  ?disabled=${minTemp !== null && value <= minTemp}
+                  ?disabled=${maxTemp !== null && value >= maxTemp}
                   class="thermostat-trigger"
-                  @click=${() => this.setTemperature(-this.stepSize, field)}
+                  @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.UP}></ha-icon>
+                  <ha-icon icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -434,12 +416,11 @@ export default class SimpleThermostat extends LitElement {
                 </h3>
 
                 <ha-icon-button
-                  label="升温"
-                  ?disabled=${maxTemp !== null && value >= maxTemp}
+                  ?disabled=${minTemp !== null && value <= minTemp}
                   class="thermostat-trigger"
-                  @click=${() => this.setTemperature(this.stepSize, field)}
+                  @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `

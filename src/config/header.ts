@@ -15,50 +15,25 @@ export interface Fault {
 }
 
 export const STATE_ICONS: Record<string, string> = {
-  auto: 'mdi:autorenew',
+  auto: 'mdi:radiator',
   cooling: 'mdi:snowflake',
   fan: 'mdi:fan',
-  heating: 'mdi:fire',
-  idle: 'mdi:air-conditioner',
-  off: 'mdi:air-conditioner',
-  drying: 'mdi:water-percent',
+  heating: 'mdi:radiator',
+  idle: 'mdi:radiator-disabled',
+  off: 'mdi:radiator-off',
 }
 
 export const MODE_ICONS: Record<string, string> = {
-  // HVAC 模式
-  auto: 'mdi:autorenew',
-  cool: 'mdi:snowflake',
-  dry: 'mdi:water-percent',
-  fan_only: 'mdi:fan',
-  heat_cool: 'mdi:autorenew',
-  heat: 'mdi:fire',
-  off: 'mdi:air-conditioner',
-  // 预设模式
-  none: 'mdi:cancel',
-  eco: 'mdi:leaf',
-  away: 'mdi:home-alert',
-  boost: 'mdi:rocket-launch',
-  comfort: 'mdi:sofa',
-  home: 'mdi:home',
-  sleep: 'mdi:power-sleep',
-  activity: 'mdi:run',
-  // 风速模式（按低/中/高映射数字图标）
-  silent: 'mdi:fan-chevron-down',
-  low: 'mdi:fan-speed-1',
-  medium_low: 'mdi:fan-speed-1',
-  medium: 'mdi:fan-speed-2',
-  medium_high: 'mdi:fan-speed-2',
-  high: 'mdi:fan-speed-3',
-  highest: 'mdi:fan-speed-3',
-  full: 'mdi:fan-chevron-up',
-  auto_mode: 'mdi:fan-auto',
-  // swing 模式
-  vertical: 'mdi:arrow-up-down',
-  horizontal: 'mdi:arrow-left-right',
-  both: 'mdi:arrow-all',
-  swing_horizontal: 'mdi:arrow-left-right',
-  swing: 'mdi:arrow-up-down',
-  on: 'mdi:toggle-switch',
+  auto: 'hass:autorenew',
+  cool: 'hass:snowflake',
+  dry: 'hass:water-percent',
+  fan_only: 'hass:fan',
+  heat_cool: 'hass:autorenew',
+  heat: 'hass:fire',
+  off: 'hass:power',
+  // 新增 swing_horizontal 模式
+  swing_horizontal: 'mdi:fan',
+  swing: 'mdi:fan-sync',
 }
 
 type Icon = string | false | LooseObject

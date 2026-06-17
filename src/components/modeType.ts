@@ -24,16 +24,10 @@ const ZH_MODE_NAMES: Record<string, string> = {
   vertical: '上下摆风',
   horizontal: '左右摆风',
   both: '全方位摆风',
-  on: '开启',
   // fan 模式
   low: '低速',
   medium: '中速',
-  medium_low: '中低速',
-  medium_high: '中高速',
   high: '高速',
-  highest: '最高速',
-  full: '满速',
-  silent: '静音',
   auto_mode: '自动',
 }
 

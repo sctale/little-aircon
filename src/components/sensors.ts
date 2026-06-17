@@ -27,12 +27,6 @@ export default function renderSensors({
     attributes: { hvac_action: action, current_temperature: current },
   } = entity
 
-  // 优先使用外部温度传感器的值
-  let currentTemp = current
-  if (config?.sensor_entity && hass?.states[config.sensor_entity]) {
-    currentTemp = hass.states[config.sensor_entity].state
-  }
-
   const showLabels = config?.layout?.sensors?.labels ?? true
 
   // 获取中文状态名
@@ -68,16 +62,18 @@ export default function renderSensors({
   }
 
   let stateString = getZhState(state)
-  if (action && action !== state) {
-    stateString = `${getZhAction(action)} (${stateString})`
-  } else if (action) {
-    stateString = getZhAction(action)
+  if (action) {
+    const actionZh = getZhAction(action)
+    // 当 action 与 state 语义重复时（如 heating/heat），只显示 action
+    if (actionZh !== stateString) {
+      stateString = actionZh
+    }
   }
 
   const sensorHtml = [
     renderInfoItem({
       hide: _hide.temperature,
-      state: `${formatNumber(currentTemp, config)}${unit || ''}`,
+      state: `${formatNumber(current, config)}${unit || ''}`,
       hass,
       details: {
         heading: showLabels
