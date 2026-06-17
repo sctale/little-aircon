@@ -192,6 +192,7 @@ export default class SimpleThermostatEditor extends LitElement {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
+            <!-- 定时器功能暂未启用，隐藏配置选项
             <ha-select
               label="定时关机"
               .value=${config.timer === true || config.timer === 'show' ? 'show' : 'hide'}
@@ -200,7 +201,9 @@ export default class SimpleThermostatEditor extends LitElement {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
+            -->
           </div>
+          <!-- 定时器功能暂未启用，隐藏 timer_entity 选择器
           ${config.timer === true || config.timer === 'show' ? html`
             <ha-entity-picker
               label="定时器实体（timer.xxx，必选）"
@@ -211,6 +214,7 @@ export default class SimpleThermostatEditor extends LitElement {
               allow-custom-entity
             ></ha-entity-picker>
           ` : nothing}
+          -->
         </div>
 
         <div class="form-group">
