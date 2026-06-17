@@ -44,11 +44,11 @@ const ICONS = {
 }
 
 const TIMER_OPTIONS = [
-  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:close' },
-  { value: 'timer_30', label: '30', minutes: 30, icon: '' },
-  { value: 'timer_60', label: '60', minutes: 60, icon: '' },
-  { value: 'timer_90', label: '90', minutes: 90, icon: '' },
-  { value: 'timer_120', label: '120', minutes: 120, icon: '' },
+  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
+  { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-3' },
+  { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-10' },
+  { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-10' },
+  { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-10' },
 ]
 
 const DEFAULT_HIDE = {
