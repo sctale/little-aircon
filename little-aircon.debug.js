@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.20";
+var version = "3.0.21";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1537,14 +1537,6 @@ class SimpleThermostat extends i$1 {
             const translations = this._hass.resources[lang];
             return translations?.[key] ?? label;
         };
-        this._onTimerClick = (ev) => {
-            const target = ev.currentTarget;
-            const value = target.dataset.value;
-            const disabled = target.dataset.disabled === 'true';
-            if (disabled || !value)
-                return;
-            this._setTimer(value);
-        };
         this.toggleEntityChanged = (ev) => {
             if (!this.header || !this?.header?.toggle)
                 return;
@@ -1846,11 +1838,9 @@ class SimpleThermostat extends i$1 {
     `;
     }
     _renderTimer() {
-        // timer 配置：默认隐藏，设为 true 或 'show' 时显示
         const timerConfig = this.config?.timer;
         if (!timerConfig || timerConfig === 'hide')
             return A;
-        const isOff = this.entity?.state === 'off';
         const headings = this.config?.layout?.mode?.headings ?? true;
         const showNames = this.config?.layout?.mode?.names !== false;
         const showIcons = this.config?.layout?.mode?.icons !== false;
@@ -1859,16 +1849,13 @@ class SimpleThermostat extends i$1 {
         ${headings ? b `<div class="mode-title">定时关机</div>` : A}
         ${TIMER_OPTIONS.map((opt) => {
             const isActive = this._timerValue === opt.value;
-            const disabled = isOff && opt.value !== 'timer_off';
             return b `
             <div
-              class="mode-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}"
-              @click=${this._onTimerClick}
-              data-value=${opt.value}
-              data-disabled=${disabled ? 'true' : 'false'}
+              class="mode-item ${isActive ? 'active' : ''}"
+              @click=${() => this._setTimer(opt.value)}
             >
               ${showIcons && opt.icon ? b `<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : A}
-              ${showNames ? opt.label : A}
+              ${showNames ? b `${opt.label}` : A}
             </div>
           `;
         })}

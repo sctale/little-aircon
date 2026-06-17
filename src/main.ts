@@ -478,11 +478,9 @@ export default class SimpleThermostat extends LitElement {
   }
 
   private _renderTimer() {
-    // timer 配置：默认隐藏，设为 true 或 'show' 时显示
     const timerConfig = this.config?.timer
     if (!timerConfig || timerConfig === 'hide') return nothing
 
-    const isOff = this.entity?.state === 'off'
     const headings = this.config?.layout?.mode?.headings ?? true
     const showNames = this.config?.layout?.mode?.names !== false
     const showIcons = this.config?.layout?.mode?.icons !== false
@@ -492,16 +490,13 @@ export default class SimpleThermostat extends LitElement {
         ${headings ? html`<div class="mode-title">定时关机</div>` : nothing}
         ${TIMER_OPTIONS.map((opt) => {
           const isActive = this._timerValue === opt.value
-          const disabled = isOff && opt.value !== 'timer_off'
           return html`
             <div
-              class="mode-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}"
-              @click=${this._onTimerClick}
-              data-value=${opt.value}
-              data-disabled=${disabled ? 'true' : 'false'}
+              class="mode-item ${isActive ? 'active' : ''}"
+              @click=${() => this._setTimer(opt.value)}
             >
               ${showIcons && opt.icon ? html`<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : nothing}
-              ${showNames ? opt.label : nothing}
+              ${showNames ? html`${opt.label}` : nothing}
             </div>
           `
         })}
@@ -513,14 +508,6 @@ export default class SimpleThermostat extends LitElement {
         }
       </div>
     `
-  }
-
-  private _onTimerClick = (ev: Event) => {
-    const target = ev.currentTarget as HTMLElement
-    const value = target.dataset.value
-    const disabled = target.dataset.disabled === 'true'
-    if (disabled || !value) return
-    this._setTimer(value)
   }
 
   private _setTimer(value: string) {
