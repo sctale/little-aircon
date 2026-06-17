@@ -44,11 +44,11 @@ const ICONS = {
 }
 
 const TIMER_OPTIONS = [
-  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
-  { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-30' },
-  { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-60' },
-  { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-90' },
-  { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-120' },
+  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off-outline' },
+  { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-outline' },
+  { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-outline' },
+  { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-outline' },
+  { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-outline' },
 ]
 
 const DEFAULT_HIDE = {
@@ -484,27 +484,29 @@ export default class SimpleThermostat extends LitElement {
 
     const isOff = this.entity?.state === 'off'
     const headings = this.config?.layout?.mode?.headings ?? true
+    const showNames = this.config?.layout?.mode?.names !== false
+    const showIcons = this.config?.layout?.mode?.icons !== false
 
     return html`
       <div class="modes ${headings ? 'heading' : ''}">
         ${headings ? html`<div class="mode-title">定时关机</div>` : nothing}
         ${TIMER_OPTIONS.map((opt) => {
           const isActive = this._timerValue === opt.value
+          const disabled = isOff && opt.value !== 'timer_off'
           return html`
             <div
-              class="mode-item ${isActive ? 'active ' + opt.value : ''} ${isOff && opt.value !== 'timer_off' ? 'disabled' : ''}"
-              @click=${() => !isOff && this._setTimer(opt.value)}
+              class="mode-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}"
+              @click=${() => { if (!disabled) this._setTimer(opt.value) }}
             >
-              <ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>
-              ${this.config?.layout?.mode?.icons === false ? nothing : nothing}
-              ${this.config?.layout?.mode?.names === false ? nothing : html`${opt.label}`}
+              ${showIcons ? html`<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : nothing}
+              ${showNames ? html`<span class="mode-name">${opt.label}</span>` : nothing}
             </div>
           `
         })}
         ${this._timerRemaining > 0
           ? html`<div class="mode-item active timer-countdown">
-              <ha-icon class="mode-icon" .icon="mdi:timer-sand"></ha-icon>
-              ${this._formatRemaining(this._timerRemaining)}
+              <ha-icon class="mode-icon" .icon=${'mdi:timer-sand'}></ha-icon>
+              <span class="mode-name">${this._formatRemaining(this._timerRemaining)}</span>
             </div>`
           : nothing
         }
