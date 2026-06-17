@@ -163,8 +163,8 @@ export default class SimpleThermostat extends LitElement {
   // 前端 UI 刷新定时器（仅刷新显示，不管理倒计时逻辑）
   _uiRefreshInterval: ReturnType<typeof setInterval> | null = null
 
-  // 记录 timer 实体上一次状态，用于检测 active→idle 的变化
-  _prevTimerState: string = ''
+  // HA 事件订阅取消函数
+  _unsubTimerFinished: (() => void) | null = null
 
   _debouncedSetTemperature = debounce(
     (values: object) => {
@@ -545,15 +545,6 @@ export default class SimpleThermostat extends LitElement {
 
     const timerState = timerEntity.state // idle / active / paused
 
-    // 检测 timer 从 active 变为 idle（倒计时结束）
-    if (this._prevTimerState === 'active' && timerState === 'idle') {
-      // 倒计时结束，关闭空调
-      this._hass.callService('climate', 'turn_off', {
-        entity_id: this.config.entity,
-      })
-    }
-    this._prevTimerState = timerState
-
     if (timerState === 'active') {
       // 从 finishes_at 计算剩余时间
       const finishesAt = timerEntity.attributes?.finishes_at
@@ -577,6 +568,9 @@ export default class SimpleThermostat extends LitElement {
 
       // 启动 UI 刷新定时器（每秒刷新显示）
       this._startUIRefresh()
+
+      // 订阅 timer.finished 事件（用于自动关空调）
+      this._subscribeTimerFinished()
     } else if (timerState === 'paused') {
       // 暂停时从 remaining 属性读取
       const remaining = timerEntity.attributes?.remaining
@@ -591,6 +585,42 @@ export default class SimpleThermostat extends LitElement {
       this._timerTotal = 0
       this._timerValue = 'timer_off'
       this._stopUIRefresh()
+    }
+  }
+
+  /** 订阅 timer.finished 事件，倒计时结束时自动关空调 */
+  private _subscribeTimerFinished() {
+    if (this._unsubTimerFinished) return // 已订阅
+
+    const timerEntityId = this.config?.timer_entity
+    if (!timerEntityId) return
+
+    // 通过 hass.connection 订阅事件
+    const conn = (this._hass as any)?.connection
+    if (!conn?.subscribeEvents) return
+
+    this._unsubTimerFinished = conn.subscribeEvents(
+      (ev: any) => {
+        const eventData = ev.data
+        // 只处理当前 timer 实体的 finished 事件
+        if (eventData?.entity_id === timerEntityId) {
+          // 倒计时自然结束，关闭空调
+          this._hass.callService('climate', 'turn_off', {
+            entity_id: this.config.entity,
+          })
+          // 取消订阅
+          this._unsubscribeTimerFinished()
+        }
+      },
+      'timer.finished'
+    )
+  }
+
+  /** 取消订阅 timer.finished 事件 */
+  private _unsubscribeTimerFinished() {
+    if (this._unsubTimerFinished) {
+      this._unsubTimerFinished()
+      this._unsubTimerFinished = null
     }
   }
 
@@ -647,10 +677,12 @@ export default class SimpleThermostat extends LitElement {
     if (!timerEntityId) return
 
     if (value === 'timer_off') {
-      // 取消定时器
+      // 取消定时器（手动取消不关空调）
       this._hass.callService('timer', 'cancel', {
         entity_id: timerEntityId,
       })
+      // 取消事件订阅，防止 cancel 后收到误触发
+      this._unsubscribeTimerFinished()
       return
     }
 
@@ -684,6 +716,7 @@ export default class SimpleThermostat extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback()
     this._stopUIRefresh()
+    this._unsubscribeTimerFinished()
   }
 
   toggleEntityChanged = (ev: Event) => {
