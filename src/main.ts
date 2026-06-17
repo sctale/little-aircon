@@ -524,6 +524,7 @@ export default class SimpleThermostat extends LitElement {
 
     if (value === 'timer_off') {
       this._timerRemaining = 0
+      this.requestUpdate()
       return
     }
 
@@ -531,6 +532,7 @@ export default class SimpleThermostat extends LitElement {
     if (!opt) return
 
     this._timerRemaining = opt.minutes * 60
+    this.requestUpdate()
 
     this._timerInterval = setInterval(() => {
       this._timerRemaining -= 1

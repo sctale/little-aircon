@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.17";
+var version = "3.0.18";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1880,12 +1880,14 @@ class SimpleThermostat extends i$1 {
         this._timerValue = value;
         if (value === 'timer_off') {
             this._timerRemaining = 0;
+            this.requestUpdate();
             return;
         }
         const opt = TIMER_OPTIONS.find((o) => o.value === value);
         if (!opt)
             return;
         this._timerRemaining = opt.minutes * 60;
+        this.requestUpdate();
         this._timerInterval = setInterval(() => {
             this._timerRemaining -= 1;
             if (this._timerRemaining <= 0) {
