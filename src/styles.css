@@ -304,3 +304,7 @@ ha-switch {
   color: var(--text-primary-color) !important;
   font-weight: 500;
 }
+.mode-title.timer-active {
+  color: var(--st-mode-active-background, var(--primary-color));
+  font-weight: 500;
+}

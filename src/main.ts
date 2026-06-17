@@ -45,10 +45,10 @@ const ICONS = {
 
 const TIMER_OPTIONS = [
   { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
-  { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-3' },
-  { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-10' },
-  { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-10' },
-  { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-10' },
+  { value: 'timer_30', label: '30分钟', minutes: 30, icon: '' },
+  { value: 'timer_60', label: '60分钟', minutes: 60, icon: '' },
+  { value: 'timer_90', label: '90分钟', minutes: 90, icon: '' },
+  { value: 'timer_120', label: '120分钟', minutes: 120, icon: '' },
 ]
 
 const DEFAULT_HIDE = {
@@ -485,9 +485,14 @@ export default class SimpleThermostat extends LitElement {
     const showNames = this.config?.layout?.mode?.names !== false
     const showIcons = this.config?.layout?.mode?.icons !== false
 
+    // 倒计时中：标题显示剩余时间
+    const timerTitle = this._timerRemaining > 0
+      ? `${this._formatRemaining(this._timerRemaining)} 后关机`
+      : '定时关机'
+
     return html`
       <div class="modes ${headings ? 'heading' : ''}">
-        ${headings ? html`<div class="mode-title">定时关机</div>` : nothing}
+        ${headings ? html`<div class="mode-title ${this._timerRemaining > 0 ? 'timer-active' : ''}">${timerTitle}</div>` : nothing}
         ${TIMER_OPTIONS.map((opt) => {
           const isActive = this._timerValue === opt.value
           return html`
@@ -500,12 +505,6 @@ export default class SimpleThermostat extends LitElement {
             </div>
           `
         })}
-        ${this._timerRemaining > 0
-          ? html`<div class="mode-item active timer-countdown">
-              ${this._formatRemaining(this._timerRemaining)}
-            </div>`
-          : nothing
-        }
       </div>
     `
   }

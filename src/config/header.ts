@@ -61,10 +61,10 @@ export const MODE_ICONS: Record<string, string> = {
   on: 'mdi:toggle-switch',
   // 定时器
   timer_off: 'mdi:timer-off',
-  timer_30: 'mdi:timer-3',
-  timer_60: 'mdi:timer-10',
-  timer_90: 'mdi:timer-10',
-  timer_120: 'mdi:timer-10',
+  timer_30: '',
+  timer_60: '',
+  timer_90: '',
+  timer_120: '',
 }
 
 type Icon = string | false | LooseObject

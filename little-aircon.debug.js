@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.21";
+var version = "3.0.22";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -394,6 +394,10 @@ ha-switch {
 .timer-countdown {
   background: var(--st-mode-active-background, var(--accent-color)) !important;
   color: var(--text-primary-color) !important;
+  font-weight: 500;
+}
+.mode-title.timer-active {
+  color: var(--st-mode-active-background, var(--primary-color));
   font-weight: 500;
 }
 `;
@@ -1339,10 +1343,10 @@ const MODE_ICONS = {
     on: 'mdi:toggle-switch',
     // 定时器
     timer_off: 'mdi:timer-off',
-    timer_30: 'mdi:timer-3',
-    timer_60: 'mdi:timer-10',
-    timer_90: 'mdi:timer-10',
-    timer_120: 'mdi:timer-10',
+    timer_30: '',
+    timer_60: '',
+    timer_90: '',
+    timer_120: '',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1461,10 +1465,10 @@ const ICONS = {
 };
 const TIMER_OPTIONS = [
     { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
-    { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-3' },
-    { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-10' },
-    { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-10' },
-    { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-10' },
+    { value: 'timer_30', label: '30分钟', minutes: 30, icon: '' },
+    { value: 'timer_60', label: '60分钟', minutes: 60, icon: '' },
+    { value: 'timer_90', label: '90分钟', minutes: 90, icon: '' },
+    { value: 'timer_120', label: '120分钟', minutes: 120, icon: '' },
 ];
 const DEFAULT_HIDE = {
     temperature: false,
@@ -1844,9 +1848,13 @@ class SimpleThermostat extends i$1 {
         const headings = this.config?.layout?.mode?.headings ?? true;
         const showNames = this.config?.layout?.mode?.names !== false;
         const showIcons = this.config?.layout?.mode?.icons !== false;
+        // 倒计时中：标题显示剩余时间
+        const timerTitle = this._timerRemaining > 0
+            ? `${this._formatRemaining(this._timerRemaining)} 后关机`
+            : '定时关机';
         return b `
       <div class="modes ${headings ? 'heading' : ''}">
-        ${headings ? b `<div class="mode-title">定时关机</div>` : A}
+        ${headings ? b `<div class="mode-title ${this._timerRemaining > 0 ? 'timer-active' : ''}">${timerTitle}</div>` : A}
         ${TIMER_OPTIONS.map((opt) => {
             const isActive = this._timerValue === opt.value;
             return b `
@@ -1859,11 +1867,6 @@ class SimpleThermostat extends i$1 {
             </div>
           `;
         })}
-        ${this._timerRemaining > 0
-            ? b `<div class="mode-item active timer-countdown">
-              ${this._formatRemaining(this._timerRemaining)}
-            </div>`
-            : A}
       </div>
     `;
     }
