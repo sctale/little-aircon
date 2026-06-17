@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.10";
+var version = "3.0.13";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -922,7 +922,11 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
     };
     let stateString = getZhState(state);
     if (action) {
-        stateString = `${getZhAction(action)} (${stateString})`;
+        const actionZh = getZhAction(action);
+        // 当 action 与 state 语义重复时（如 heating/heat），只显示 action
+        if (actionZh !== stateString) {
+            stateString = actionZh;
+        }
     }
     const sensorHtml = [
         renderInfoItem({

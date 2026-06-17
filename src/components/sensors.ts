@@ -63,7 +63,11 @@ export default function renderSensors({
 
   let stateString = getZhState(state)
   if (action) {
-    stateString = `${getZhAction(action)} (${stateString})`
+    const actionZh = getZhAction(action)
+    // 当 action 与 state 语义重复时（如 heating/heat），只显示 action
+    if (actionZh !== stateString) {
+      stateString = actionZh
+    }
   }
 
   const sensorHtml = [
