@@ -9,7 +9,6 @@ const ZH_SENSOR_LABELS: Record<string, string> = {
   current_temperature: '当前温度',
   humidity: '湿度',
   temperature: '温度',
-  // fallback
 }
 
 export default function renderSensors({
@@ -27,6 +26,12 @@ export default function renderSensors({
     attributes: { hvac_action: action, current_temperature: current },
   } = entity
 
+  // 优先使用外部温度传感器的值
+  let currentTemp = current
+  if (config?.sensor_entity && hass?.states[config.sensor_entity]) {
+    currentTemp = hass.states[config.sensor_entity].state
+  }
+
   const showLabels = config?.layout?.sensors?.labels ?? true
 
   // 获取中文状态名
@@ -40,10 +45,10 @@ export default function renderSensors({
       fan_only: '送风',
       heat_cool: '冷热',
       idle: '待机',
-      heating: '加热中',
-      cooling: '制冷中',
-      drying: '除湿中',
-      fan: '送风中',
+      heating: '制热',
+      cooling: '制冷',
+      drying: '除湿',
+      fan: '送风',
     }
     return map[s] ?? s
   }
@@ -61,19 +66,18 @@ export default function renderSensors({
     return map[a] ?? a
   }
 
+  // 状态显示逻辑：优先显示 action（实际运行状态），避免与 state 重复
   let stateString = getZhState(state)
-  if (action) {
-    const actionZh = getZhAction(action)
-    // 当 action 与 state 语义重复时（如 heating/heat），只显示 action
-    if (actionZh !== stateString) {
-      stateString = actionZh
-    }
+  if (action && action !== state) {
+    stateString = getZhAction(action)
+  } else if (action) {
+    stateString = getZhAction(action)
   }
 
   const sensorHtml = [
     renderInfoItem({
       hide: _hide.temperature,
-      state: `${formatNumber(current, config)}${unit || ''}`,
+      state: `${formatNumber(currentTemp, config)}${unit || ''}`,
       hass,
       details: {
         heading: showLabels

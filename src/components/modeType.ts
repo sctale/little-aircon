@@ -20,15 +20,21 @@ const ZH_MODE_NAMES: Record<string, string> = {
   home: '在家',
   sleep: '睡眠',
   activity: '活动',
+  // 风速模式
+  silent: '静音',
+  low: '低速',
+  medium_low: '中低速',
+  medium: '中速',
+  medium_high: '中高速',
+  high: '高速',
+  highest: '最高速',
+  full: '满速',
+  auto_mode: '自动',
   // swing 模式
   vertical: '上下摆风',
   horizontal: '左右摆风',
   both: '全方位摆风',
-  // fan 模式
-  low: '低速',
-  medium: '中速',
-  high: '高速',
-  auto_mode: '自动',
+  on: '开',
 }
 
 interface ModeTypeOptions {
@@ -52,6 +58,11 @@ export default function renderModeType({
   }
 
   const getZhName = (value: string): string => {
+    // 优先使用 modeOptions.names 自定义名称
+    if (modeOptions?.names && typeof modeOptions.names === 'object') {
+      const custom = modeOptions.names[value]
+      if (custom) return custom
+    }
     return ZH_MODE_NAMES[value] ?? localize(value)
   }
 
