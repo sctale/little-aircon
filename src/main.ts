@@ -150,6 +150,7 @@ export default class SimpleThermostat extends LitElement {
   @property({ type: Object })
   _hide = DEFAULT_HIDE
 
+  // 定时器相关：从 HA timer 实体读取状态
   @property({ type: String })
   _timerValue: string = 'timer_off'
 
@@ -159,7 +160,11 @@ export default class SimpleThermostat extends LitElement {
   @property({ type: Number })
   _timerTotal: number = 0
 
-  _timerInterval: ReturnType<typeof setInterval> | null = null
+  // 前端 UI 刷新定时器（仅刷新显示，不管理倒计时逻辑）
+  _uiRefreshInterval: ReturnType<typeof setInterval> | null = null
+
+  // 记录 timer 实体上一次状态，用于检测 active→idle 的变化
+  _prevTimerState: string = ''
 
   _debouncedSetTemperature = debounce(
     (values: object) => {
@@ -286,6 +291,9 @@ export default class SimpleThermostat extends LitElement {
     if (this.config.hide) {
       this._hide = { ...this._hide, ...this.config.hide }
     }
+
+    // 同步 HA timer 实体状态
+    this._syncTimerEntity()
 
     if (this.config.sensors === false) {
       this.showSensors = false
@@ -484,6 +492,13 @@ export default class SimpleThermostat extends LitElement {
     const timerConfig = this.config?.timer
     if (!timerConfig || timerConfig === 'hide') return nothing
 
+    // 没有配置 timer_entity 时提示用户
+    if (!this.config?.timer_entity) {
+      return html`
+        <div class="timer-hint">请在配置中指定定时器实体（timer.xxx）</div>
+      `
+    }
+
     const headings = this.config?.layout?.mode?.headings ?? true
     const showNames = this.config?.layout?.mode?.names !== false
     const showIcons = this.config?.layout?.mode?.icons !== false
@@ -520,46 +535,144 @@ export default class SimpleThermostat extends LitElement {
     `
   }
 
-  private _setTimer(value: string) {
-    // 清除旧定时器
-    if (this._timerInterval) {
-      clearInterval(this._timerInterval)
-      this._timerInterval = null
+  /** 从 HA timer 实体同步状态到卡片 */
+  private _syncTimerEntity() {
+    const timerEntityId = this.config?.timer_entity
+    if (!timerEntityId) return
+
+    const timerEntity = this._hass.states?.[timerEntityId]
+    if (!timerEntity) return
+
+    const timerState = timerEntity.state // idle / active / paused
+
+    // 检测 timer 从 active 变为 idle（倒计时结束）
+    if (this._prevTimerState === 'active' && timerState === 'idle') {
+      // 倒计时结束，关闭空调
+      this._hass.callService('climate', 'turn_off', {
+        entity_id: this.config.entity,
+      })
     }
+    this._prevTimerState = timerState
 
-    this._timerValue = value
+    if (timerState === 'active') {
+      // 从 finishes_at 计算剩余时间
+      const finishesAt = timerEntity.attributes?.finishes_at
+      if (finishesAt) {
+        const endTime = new Date(finishesAt).getTime()
+        const now = Date.now()
+        const remaining = Math.max(0, Math.floor((endTime - now) / 1000))
+        this._timerRemaining = remaining
 
-    if (value === 'timer_off') {
+        // 从 duration 属性获取总时长
+        const duration = timerEntity.attributes?.duration
+        if (duration) {
+          this._timerTotal = this._parseDuration(duration)
+        } else if (this._timerTotal === 0) {
+          this._timerTotal = remaining
+        }
+      }
+
+      // 匹配当前定时选项
+      this._timerValue = this._matchTimerOption(this._timerRemaining)
+
+      // 启动 UI 刷新定时器（每秒刷新显示）
+      this._startUIRefresh()
+    } else if (timerState === 'paused') {
+      // 暂停时从 remaining 属性读取
+      const remaining = timerEntity.attributes?.remaining
+      if (remaining) {
+        this._timerRemaining = this._parseDuration(remaining)
+      }
+      this._timerValue = this._matchTimerOption(this._timerRemaining)
+      this._stopUIRefresh()
+    } else {
+      // idle
       this._timerRemaining = 0
       this._timerTotal = 0
+      this._timerValue = 'timer_off'
+      this._stopUIRefresh()
+    }
+  }
+
+  /** 匹配当前剩余时间对应的定时选项 */
+  private _matchTimerOption(remainingSeconds: number): string {
+    const minutes = Math.round(remainingSeconds / 60)
+    const match = TIMER_OPTIONS.find((o) => o.minutes === minutes)
+    return match ? match.value : 'timer_off'
+  }
+
+  /** 解析 HA duration 格式（HH:MM:SS 或秒数）为总秒数 */
+  private _parseDuration(duration: string | number): number {
+    if (typeof duration === 'number') return duration
+    // 格式：HH:MM:SS
+    const parts = String(duration).split(':').map(Number)
+    if (parts.length === 3) {
+      return parts[0] * 3600 + parts[1] * 60 + parts[2]
+    } else if (parts.length === 2) {
+      return parts[0] * 60 + parts[1]
+    }
+    return parseInt(String(duration), 10) || 0
+  }
+
+  /** 启动 UI 刷新定时器 */
+  private _startUIRefresh() {
+    if (this._uiRefreshInterval) return
+    this._uiRefreshInterval = setInterval(() => {
+      // 重新计算剩余时间
+      const timerEntityId = this.config?.timer_entity
+      if (!timerEntityId) return
+      const timerEntity = this._hass.states?.[timerEntityId]
+      if (!timerEntity || timerEntity.state !== 'active') return
+
+      const finishesAt = timerEntity.attributes?.finishes_at
+      if (finishesAt) {
+        const endTime = new Date(finishesAt).getTime()
+        const now = Date.now()
+        this._timerRemaining = Math.max(0, Math.floor((endTime - now) / 1000))
+      }
       this.requestUpdate()
+    }, 1000)
+  }
+
+  /** 停止 UI 刷新定时器 */
+  private _stopUIRefresh() {
+    if (this._uiRefreshInterval) {
+      clearInterval(this._uiRefreshInterval)
+      this._uiRefreshInterval = null
+    }
+  }
+
+  private _setTimer(value: string) {
+    const timerEntityId = this.config?.timer_entity
+    if (!timerEntityId) return
+
+    if (value === 'timer_off') {
+      // 取消定时器
+      this._hass.callService('timer', 'cancel', {
+        entity_id: timerEntityId,
+      })
       return
     }
 
     const opt = TIMER_OPTIONS.find((o) => o.value === value)
     if (!opt) return
 
+    // 格式化 duration 为 HH:MM:SS
+    const hours = Math.floor(opt.minutes / 60)
+    const mins = opt.minutes % 60
+    const durationStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`
+
+    // 启动 HA timer
+    this._hass.callService('timer', 'start', {
+      entity_id: timerEntityId,
+      duration: durationStr,
+    })
+
+    // 立即更新 UI 状态
+    this._timerValue = value
     this._timerTotal = opt.minutes * 60
     this._timerRemaining = this._timerTotal
     this.requestUpdate()
-
-    this._timerInterval = setInterval(() => {
-      this._timerRemaining -= 1
-      if (this._timerRemaining <= 0) {
-        // 时间到，关闭空调
-        if (this._timerInterval) {
-          clearInterval(this._timerInterval)
-          this._timerInterval = null
-        }
-        this._timerValue = 'timer_off'
-        this._timerRemaining = 0
-        this._timerTotal = 0
-        this._hass.callService('climate', 'turn_off', {
-          entity_id: this.config.entity,
-        })
-      }
-      this.requestUpdate()
-    }, 1000)
   }
 
   private _formatRemaining(seconds: number): string {
@@ -570,10 +683,7 @@ export default class SimpleThermostat extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback()
-    if (this._timerInterval) {
-      clearInterval(this._timerInterval)
-      this._timerInterval = null
-    }
+    this._stopUIRefresh()
   }
 
   toggleEntityChanged = (ev: Event) => {

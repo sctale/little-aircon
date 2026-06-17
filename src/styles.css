@@ -327,3 +327,9 @@ ha-switch {
   color: var(--st-mode-active-background, var(--primary-color));
   font-weight: 500;
 }
+.timer-hint {
+  padding: 8px 16px;
+  font-size: var(--ha-font-size-s);
+  color: var(--secondary-text-color);
+  text-align: center;
+}

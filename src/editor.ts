@@ -8,6 +8,7 @@ import { HASS } from './types'
 
 const includeDomains = ['climate']
 const sensorIncludeDomains = ['sensor']
+const timerIncludeDomains = ['timer']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
 const cloneDeep = (obj: any) => JSON.parse(JSON.stringify(obj))
@@ -200,6 +201,16 @@ export default class SimpleThermostatEditor extends LitElement {
               fixedMenuPosition
             ></ha-select>
           </div>
+          ${config.timer === true || config.timer === 'show' ? html`
+            <ha-entity-picker
+              label="定时器实体（timer.xxx，必选）"
+              .hass=${this.hass}
+              .value=${config.timer_entity || ''}
+              .includeDomains=${timerIncludeDomains}
+              @value-changed=${(ev) => this._configChanged('timer_entity', ev.detail.value)}
+              allow-custom-entity
+            ></ha-entity-picker>
+          ` : nothing}
         </div>
 
         <div class="form-group">
