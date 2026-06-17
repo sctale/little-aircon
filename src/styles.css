@@ -295,3 +295,12 @@ ha-switch {
   color: var(--secondary-text-color);
   padding-top: 4px;
 }
+.mode-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.timer-countdown {
+  background: var(--st-mode-active-background, var(--accent-color)) !important;
+  color: var(--text-primary-color) !important;
+  font-weight: 500;
+}

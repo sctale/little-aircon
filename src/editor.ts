@@ -191,6 +191,14 @@ export default class SimpleThermostatEditor extends LitElement {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
+            <ha-select
+              label="定时关机"
+              .value=${config.timer === true || config.timer === 'show' ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._timerChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
           </div>
         </div>
 
@@ -262,6 +270,12 @@ export default class SimpleThermostatEditor extends LitElement {
     const value = ev.detail?.value
     if (value === undefined) return
     this._configChanged('layout.mode.headings', value === 'hide' ? false : true)
+  }
+
+  private _timerChanged(ev: any) {
+    const value = ev.detail?.value
+    if (value === undefined) return
+    this._configChanged('timer', value === 'show' ? true : 'hide')
   }
 
   private _presetControlChanged(ev: any) {

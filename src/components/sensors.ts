@@ -66,12 +66,10 @@ export default function renderSensors({
     return map[a] ?? a
   }
 
-  // 状态显示逻辑：优先显示 action（实际运行状态），避免与 state 重复
+  // 状态显示：显示 state（当前模式），当 action 与 state 不同时补充显示 action
   let stateString = getZhState(state)
   if (action && action !== state) {
-    stateString = getZhAction(action)
-  } else if (action) {
-    stateString = getZhAction(action)
+    stateString = `${stateString} (${getZhAction(action)})`
   }
 
   const sensorHtml = [

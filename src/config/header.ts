@@ -59,6 +59,12 @@ export const MODE_ICONS: Record<string, string> = {
   swing_horizontal: 'mdi:arrow-left-right',
   swing: 'mdi:arrow-up-down',
   on: 'mdi:toggle-switch',
+  // 定时器
+  timer_off: 'mdi:timer-off',
+  timer_30: 'mdi:timer-30',
+  timer_60: 'mdi:timer-60',
+  timer_90: 'mdi:timer-90',
+  timer_120: 'mdi:timer-120',
 }
 
 type Icon = string | false | LooseObject

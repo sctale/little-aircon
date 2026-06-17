@@ -43,6 +43,14 @@ const ICONS = {
   MINUS: 'mdi:minus',
 }
 
+const TIMER_OPTIONS = [
+  { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
+  { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-30' },
+  { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-60' },
+  { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-90' },
+  { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-120' },
+]
+
 const DEFAULT_HIDE = {
   temperature: false,
   state: false,
@@ -141,6 +149,14 @@ export default class SimpleThermostat extends LitElement {
 
   @property({ type: Object })
   _hide = DEFAULT_HIDE
+
+  @property({ type: String })
+  _timerValue: string = 'timer_off'
+
+  @property({ type: Number })
+  _timerRemaining: number = 0
+
+  _timerInterval: ReturnType<typeof setInterval> | null = null
 
   _debouncedSetTemperature = debounce(
     (values: object) => {
@@ -455,8 +471,96 @@ export default class SimpleThermostat extends LitElement {
             setMode: this.setMode,
           })
         )}
+
+        ${this._renderTimer()}
       </ha-card>
     `
+  }
+
+  private _renderTimer() {
+    // timer 配置：默认隐藏，设为 true 或 'show' 时显示
+    const timerConfig = this.config?.timer
+    if (!timerConfig || timerConfig === 'hide') return nothing
+
+    const isOff = this.entity?.state === 'off'
+    const headings = this.config?.layout?.mode?.headings ?? true
+
+    return html`
+      <div class="modes ${headings ? 'heading' : ''}">
+        ${headings ? html`<div class="mode-title">定时关机</div>` : nothing}
+        ${TIMER_OPTIONS.map((opt) => {
+          const isActive = this._timerValue === opt.value
+          return html`
+            <div
+              class="mode-item ${isActive ? 'active ' + opt.value : ''} ${isOff && opt.value !== 'timer_off' ? 'disabled' : ''}"
+              @click=${() => !isOff && this._setTimer(opt.value)}
+            >
+              <ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>
+              ${this.config?.layout?.mode?.icons === false ? nothing : nothing}
+              ${this.config?.layout?.mode?.names === false ? nothing : html`${opt.label}`}
+            </div>
+          `
+        })}
+        ${this._timerRemaining > 0
+          ? html`<div class="mode-item active timer-countdown">
+              <ha-icon class="mode-icon" .icon="mdi:timer-sand"></ha-icon>
+              ${this._formatRemaining(this._timerRemaining)}
+            </div>`
+          : nothing
+        }
+      </div>
+    `
+  }
+
+  private _setTimer(value: string) {
+    // 清除旧定时器
+    if (this._timerInterval) {
+      clearInterval(this._timerInterval)
+      this._timerInterval = null
+    }
+
+    this._timerValue = value
+
+    if (value === 'timer_off') {
+      this._timerRemaining = 0
+      return
+    }
+
+    const opt = TIMER_OPTIONS.find((o) => o.value === value)
+    if (!opt) return
+
+    this._timerRemaining = opt.minutes * 60
+
+    this._timerInterval = setInterval(() => {
+      this._timerRemaining -= 1
+      if (this._timerRemaining <= 0) {
+        // 时间到，关闭空调
+        if (this._timerInterval) {
+          clearInterval(this._timerInterval)
+          this._timerInterval = null
+        }
+        this._timerValue = 'timer_off'
+        this._timerRemaining = 0
+        this._hass.callService('climate', 'turn_off', {
+          entity_id: this.config.entity,
+        })
+      }
+      this.requestUpdate()
+    }, 1000)
+  }
+
+  private _formatRemaining(seconds: number): string {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${m}:${s.toString().padStart(2, '0')}`
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    if (this._timerInterval) {
+      clearInterval(this._timerInterval)
+      this._timerInterval = null
+    }
   }
 
   toggleEntityChanged = (ev: Event) => {

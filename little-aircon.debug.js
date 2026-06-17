@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.14";
+var version = "3.0.15";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -387,6 +387,15 @@ ha-switch {
   color: var(--secondary-text-color);
   padding-top: 4px;
 }
+.mode-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.timer-countdown {
+  background: var(--st-mode-active-background, var(--accent-color)) !important;
+  color: var(--text-primary-color) !important;
+  font-weight: 500;
+}
 `;
 styleInject(css_248z);
 
@@ -574,6 +583,14 @@ class SimpleThermostatEditor extends i$1 {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
+            <ha-select
+              label="定时关机"
+              .value=${config.timer === true || config.timer === 'show' ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._timerChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
           </div>
         </div>
 
@@ -645,6 +662,12 @@ class SimpleThermostatEditor extends i$1 {
         if (value === undefined)
             return;
         this._configChanged('layout.mode.headings', value === 'hide' ? false : true);
+    }
+    _timerChanged(ev) {
+        const value = ev.detail?.value;
+        if (value === undefined)
+            return;
+        this._configChanged('timer', value === 'show' ? true : 'hide');
     }
     _presetControlChanged(ev) {
         const value = ev.detail?.value;
@@ -1134,13 +1157,10 @@ function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, o
         };
         return map[a] ?? a;
     };
-    // 状态显示逻辑：优先显示 action（实际运行状态），避免与 state 重复
+    // 状态显示：显示 state（当前模式），当 action 与 state 不同时补充显示 action
     let stateString = getZhState(state);
     if (action && action !== state) {
-        stateString = getZhAction(action);
-    }
-    else if (action) {
-        stateString = getZhAction(action);
+        stateString = `${stateString} (${getZhAction(action)})`;
     }
     const sensorHtml = [
         renderInfoItem({
@@ -1224,6 +1244,12 @@ const ZH_MODE_NAMES = {
     horizontal: '左右摆风',
     both: '全方位摆风',
     on: '开',
+    // 定时器
+    timer_off: '关闭',
+    timer_30: '30分钟',
+    timer_60: '60分钟',
+    timer_90: '90分钟',
+    timer_120: '120分钟',
 };
 function renderModeType({ state, mode: options, modeOptions, localize, setMode, }) {
     const { type, hide_when_off, mode = 'none', list, name } = options;
@@ -1326,6 +1352,12 @@ const MODE_ICONS = {
     swing_horizontal: 'mdi:arrow-left-right',
     swing: 'mdi:arrow-up-down',
     on: 'mdi:toggle-switch',
+    // 定时器
+    timer_off: 'mdi:timer-off',
+    timer_30: 'mdi:timer-30',
+    timer_60: 'mdi:timer-60',
+    timer_90: 'mdi:timer-90',
+    timer_120: 'mdi:timer-120',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1442,6 +1474,13 @@ const ICONS = {
     PLUS: 'mdi:plus',
     MINUS: 'mdi:minus',
 };
+const TIMER_OPTIONS = [
+    { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
+    { value: 'timer_30', label: '30分钟', minutes: 30, icon: 'mdi:timer-30' },
+    { value: 'timer_60', label: '60分钟', minutes: 60, icon: 'mdi:timer-60' },
+    { value: 'timer_90', label: '90分钟', minutes: 90, icon: 'mdi:timer-90' },
+    { value: 'timer_120', label: '120分钟', minutes: 120, icon: 'mdi:timer-120' },
+];
 const DEFAULT_HIDE = {
     temperature: false,
     state: false,
@@ -1496,6 +1535,9 @@ class SimpleThermostat extends i$1 {
         this._values = {};
         this._updatingValues = false;
         this._hide = DEFAULT_HIDE;
+        this._timerValue = 'timer_off';
+        this._timerRemaining = 0;
+        this._timerInterval = null;
         this._debouncedSetTemperature = debounceFn((values) => {
             const { domain, service, data = {} } = this.service;
             this._hass.callService(domain, service, {
@@ -1805,8 +1847,86 @@ class SimpleThermostat extends i$1 {
             modeOptions: this.config?.layout?.mode ?? {},
             setMode: this.setMode,
         }))}
+
+        ${this._renderTimer()}
       </ha-card>
     `;
+    }
+    _renderTimer() {
+        // timer 配置：默认隐藏，设为 true 或 'show' 时显示
+        const timerConfig = this.config?.timer;
+        if (!timerConfig || timerConfig === 'hide')
+            return A;
+        const isOff = this.entity?.state === 'off';
+        const headings = this.config?.layout?.mode?.headings ?? true;
+        return b `
+      <div class="modes ${headings ? 'heading' : ''}">
+        ${headings ? b `<div class="mode-title">定时关机</div>` : A}
+        ${TIMER_OPTIONS.map((opt) => {
+            const isActive = this._timerValue === opt.value;
+            return b `
+            <div
+              class="mode-item ${isActive ? 'active ' + opt.value : ''} ${isOff && opt.value !== 'timer_off' ? 'disabled' : ''}"
+              @click=${() => !isOff && this._setTimer(opt.value)}
+            >
+              <ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>
+              ${this.config?.layout?.mode?.icons === false ? A : A}
+              ${this.config?.layout?.mode?.names === false ? A : b `${opt.label}`}
+            </div>
+          `;
+        })}
+        ${this._timerRemaining > 0
+            ? b `<div class="mode-item active timer-countdown">
+              <ha-icon class="mode-icon" .icon="mdi:timer-sand"></ha-icon>
+              ${this._formatRemaining(this._timerRemaining)}
+            </div>`
+            : A}
+      </div>
+    `;
+    }
+    _setTimer(value) {
+        // 清除旧定时器
+        if (this._timerInterval) {
+            clearInterval(this._timerInterval);
+            this._timerInterval = null;
+        }
+        this._timerValue = value;
+        if (value === 'timer_off') {
+            this._timerRemaining = 0;
+            return;
+        }
+        const opt = TIMER_OPTIONS.find((o) => o.value === value);
+        if (!opt)
+            return;
+        this._timerRemaining = opt.minutes * 60;
+        this._timerInterval = setInterval(() => {
+            this._timerRemaining -= 1;
+            if (this._timerRemaining <= 0) {
+                // 时间到，关闭空调
+                if (this._timerInterval) {
+                    clearInterval(this._timerInterval);
+                    this._timerInterval = null;
+                }
+                this._timerValue = 'timer_off';
+                this._timerRemaining = 0;
+                this._hass.callService('climate', 'turn_off', {
+                    entity_id: this.config.entity,
+                });
+            }
+            this.requestUpdate();
+        }, 1000);
+    }
+    _formatRemaining(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this._timerInterval) {
+            clearInterval(this._timerInterval);
+            this._timerInterval = null;
+        }
     }
     setTemperature(change, field) {
         this._updatingValues = true;
@@ -1863,6 +1983,12 @@ __decorate([
 __decorate([
     n({ type: Object })
 ], SimpleThermostat.prototype, "_hide", void 0);
+__decorate([
+    n({ type: String })
+], SimpleThermostat.prototype, "_timerValue", void 0);
+__decorate([
+    n({ type: Number })
+], SimpleThermostat.prototype, "_timerRemaining", void 0);
 
 customElements.define(name, SimpleThermostat);
 customElements.define(`${name}-editor`, SimpleThermostatEditor);

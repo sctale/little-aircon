@@ -35,6 +35,12 @@ const ZH_MODE_NAMES: Record<string, string> = {
   horizontal: '左右摆风',
   both: '全方位摆风',
   on: '开',
+  // 定时器
+  timer_off: '关闭',
+  timer_30: '30分钟',
+  timer_60: '60分钟',
+  timer_90: '90分钟',
+  timer_120: '120分钟',
 }
 
 interface ModeTypeOptions {
