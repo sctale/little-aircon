@@ -125,6 +125,18 @@ sensors:
 
 ## 更新日志
 
+### v3.0.13
+
+- 修复 `fireEvent` 使用 `CustomEvent` 确保 detail 正确传递
+- 修复图标前缀 `hass:` → `mdi:`，兼容 HA 2025.5+
+- 修复 `getModeList` 默认图标 `hass:radiator` → `mdi:air-conditioner`
+- 修复 `entity` 初始值 `{}` → `undefined`
+- 修复编辑器 `ha-select` 全部改用 `.options` 属性方式，兼容 HA 2025.5+
+- 修复编辑器 `valueChanged` 中 ha-select 取值逻辑
+- 修复编辑器缺少 `nothing` 导入
+- 修复 `_deleteTimerEntity` 查找逻辑，改用 entity registry 精确匹配
+- 添加 `setConfig` entity 域验证（仅 `climate.`）
+
 ### v3.0.12
 
 - 定时关机功能：基于 HA timer 实体，服务端运行，刷新页面不丢失
