@@ -284,6 +284,11 @@ export default class SimpleThermostat extends LitElement {
       this._autoCreateTimerEntity()
     }
 
+    // 定时器隐藏时，删除 timer 实体并清理配置
+    if ((!this.config?.timer || this.config.timer === 'hide') && this.config?.timer_entity) {
+      this._deleteTimerEntity(this.config.timer_entity)
+    }
+
     // 同步 HA timer 实体状态
     this._syncTimerEntity()
 
@@ -783,13 +788,58 @@ export default class SimpleThermostat extends LitElement {
     try {
       const entityId = await this._createTimerEntity()
       if (entityId) {
-        // 将 entity_id 写入卡片配置
         this.config = { ...this.config, timer_entity: entityId }
         fireEvent(this, 'config-changed', { config: this.config })
       }
     } finally {
       this._timerCreating = false
     }
+  }
+
+  /** 删除 timer 实体并清理配置 */
+  private async _deleteTimerEntity(entityId: string) {
+    // 先取消正在运行的定时器
+    const timerEntity = this._hass.states?.[entityId]
+    if (timerEntity?.state === 'active') {
+      this._hass.callService('timer', 'cancel', { entity_id: entityId })
+    }
+    this._stopUIRefresh()
+    this._unsubscribeTimerFinished()
+
+    // 通过 HA API 删除 timer 实体
+    try {
+      const conn = (this._hass as any)?.connection
+      if (conn) {
+        const configEntries = await conn.sendMessagePromise({
+          type: 'config_entries/get',
+          domain: 'timer',
+        })
+        const entry = (configEntries || []).find((e: any) => {
+          // 通过 entity_id 匹配
+          const entryEntityId = e.entry_id
+          return entryEntityId
+        })
+        if (entry?.entry_id) {
+          await conn.sendMessagePromise({
+            type: 'config_entries/remove',
+            entry_id: entry.entry_id,
+          })
+        }
+      }
+    } catch (err) {
+      console.warn('小空调：删除 timer 实体失败', err)
+    }
+
+    // 清理配置中的 timer_entity
+    const newConfig = { ...this.config }
+    delete (newConfig as any).timer_entity
+    this.config = newConfig
+    fireEvent(this, 'config-changed', { config: newConfig })
+
+    // 重置 UI 状态
+    this._timerValue = 'timer_off'
+    this._timerRemaining = 0
+    this._timerTotal = 0
   }
 
   /** 自动创建 HA timer helper 实体 */
