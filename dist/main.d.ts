@@ -29,7 +29,6 @@ export default class SimpleThermostat extends LitElement {
     _timerTotal: number;
     _uiRefreshInterval: ReturnType<typeof setInterval> | null;
     _unsubTimerFinished: (() => void) | null;
-    _timerCreating: boolean;
     _debouncedSetTemperature: import("debounce-fn").DebouncedFunction<[values: object], void>;
     static getConfigElement(): HTMLElement;
     setConfig(config: CardConfig): void;
@@ -37,13 +36,6 @@ export default class SimpleThermostat extends LitElement {
     set hass(hass: any);
     localize: (label: string, prefix?: string) => any;
     render(): import("lit-html").TemplateResult<1>;
-    toggleEntityChanged: (ev: Event) => void;
-    setTemperature(change: number, field: string): void;
-    setMode: (type: string, mode: string) => void;
-    openEntityPopover: (entityId?: string | null) => void;
-    getCardSize(): number;
-    getUnit(): string | boolean;
-    disconnectedCallback(): void;
     /** 渲染定时器 UI */
     private _renderTimer;
     /** 从 HA timer 实体同步状态到卡片 */
@@ -64,11 +56,19 @@ export default class SimpleThermostat extends LitElement {
     private _setTimer;
     /** 格式化剩余时间 */
     private _formatRemaining;
+    _timerCreating: boolean;
     /** 自动创建 timer（带防重复） */
     private _autoCreateTimerEntity;
     /** 删除 timer 实体并清理配置 */
     private _deleteTimerEntity;
     /** 自动创建 HA timer helper 实体 */
     private _createTimerEntity;
+    disconnectedCallback(): void;
+    toggleEntityChanged: (ev: Event) => void;
+    setTemperature(change: number, field: string): void;
+    setMode: (type: string, mode: string) => void;
+    openEntityPopover: (entityId?: string | null) => void;
+    getCardSize(): number;
+    getUnit(): string | boolean;
 }
 export {};

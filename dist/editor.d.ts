@@ -1,15 +1,29 @@
-import { LitElement } from 'lit';
+import { LitElement, nothing } from 'lit';
 import { CardConfig } from './config/card';
 import { HASS } from './types';
 export default class SimpleThermostatEditor extends LitElement {
-    config: CardConfig;
     hass: HASS;
+    private _config;
     static styles: any;
-    static getStubConfig(): any;
+    static getStubConfig(): {
+        header: {};
+        layout: {
+            mode: {};
+        };
+    };
     setConfig(config: CardConfig): void;
     _openLink(): void;
-    render(): import("lit-html").TemplateResult<1>;
-    valueChanged(ev: any): void;
-    _timerChanged(ev: any): void;
-    _configChanged(key: string, value: any): void;
+    protected render(): typeof nothing | import("lit-html").TemplateResult<1>;
+    private _entityPicked;
+    private _decimalsChanged;
+    private _stepLayoutChanged;
+    private _stepSizeChanged;
+    private _modeNamesChanged;
+    private _modeIconsChanged;
+    private _modeHeadingsChanged;
+    private _timerChanged;
+    private _presetControlChanged;
+    private _fanControlChanged;
+    private _updateControlList;
+    private _configChanged;
 }

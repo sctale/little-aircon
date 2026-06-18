@@ -13,13 +13,7 @@
 - 编辑器新增定时关机开关和 timer_entity 显示
 
 ### 改进
-- fireEvent 使用 CustomEvent 确保 detail 正确传递
-- 升降温按钮逻辑修正（+/- 方向正确）
-- 默认布局改为 column
-- entity 可用判断简化
-- 编辑器重写为 side-by-side 布局，统一 valueChanged 处理
-- 图标修正：off → mdi:power，swing 图标简化
-- 状态名改为"制冷中/制热中/除湿中/送风中"
+- _matchTimerOption 未精确匹配时保留当前选中项（倒计时进行中）
 - .gitignore 移除 dist 排除，HACS 可下载构建产物
 
 ## v3.1.3 (2026-06-18)

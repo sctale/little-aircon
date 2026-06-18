@@ -2,4 +2,3 @@ node_modules
 *.min.js
 simple-thermostat.js
 .nvmrc
-build

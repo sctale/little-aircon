@@ -32,20 +32,17 @@ export const MODE_ICONS: Record<string, string> = {
   fan_only: 'mdi:fan',
   heat_cool: 'mdi:autorenew',
   heat: 'mdi:fire',
-  off: 'mdi:power',
-  // swing 模式
-  swing_horizontal: 'mdi:fan',
-  swing: 'mdi:fan-sync',
-  // preset 预设模式
+  off: 'mdi:air-conditioner',
+  // 预设模式
   none: 'mdi:cancel',
   eco: 'mdi:leaf',
-  away: 'mdi:account-arrow-right',
+  away: 'mdi:home-alert',
   boost: 'mdi:rocket-launch',
   comfort: 'mdi:sofa',
   home: 'mdi:home',
-  sleep: 'mdi:sleep',
+  sleep: 'mdi:power-sleep',
   activity: 'mdi:run',
-  // fan 风速模式
+  // 风速模式（按低/中/高映射数字图标）
   silent: 'mdi:fan-chevron-down',
   low: 'mdi:fan-speed-1',
   medium_low: 'mdi:fan-speed-1',
@@ -55,6 +52,13 @@ export const MODE_ICONS: Record<string, string> = {
   highest: 'mdi:fan-speed-3',
   full: 'mdi:fan-chevron-up',
   auto_mode: 'mdi:fan-auto',
+  // swing 模式
+  vertical: 'mdi:arrow-up-down',
+  horizontal: 'mdi:arrow-left-right',
+  both: 'mdi:arrow-all',
+  swing_horizontal: 'mdi:arrow-left-right',
+  swing: 'mdi:arrow-up-down',
+  on: 'mdi:toggle-switch',
   // 定时器
   timer_off: 'mdi:timer-off',
   timer_30: 'mdi:timer-outline',

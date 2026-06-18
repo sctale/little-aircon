@@ -7,5 +7,5 @@ type HeaderOptions = {
     openEntityPopover: any;
     toggleEntityChanged: any;
 };
-export default function renderHeader({ header, toggleEntityChanged, entity, openEntityPopover, }: HeaderOptions): import("lit-html").TemplateResult<1> | typeof nothing;
+export default function renderHeader({ header, toggleEntityChanged, entity, openEntityPopover, }: HeaderOptions): typeof nothing | import("lit-html").TemplateResult<1>;
 export {};
