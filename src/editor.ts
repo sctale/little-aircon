@@ -187,14 +187,14 @@ export default class SimpleThermostatEditor extends LitElement {
 
           ${this.config.timer === true || this.config.timer === 'show' ? html`
             <div class="side-by-side">
-              <ha-entity-picker
-                label="定时器实体（timer.xxx）"
-                .hass=${this.hass}
-                .value=${this.config.timer_entity || ''}
-                .includeDomains=${timerIncludeDomains}
-                @value-changed=${(ev: any) => this._configChanged('timer_entity', ev.detail.value)}
-                allow-custom-entity
-              ></ha-entity-picker>
+              ${this.config.timer_entity
+                ? html`<ha-textfield
+                    label="定时器实体（已自动创建）"
+                    .value=${this.config.timer_entity}
+                    disabled
+                  ></ha-textfield>`
+                : html`<span class="hint">定时器实体将自动创建...</span>`
+              }
             </div>
           ` : nothing}
 

@@ -101,7 +101,7 @@ sensors:
 | `sensors` | false / array | 传感器列表 |
 | `sensor_entity` | string | 室内温度传感器实体 ID（可选） |
 | `timer` | boolean / 'show' / 'hide' | 定时关机显隐 |
-| `timer_entity` | string | HA timer 实体 ID（开启定时后必填） |
+| `timer_entity` | string | HA timer 实体 ID（自动创建，无需手动配置） |
 | `layout.step` | row / column | 温度调节按钮排列方向（默认 row） |
 | `layout.mode.names` | boolean | 是否显示模式名称（默认 true） |
 | `layout.mode.icons` | boolean | 是否显示模式图标（默认 true） |
@@ -132,7 +132,7 @@ sensors:
 - 手动取消定时不会关空调
 - 进度条展示倒计时剩余时间
 - 空调被关闭时自动取消定时器
-- 编辑器新增定时关机开关和 timer 实体选择器
+- 编辑器新增定时关机开关（timer 实体自动创建）
 - 编辑器新增室内温度传感器选择器
 
 ### v3.0.11

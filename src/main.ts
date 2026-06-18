@@ -153,6 +153,9 @@ export default class SimpleThermostat extends LitElement {
   // HA 事件订阅取消函数
   _unsubTimerFinished: (() => void) | null = null
 
+  // 防止重复创建 timer
+  _timerCreating: boolean = false
+
   _debouncedSetTemperature = debounce(
     (values: object) => {
       const { domain, service, data = {} } = this.service
@@ -274,6 +277,11 @@ export default class SimpleThermostat extends LitElement {
 
     if (this.config.hide) {
       this._hide = { ...this._hide, ...this.config.hide }
+    }
+
+    // 定时器开启但未配置 timer_entity 时，自动创建
+    if (this.config?.timer && this.config.timer !== 'hide' && !this.config?.timer_entity) {
+      this._autoCreateTimerEntity()
     }
 
     // 同步 HA timer 实体状态
@@ -765,6 +773,23 @@ export default class SimpleThermostat extends LitElement {
     const m = Math.floor(seconds / 60)
     const s = seconds % 60
     return `${m}:${s.toString().padStart(2, '0')}`
+  }
+
+  /** 自动创建 timer（带防重复） */
+  private async _autoCreateTimerEntity() {
+    if (this._timerCreating) return
+    this._timerCreating = true
+
+    try {
+      const entityId = await this._createTimerEntity()
+      if (entityId) {
+        // 将 entity_id 写入卡片配置
+        this.config = { ...this.config, timer_entity: entityId }
+        fireEvent(this, 'config-changed', { config: this.config })
+      }
+    } finally {
+      this._timerCreating = false
+    }
   }
 
   /** 自动创建 HA timer helper 实体 */
