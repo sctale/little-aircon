@@ -20,7 +20,13 @@ function setValue(obj: any, path: string, value: any) {
 const OptionsDecimals = [0, 1]
 const OptionsStepSize = [0.5, 1]
 const OptionsStepLayout = ['column', 'row']
+const OPTIONS_SHOW_HIDE = [
+  { value: 'show', label: '显示' },
+  { value: 'hide', label: '隐藏' },
+]
 const includeDomains = ['climate']
+const sensorIncludeDomains = ['sensor']
+const timerIncludeDomains = ['timer']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
 const stub: any = {
@@ -158,6 +164,41 @@ export default class SimpleThermostatEditor extends LitElement {
           </div>
 
           <div class="side-by-side">
+            <ha-entity-picker
+              label="室内温度传感器（可选）"
+              .hass=${this.hass}
+              .value=${this.config.sensor_entity || ''}
+              .includeDomains=${sensorIncludeDomains}
+              @value-changed=${(ev: any) => this._configChanged('sensor_entity', ev.detail.value)}
+              allow-custom-entity
+            ></ha-entity-picker>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
+              label="定时关机"
+              .value=${this.config.timer === true || this.config.timer === 'show' ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._timerChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+
+          ${this.config.timer === true || this.config.timer === 'show' ? html`
+            <div class="side-by-side">
+              <ha-entity-picker
+                label="定时器实体（timer.xxx）"
+                .hass=${this.hass}
+                .value=${this.config.timer_entity || ''}
+                .includeDomains=${timerIncludeDomains}
+                @value-changed=${(ev: any) => this._configChanged('timer_entity', ev.detail.value)}
+                allow-custom-entity
+              ></ha-entity-picker>
+            </div>
+          ` : nothing}
+
+          <div class="side-by-side">
             <ha-button @click=${this._openLink}>
               配置选项说明
             </ha-button>
@@ -192,6 +233,25 @@ export default class SimpleThermostatEditor extends LitElement {
         )
       }
     }
+    fireEvent(this, 'config-changed', { config: copy })
+  }
+
+  _timerChanged(ev: any) {
+    const value = ev.detail.value
+    const copy = cloneDeep(this.config)
+    copy.timer = value === 'show' ? true : 'hide'
+    this.config = copy
+    fireEvent(this, 'config-changed', { config: copy })
+  }
+
+  _configChanged(key: string, value: any) {
+    const copy = cloneDeep(this.config)
+    if (value === '' || value === undefined) {
+      delete copy[key]
+    } else {
+      ;(copy as any)[key] = value
+    }
+    this.config = copy
     fireEvent(this, 'config-changed', { config: copy })
   }
 }

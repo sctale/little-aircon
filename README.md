@@ -94,14 +94,18 @@ sensors:
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `entity` | string | 温控实体 ID **（必填）** |
+| `entity` | string | 温控实体 ID **（必填，仅 climate 域）** |
 | `header` | false / object | 标题栏配置 |
 | `setpoints` | false / object | 温度设定点配置 |
 | `control` | false / string[] / object | 控制模式配置 |
 | `sensors` | false / array | 传感器列表 |
-| `layout.step` | row / column | 温度调节按钮排列方向 |
-| `layout.mode.names` | boolean | 是否显示模式名称 |
-| `layout.mode.icons` | boolean | 是否显示模式图标 |
+| `sensor_entity` | string | 室内温度传感器实体 ID（可选） |
+| `timer` | boolean / 'show' / 'hide' | 定时关机显隐 |
+| `timer_entity` | string | HA timer 实体 ID（开启定时后必填） |
+| `layout.step` | row / column | 温度调节按钮排列方向（默认 row） |
+| `layout.mode.names` | boolean | 是否显示模式名称（默认 true） |
+| `layout.mode.icons` | boolean | 是否显示模式图标（默认 true） |
+| `layout.mode.headings` | boolean | 是否显示模式标题（默认 true） |
 | `layout.sensors.type` | list / table | 传感器渲染方式 |
 | `service` | object | 自定义服务调用 |
 | `unit` | string / bool | 温度单位（false 隐藏） |
@@ -121,7 +125,17 @@ sensors:
 
 ## 更新日志
 
-### v3.0.10
+### v3.1.0
+
+- 定时关机功能：基于 HA timer 实体，服务端运行，刷新页面不丢失
+- 通过 `hass.connection.subscribeEvents` 监听 `timer.finished` 事件自动关空调
+- 手动取消定时不会关空调
+- 进度条展示倒计时剩余时间
+- 空调被关闭时自动取消定时器
+- 编辑器新增定时关机开关和 timer 实体选择器
+- 编辑器新增室内温度传感器选择器
+
+### v3.0.11
 
 - 全面升级至 lit v3，兼容 Home Assistant 2026.x
 - 升级 TypeScript 5.3 + Rollup 4.x
