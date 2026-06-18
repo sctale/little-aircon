@@ -94,18 +94,14 @@ sensors:
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `entity` | string | 温控实体 ID **（必填，仅 climate 域）** |
+| `entity` | string | 温控实体 ID **（必填）** |
 | `header` | false / object | 标题栏配置 |
 | `setpoints` | false / object | 温度设定点配置 |
 | `control` | false / string[] / object | 控制模式配置 |
 | `sensors` | false / array | 传感器列表 |
-| `sensor_entity` | string | 室内温度传感器实体 ID（可选） |
-| `timer` | boolean / 'show' / 'hide' | 定时关机显隐 |
-| `timer_entity` | string | HA timer 实体 ID（自动创建，无需手动配置） |
-| `layout.step` | row / column | 温度调节按钮排列方向（默认 row） |
-| `layout.mode.names` | boolean | 是否显示模式名称（默认 true） |
-| `layout.mode.icons` | boolean | 是否显示模式图标（默认 true） |
-| `layout.mode.headings` | boolean | 是否显示模式标题（默认 true） |
+| `layout.step` | row / column | 温度调节按钮排列方向 |
+| `layout.mode.names` | boolean | 是否显示模式名称 |
+| `layout.mode.icons` | boolean | 是否显示模式图标 |
 | `layout.sensors.type` | list / table | 传感器渲染方式 |
 | `service` | object | 自定义服务调用 |
 | `unit` | string / bool | 温度单位（false 隐藏） |
@@ -125,30 +121,7 @@ sensors:
 
 ## 更新日志
 
-### v3.1.3
-
-- 修复 `fireEvent` 使用 `CustomEvent` 确保 detail 正确传递
-- 修复图标前缀 `hass:` → `mdi:`，兼容 HA 2025.5+
-- 修复 `getModeList` 默认图标 `hass:radiator` → `mdi:air-conditioner`
-- 修复 `entity` 初始值 `{}` → `undefined`
-- 修复编辑器 `ha-select` 全部改用 `.options` 属性方式，兼容 HA 2025.5+
-- 修复编辑器 `valueChanged` 中 ha-select 取值逻辑
-- 修复编辑器缺少 `nothing` 导入
-- 修复 `_deleteTimerEntity` 查找逻辑，改用 entity registry 精确匹配
-- 添加 `setConfig` entity 域验证（仅 `climate.`）
-
-### v3.1.2
-
-- 定时关机功能：基于 HA timer 实体，服务端运行，刷新页面不丢失
-- 通过 `hass.connection.subscribeEvents` 监听 `timer.finished` 事件自动关空调
-- 手动取消定时不会关空调
-- 进度条展示倒计时剩余时间
-- 空调被关闭时自动取消定时器
-- 编辑器新增定时关机开关（timer 实体自动创建）
-- 隐藏定时关机时自动删除 timer 实体，防止残留
-- 编辑器新增室内温度传感器选择器
-
-### v3.1.1
+### v3.0.58
 
 - 全面升级至 lit v3，兼容 Home Assistant 2026.x
 - 升级 TypeScript 5.3 + Rollup 4.x
