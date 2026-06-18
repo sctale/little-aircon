@@ -1,0 +1,2078 @@
+(function() {
+    const env = {"DEBUG":"true"};
+    try {
+        if (process) {
+            process.env = Object.assign({}, process.env);
+            Object.assign(process.env, env);
+            return;
+        }
+    } catch (e) {} // avoid ReferenceError: process is not defined
+    globalThis.process = { env:env };
+})();
+
+var name = "little-aircon";
+var version = "3.0.13";
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+/**
+ * @license
+ * Copyright 2019 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$2=globalThis,e$4=t$2.ShadowRoot&&(void 0===t$2.ShadyCSS||t$2.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s$2=Symbol(),o$5=new WeakMap;let n$3 = class n{constructor(t,e,o){if(this._$cssResult$=true,o!==s$2)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e;}get styleSheet(){let t=this.o;const s=this.t;if(e$4&&void 0===t){const e=void 0!==s&&1===s.length;e&&(t=o$5.get(s)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&o$5.set(s,t));}return t}toString(){return this.cssText}};const r$3=t=>new n$3("string"==typeof t?t:t+"",void 0,s$2),i$4=(t,...e)=>{const o=1===t.length?t[0]:e.reduce((e,s,o)=>e+(t=>{if(true===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[o+1],t[0]);return new n$3(o,t,s$2)},S$1=(s,o)=>{if(e$4)s.adoptedStyleSheets=o.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const e of o){const o=document.createElement("style"),n=t$2.litNonce;void 0!==n&&o.setAttribute("nonce",n),o.textContent=e.cssText,s.appendChild(o);}},c$2=e$4?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r$3(e)})(t):t;
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const{is:i$3,defineProperty:e$3,getOwnPropertyDescriptor:h$1,getOwnPropertyNames:r$2,getOwnPropertySymbols:o$4,getPrototypeOf:n$2}=Object,a$1=globalThis,c$1=a$1.trustedTypes,l$1=c$1?c$1.emptyScript:"",p$1=a$1.reactiveElementPolyfillSupport,d$1=(t,s)=>t,u$1={toAttribute(t,s){switch(s){case Boolean:t=t?l$1:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,s){let i=t;switch(s){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t);}catch(t){i=null;}}return i}},f$1=(t,s)=>!i$3(t,s),b$1={attribute:true,type:String,converter:u$1,reflect:false,useDefault:false,hasChanged:f$1};Symbol.metadata??=Symbol("metadata"),a$1.litPropertyMetadata??=new WeakMap;let y$1 = class y extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t);}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,s=b$1){if(s.state&&(s.attribute=false),this._$Ei(),this.prototype.hasOwnProperty(t)&&((s=Object.create(s)).wrapped=true),this.elementProperties.set(t,s),!s.noAccessor){const i=Symbol(),h=this.getPropertyDescriptor(t,i,s);void 0!==h&&e$3(this.prototype,t,h);}}static getPropertyDescriptor(t,s,i){const{get:e,set:r}=h$1(this.prototype,t)??{get(){return this[s]},set(t){this[s]=t;}};return {get:e,set(s){const h=e?.call(this);r?.call(this,s),this.requestUpdate(t,h,i);},configurable:true,enumerable:true}}static getPropertyOptions(t){return this.elementProperties.get(t)??b$1}static _$Ei(){if(this.hasOwnProperty(d$1("elementProperties")))return;const t=n$2(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties);}static finalize(){if(this.hasOwnProperty(d$1("finalized")))return;if(this.finalized=true,this._$Ei(),this.hasOwnProperty(d$1("properties"))){const t=this.properties,s=[...r$2(t),...o$4(t)];for(const i of s)this.createProperty(i,t[i]);}const t=this[Symbol.metadata];if(null!==t){const s=litPropertyMetadata.get(t);if(void 0!==s)for(const[t,i]of s)this.elementProperties.set(t,i);}this._$Eh=new Map;for(const[t,s]of this.elementProperties){const i=this._$Eu(t,s);void 0!==i&&this._$Eh.set(i,t);}this.elementStyles=this.finalizeStyles(this.styles);}static finalizeStyles(s){const i=[];if(Array.isArray(s)){const e=new Set(s.flat(1/0).reverse());for(const s of e)i.unshift(c$2(s));}else void 0!==s&&i.push(c$2(s));return i}static _$Eu(t,s){const i=s.attribute;return  false===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=false,this.hasUpdated=false,this._$Em=null,this._$Ev();}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this));}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.();}removeController(t){this._$EO?.delete(t);}_$E_(){const t=new Map,s=this.constructor.elementProperties;for(const i of s.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t);}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return S$1(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(true),this._$EO?.forEach(t=>t.hostConnected?.());}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.());}attributeChangedCallback(t,s,i){this._$AK(t,i);}_$ET(t,s){const i=this.constructor.elementProperties.get(t),e=this.constructor._$Eu(t,i);if(void 0!==e&&true===i.reflect){const h=(void 0!==i.converter?.toAttribute?i.converter:u$1).toAttribute(s,i.type);this._$Em=t,null==h?this.removeAttribute(e):this.setAttribute(e,h),this._$Em=null;}}_$AK(t,s){const i=this.constructor,e=i._$Eh.get(t);if(void 0!==e&&this._$Em!==e){const t=i.getPropertyOptions(e),h="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:u$1;this._$Em=e;const r=h.fromAttribute(s,t.type);this[e]=r??this._$Ej?.get(e)??r,this._$Em=null;}}requestUpdate(t,s,i,e=false,h){if(void 0!==t){const r=this.constructor;if(false===e&&(h=this[t]),i??=r.getPropertyOptions(t),!((i.hasChanged??f$1)(h,s)||i.useDefault&&i.reflect&&h===this._$Ej?.get(t)&&!this.hasAttribute(r._$Eu(t,i))))return;this.C(t,s,i);} false===this.isUpdatePending&&(this._$ES=this._$EP());}C(t,s,{useDefault:i,reflect:e,wrapped:h},r){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,r??s??this[t]),true!==h||void 0!==r)||(this._$AL.has(t)||(this.hasUpdated||i||(s=void 0),this._$AL.set(t,s)),true===e&&this._$Em!==t&&(this._$Eq??=new Set).add(t));}async _$EP(){this.isUpdatePending=true;try{await this._$ES;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,s]of this._$Ep)this[t]=s;this._$Ep=void 0;}const t=this.constructor.elementProperties;if(t.size>0)for(const[s,i]of t){const{wrapped:t}=i,e=this[s];true!==t||this._$AL.has(s)||void 0===e||this.C(s,void 0,i,e);}}let t=false;const s=this._$AL;try{t=this.shouldUpdate(s),t?(this.willUpdate(s),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(s)):this._$EM();}catch(s){throw t=false,this._$EM(),s}t&&this._$AE(s);}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=true,this.firstUpdated(t)),this.updated(t);}_$EM(){this._$AL=new Map,this.isUpdatePending=false;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return  true}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM();}updated(t){}firstUpdated(t){}};y$1.elementStyles=[],y$1.shadowRootOptions={mode:"open"},y$1[d$1("elementProperties")]=new Map,y$1[d$1("finalized")]=new Map,p$1?.({ReactiveElement:y$1}),(a$1.reactiveElementVersions??=[]).push("2.1.2");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$1=globalThis,i$2=t=>t,s$1=t$1.trustedTypes,e$2=s$1?s$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,h="$lit$",o$3=`lit$${Math.random().toFixed(9).slice(2)}$`,n$1="?"+o$3,r$1=`<${n$1}>`,l=document,c=()=>l.createComment(""),a=t=>null===t||"object"!=typeof t&&"function"!=typeof t,u=Array.isArray,d=t=>u(t)||"function"==typeof t?.[Symbol.iterator],f="[ \t\n\f\r]",v=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,_=/-->/g,m=/>/g,p=RegExp(`>|${f}(?:([^\\s"'>=/]+)(${f}*=${f}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),g=/'/g,$=/"/g,y=/^(?:script|style|textarea|title)$/i,x=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),b=x(1),E=Symbol.for("lit-noChange"),A=Symbol.for("lit-nothing"),C=new WeakMap,P=l.createTreeWalker(l,129);function V(t,i){if(!u(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==e$2?e$2.createHTML(i):i}const N=(t,i)=>{const s=t.length-1,e=[];let n,l=2===i?"<svg>":3===i?"<math>":"",c=v;for(let i=0;i<s;i++){const s=t[i];let a,u,d=-1,f=0;for(;f<s.length&&(c.lastIndex=f,u=c.exec(s),null!==u);)f=c.lastIndex,c===v?"!--"===u[1]?c=_:void 0!==u[1]?c=m:void 0!==u[2]?(y.test(u[2])&&(n=RegExp("</"+u[2],"g")),c=p):void 0!==u[3]&&(c=p):c===p?">"===u[0]?(c=n??v,d=-1):void 0===u[1]?d=-2:(d=c.lastIndex-u[2].length,a=u[1],c=void 0===u[3]?p:'"'===u[3]?$:g):c===$||c===g?c=p:c===_||c===m?c=v:(c=p,n=void 0);const x=c===p&&t[i+1].startsWith("/>")?" ":"";l+=c===v?s+r$1:d>=0?(e.push(a),s.slice(0,d)+h+s.slice(d)+o$3+x):s+o$3+(-2===d?i:x);}return [V(t,l+(t[s]||"<?>")+(2===i?"</svg>":3===i?"</math>":"")),e]};class S{constructor({strings:t,_$litType$:i},e){let r;this.parts=[];let l=0,a=0;const u=t.length-1,d=this.parts,[f,v]=N(t,i);if(this.el=S.createElement(f,e),P.currentNode=this.el.content,2===i||3===i){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes);}for(;null!==(r=P.nextNode())&&d.length<u;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(h)){const i=v[a++],s=r.getAttribute(t).split(o$3),e=/([.?@])?(.*)/.exec(i);d.push({type:1,index:l,name:e[2],strings:s,ctor:"."===e[1]?I:"?"===e[1]?L:"@"===e[1]?z:H}),r.removeAttribute(t);}else t.startsWith(o$3)&&(d.push({type:6,index:l}),r.removeAttribute(t));if(y.test(r.tagName)){const t=r.textContent.split(o$3),i=t.length-1;if(i>0){r.textContent=s$1?s$1.emptyScript:"";for(let s=0;s<i;s++)r.append(t[s],c()),P.nextNode(),d.push({type:2,index:++l});r.append(t[i],c());}}}else if(8===r.nodeType)if(r.data===n$1)d.push({type:2,index:l});else {let t=-1;for(;-1!==(t=r.data.indexOf(o$3,t+1));)d.push({type:7,index:l}),t+=o$3.length-1;}l++;}}static createElement(t,i){const s=l.createElement("template");return s.innerHTML=t,s}}function M(t,i,s=t,e){if(i===E)return i;let h=void 0!==e?s._$Co?.[e]:s._$Cl;const o=a(i)?void 0:i._$litDirective$;return h?.constructor!==o&&(h?._$AO?.(false),void 0===o?h=void 0:(h=new o(t),h._$AT(t,s,e)),void 0!==e?(s._$Co??=[])[e]=h:s._$Cl=h),void 0!==h&&(i=M(t,h._$AS(t,i.values),h,e)),i}class R{constructor(t,i){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:i},parts:s}=this._$AD,e=(t?.creationScope??l).importNode(i,true);P.currentNode=e;let h=P.nextNode(),o=0,n=0,r=s[0];for(;void 0!==r;){if(o===r.index){let i;2===r.type?i=new k(h,h.nextSibling,this,t):1===r.type?i=new r.ctor(h,r.name,r.strings,this,t):6===r.type&&(i=new Z(h,this,t)),this._$AV.push(i),r=s[++n];}o!==r?.index&&(h=P.nextNode(),o++);}return P.currentNode=l,e}p(t){let i=0;for(const s of this._$AV) void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class k{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,i,s,e){this.type=2,this._$AH=A,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cv=e?.isConnected??true;}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t?.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=M(this,t,i),a(t)?t===A||null==t||""===t?(this._$AH!==A&&this._$AR(),this._$AH=A):t!==this._$AH&&t!==E&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):d(t)?this.k(t):this._(t);}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t));}_(t){this._$AH!==A&&a(this._$AH)?this._$AA.nextSibling.data=t:this.T(l.createTextNode(t)),this._$AH=t;}$(t){const{values:i,_$litType$:s}=t,e="number"==typeof s?this._$AC(t):(void 0===s.el&&(s.el=S.createElement(V(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===e)this._$AH.p(i);else {const t=new R(e,this),s=t.u(this.options);t.p(i),this.T(s),this._$AH=t;}}_$AC(t){let i=C.get(t.strings);return void 0===i&&C.set(t.strings,i=new S(t)),i}k(t){u(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const h of t)e===i.length?i.push(s=new k(this.O(c()),this.O(c()),this,this.options)):s=i[e],s._$AI(h),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,s){for(this._$AP?.(false,true,s);t!==this._$AB;){const s=i$2(t).nextSibling;i$2(t).remove(),t=s;}}setConnected(t){ void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t));}}class H{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,i,s,e,h){this.type=1,this._$AH=A,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=h,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=A;}_$AI(t,i=this,s,e){const h=this.strings;let o=false;if(void 0===h)t=M(this,t,i,0),o=!a(t)||t!==this._$AH&&t!==E,o&&(this._$AH=t);else {const e=t;let n,r;for(t=h[0],n=0;n<h.length-1;n++)r=M(this,e[s+n],i,n),r===E&&(r=this._$AH[n]),o||=!a(r)||r!==this._$AH[n],r===A?t=A:t!==A&&(t+=(r??"")+h[n+1]),this._$AH[n]=r;}o&&!e&&this.j(t);}j(t){t===A?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"");}}class I extends H{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===A?void 0:t;}}class L extends H{constructor(){super(...arguments),this.type=4;}j(t){this.element.toggleAttribute(this.name,!!t&&t!==A);}}class z extends H{constructor(t,i,s,e,h){super(t,i,s,e,h),this.type=5;}_$AI(t,i=this){if((t=M(this,t,i,0)??A)===E)return;const s=this._$AH,e=t===A&&s!==A||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,h=t!==A&&(s===A||e);e&&this.element.removeEventListener(this.name,this,s),h&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t);}}class Z{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){M(this,t);}}const B=t$1.litHtmlPolyfillSupport;B?.(S,k),(t$1.litHtmlVersions??=[]).push("3.3.2");const D=(t,i,s)=>{const e=s?.renderBefore??i;let h=e._$litPart$;if(void 0===h){const t=s?.renderBefore??null;e._$litPart$=h=new k(i.insertBefore(c(),t),t,void 0,s??{});}return h._$AI(t),h};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const s=globalThis;let i$1 = class i extends y$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const r=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=D(r,this.renderRoot,this.renderOptions);}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(true);}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(false);}render(){return E}};i$1._$litElement$=true,i$1["finalized"]=true,s.litElementHydrateSupport?.({LitElement:i$1});const o$2=s.litElementPolyfillSupport;o$2?.({LitElement:i$1});(s.litElementVersions??=[]).push("4.2.2");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */const o$1={attribute:true,type:String,converter:u$1,reflect:false,hasChanged:f$1},r=(t=o$1,e,r)=>{const{kind:n,metadata:i}=r;let s=globalThis.litPropertyMetadata.get(i);if(void 0===s&&globalThis.litPropertyMetadata.set(i,s=new Map),"setter"===n&&((t=Object.create(t)).wrapped=true),s.set(r.name,t),"accessor"===n){const{name:o}=r;return {set(r){const n=e.get.call(this);e.set.call(this,r),this.requestUpdate(o,n,t,true,r);},init(e){return void 0!==e&&this.C(o,void 0,t,e),e}}}if("setter"===n){const{name:o}=r;return function(r){const n=this[o];e.call(this,r),this.requestUpdate(o,n,t,true,r);}}throw Error("Unsupported decorator location: "+n)};function n(t){return (e,o)=>"object"==typeof o?r(t,e,o):((t,e,o)=>{const r=e.hasOwnProperty(o);return e.constructor.createProperty(o,t),r?Object.getOwnPropertyDescriptor(e,o):void 0})(t,e,o)}
+
+function styleInject(css, ref) {
+  if ( ref === void 0 ) ref = {};
+  var insertAt = ref.insertAt;
+
+  if (!css || typeof document === 'undefined') { return; }
+
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (insertAt === 'top') {
+    if (head.firstChild) {
+      head.insertBefore(style, head.firstChild);
+    } else {
+      head.appendChild(style);
+    }
+  } else {
+    head.appendChild(style);
+  }
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var css_248z = i$4`:host {
+  --st-default-spacing: 4px;
+}
+ha-card {
+  font-smoothing: var(--ha-font-smoothing);
+  font-size: var(--ha-font-size-m);
+  font-weight: var(--ha-font-weight-body);
+  line-height: var(--ha-line-height-normal);
+
+  padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+
+  --auto-color: green;
+  --heat_cool-color: springgreen;
+  --cool-color: #2b9af9;
+  --heat-color: #ff8100;
+  --manual-color: #44739e;
+  --off-color: #8a8a8a;
+  --fan_only-color: #8a8a8a;
+  --dry-color: #efbd07;
+}
+
+ha-card.no-header {
+  padding: calc(var(--st-spacing, var(--st-default-spacing)) * 4) 0;
+}
+
+.body {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(min-content, auto);
+  align-items: center;
+  justify-items: center;
+  place-items: center;
+  padding: 0 calc(var(--st-spacing, var(--st-default-spacing)) * 4);
+  padding-bottom: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+
+.toggle-label {
+  color: var(--st-toggle-label-color, var(--primary-text-color));
+  margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+  font-size: var(
+    --st-font-size-toggle-label,
+    var(--ha-font-size-m)
+  );
+}
+
+.faults {
+  display: flex;
+  flex-direction: row;
+  margin-left: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+.fault-icon {
+  padding: 2px;
+  cursor: pointer;
+  color: var(--st-fault-inactive-color, var(--secondary-background-color));
+}
+.fault-icon.active {
+    color: var(--st-fault-active-color, var(--accent-color));
+  }
+.fault-icon.hide {
+    display: none;
+  }
+
+.sensors {
+  display: grid;
+  grid-gap: var(--st-spacing, var(--st-default-spacing));
+  font-size: var(
+    --st-font-size-sensors,
+    var(--ha-font-size-m)
+  );
+}
+.sensors.as-list {
+  grid-auto-flow: column;
+  grid-template-columns: min-content;
+}
+
+.sensors.as-table.without-labels {
+    grid: auto-flow / 100%;
+    align-items: start;
+    justify-items: start;
+    place-items: start;
+  }
+
+.sensors.as-table.with-labels {
+    grid: auto-flow / auto auto;
+    align-items: start;
+    justify-items: start;
+    place-items: start;
+  }
+
+.sensor-value {
+  display: flex;
+  align-items: center;
+  padding-bottom: 4px;
+}
+.sensor-heading {
+  font-weight: 300;
+  padding-right: 8px;
+  padding-bottom: 4px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.sensors:empty {
+  display: none;
+}
+header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  padding: calc(var(--st-spacing, var(--st-default-spacing)) * 6)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 4)
+    calc(var(--st-spacing, var(--st-default-spacing)) * 4);
+}
+.header__icon {
+  margin-right: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+  color: #44739e;
+  color: var(--state-icon-color, #44739e);
+}
+.header__title {
+  font-size: var(--st-font-size-title, var(--ha-card-header-font-size, var(--ha-font-size-2xl)));
+  line-height: var(--st-font-size-title, var(--ha-card-header-font-size, var(--ha-font-size-2xl)));
+  font-smoothing: var(--ha-font-smoothing);
+  font-weight: var(--ha-font-weight-heading);
+  margin: 0;
+  align-self: left;
+}
+.current-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+.current-wrapper.row {
+    flex-direction: row;
+    gap: 4px;
+  }
+.current--value {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-weight: 400;
+  line-height: var(--st-font-size-l, var(--ha-font-size-3xl));
+  font-size: var(--st-font-size-l, var(--ha-font-size-3xl));
+}
+@media (min-width: 768px) {
+.current--value {
+    font-size: var(--st-font-size-xl, var(--ha-font-size-4xl));
+    line-height: var(--st-font-size-xl, var(--ha-font-size-4xl));
+}
+  }
+.current--value.updating {
+    color: var(--error-color);
+  }
+.current--unit {
+  font-size: var(--st-font-size-m, var(--ha-font-size-l));
+}
+.thermostat-trigger {
+  padding: 0px;
+}
+.clickable {
+  cursor: pointer;
+}
+.modes {
+  display: grid;
+  grid-template-columns: auto;
+  grid-auto-flow: column;
+  grid-gap: 2px;
+  margin-top: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+  padding: var(--st-spacing, var(--st-default-spacing));
+}
+.modes.heading {
+    grid-template-columns: min-content;
+  }
+.mode-title {
+  padding: 0 16px;
+  align-self: center;
+  justify-self: center;
+  place-self: center;
+  font-size: var(
+    --st-font-size-sensors,
+    var(--ha-font-size-m)
+  );
+  font-weight: 300;
+  white-space: nowrap;
+}
+.mode-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: var(--st-spacing, var(--st-default-spacing)) 0;
+  background: var(--st-mode-background, var(--secondary-background-color));
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  border-radius: var(--st-spacing, var(--st-default-spacing));
+}
+.mode-item:hover {
+    color: var(--st-mode-active-color, var(--primary-text-color));
+  }
+.mode-item.active,
+  .mode-item.active:hover {
+    background: var(--st-mode-active-background, var(--primary-color));
+    color: var(--st-mode-active-color, var(--text-primary-color));
+  }
+.mode-item.active.off {
+    background: var(--st-mode-active-background, var(--off-color));
+  }
+.mode-item.active.heat {
+    background: var(--st-mode-active-background, var(--heat-color));
+  }
+.mode-item.active.cool {
+    background: var(--st-mode-active-background, var(--cool-color));
+  }
+.mode-item.active.heat_cool {
+    background: var(--st-mode-active-background, var(--heat_cool-color));
+  }
+.mode-item.active.auto {
+    background: var(--st-mode-active-background, var(--auto-color));
+  }
+.mode-item.active.dry {
+    background: var(--st-mode-active-background, var(--dry-color));
+  }
+.mode-item.active.fan_only {
+    background: var(--st-mode-active-background, var(--fan_only-color));
+  }
+.mode-icon {
+  --iron-icon-width: 24px;
+  --iron-icon-height: 24px;
+  display: block;
+}
+ha-switch {
+  padding: 16px 6px;
+}
+.side-by-side {
+  display: flex;
+  align-items: center;
+}
+.side-by-side > * {
+  flex: 1;
+  padding-right: 4px;
+}
+.timer-hint {
+  padding: 8px 16px;
+  font-size: var(--ha-font-size-s);
+  color: var(--secondary-text-color);
+  text-align: center;
+}
+.timer-progress-bar {
+  margin: 4px 16px 0;
+  background: var(--secondary-background-color);
+  border-radius: 10px;
+  overflow: hidden;
+  height: 22px;
+}
+.timer-progress-fill {
+  height: 100%;
+  background: var(--st-mode-active-background, var(--primary-color));
+  border-radius: 10px;
+  transition: width 1s linear;
+  display: flex;
+  align-items: center;
+  min-width: 80px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+.timer-progress-text {
+  color: var(--text-primary-color);
+  font-size: var(--ha-font-size-s);
+  white-space: nowrap;
+  font-weight: 500;
+}
+`;
+styleInject(css_248z);
+
+function fireEvent(node, type, detail, options = {}) {
+    options = options || {};
+    detail = detail === null || detail === undefined ? {} : detail;
+    const event = new CustomEvent(type, {
+        detail,
+        bubbles: options.bubbles === undefined ? true : options.bubbles,
+        cancelable: Boolean(options.cancelable),
+        composed: options.composed === undefined ? true : options.composed,
+    });
+    node.dispatchEvent(event);
+    return event;
+}
+
+function setValue(obj, path, value) {
+    const pathFragments = path.split('.');
+    let o = obj;
+    while (pathFragments.length - 1) {
+        const fragment = pathFragments.shift();
+        if (!o.hasOwnProperty(fragment))
+            o[fragment] = {};
+        o = o[fragment];
+    }
+    o[pathFragments[0]] = value;
+}
+const OptionsDecimals = [
+    { value: '0', label: '0' },
+    { value: '1', label: '1' },
+];
+const OptionsStepSize = [
+    { value: '0.5', label: '0.5' },
+    { value: '1', label: '1' },
+];
+const OptionsStepLayout = [
+    { value: 'column', label: 'column' },
+    { value: 'row', label: 'row' },
+];
+const OPTIONS_SHOW_HIDE = [
+    { value: 'show', label: '显示' },
+    { value: 'hide', label: '隐藏' },
+];
+const includeDomains = ['climate'];
+const sensorIncludeDomains = ['sensor'];
+const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md';
+const stub = {
+    header: {},
+    layout: { mode: {} },
+};
+const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
+class SimpleThermostatEditor extends i$1 {
+    constructor() {
+        super(...arguments);
+        this.config = {};
+    }
+    static getStubConfig() {
+        return { ...stub };
+    }
+    setConfig(config) {
+        this.config = config || { ...stub };
+    }
+    _openLink() {
+        window.open(GithubReadMe);
+    }
+    render() {
+        if (!this.hass)
+            return b ``;
+        return b `
+      <div class="card-config">
+        <div class="overall-config">
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="实体（必选）"
+              .hass=${this.hass}
+              .value=${this.config.entity || ''}
+              .configValue="entity"
+              .includeDomains=${includeDomains}
+              @change=${this.valueChanged}
+              allow-custom-entity
+            ></ha-entity-picker>
+          </div>
+
+          <div class="side-by-side">
+            <ha-textfield
+              label="名称（可选）"
+              .value=${this.config.header?.name || ''}
+              .configValue="header.name"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+            <ha-textfield
+              label="图标（可选）"
+              .value=${this.config.header?.icon || ''}
+              .configValue="header.icon"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="开关实体（可选）"
+              .hass=${this.hass}
+              .value=${this.config?.header?.toggle?.entity || ''}
+              .configValue="header.toggle.entity"
+              @change=${this.valueChanged}
+              allow-custom-entity
+            ></ha-entity-picker>
+            <ha-textfield
+              label="开关标签"
+              .value=${this.config?.header?.toggle?.name || ''}
+              .configValue="header.toggle.name"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-textfield
+              label="占位文本（可选）"
+              .value=${this.config.fallback || ''}
+              .configValue="fallback"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
+              label="小数位数（可选）"
+              .configValue="decimals"
+              .value=${String(this.config.decimals ?? '')}
+              .options=${OptionsDecimals}
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+
+            <ha-textfield
+              label="单位（可选）"
+              .value=${this.config.unit || ''}
+              .configValue="unit"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
+              label="布局方向（可选）"
+              .configValue="layout.step"
+              .value=${this.config.layout?.step ?? ''}
+              .options=${OptionsStepLayout}
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+
+            <ha-select
+              label="步进值（可选）"
+              .configValue="step_size"
+              .value=${String(this.config.step_size ?? '')}
+              .options=${OptionsStepSize}
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="室内温度传感器（可选）"
+              .hass=${this.hass}
+              .value=${this.config.sensor_entity || ''}
+              .includeDomains=${sensorIncludeDomains}
+              @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
+              allow-custom-entity
+            ></ha-entity-picker>
+          </div>
+
+          <div class="side-by-side">
+            <ha-select
+              label="定时关机"
+              .value=${this.config.timer === true || this.config.timer === 'show' ? 'show' : 'hide'}
+              .options=${OPTIONS_SHOW_HIDE}
+              @selected=${this._timerChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+          </div>
+
+          ${this.config.timer === true || this.config.timer === 'show' ? b `
+            <div class="side-by-side">
+              ${this.config.timer_entity
+            ? b `<ha-textfield
+                    label="定时器实体（已自动创建）"
+                    .value=${this.config.timer_entity}
+                    disabled
+                  ></ha-textfield>`
+            : b `<span class="hint">定时器实体将自动创建...</span>`}
+            </div>
+          ` : A}
+
+          <div class="side-by-side">
+            <ha-button @click=${this._openLink}>
+              配置选项说明
+            </ha-button>
+            <span>标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+    valueChanged(ev) {
+        if (!this.config || !this.hass)
+            return;
+        const { target } = ev;
+        const copy = cloneDeep(this.config);
+        const configValue = target.configValue;
+        if (configValue) {
+            // ha-select 使用 @selected 事件，值在 ev.detail.value
+            // ha-textfield 使用 @input 事件，值在 target.value
+            // ha-entity-picker 使用 @change 事件，值在 target.value
+            const value = target.tagName === 'HA-SELECT'
+                ? ev.detail?.value ?? target.value
+                : target.value;
+            if (value === '' || value === undefined) {
+                // ha-select 不在空值时删除配置
+                if (target.tagName !== 'HA-SELECT') {
+                    delete copy[configValue];
+                }
+            }
+            else {
+                setValue(copy, configValue, target.checked !== undefined ? target.checked : value);
+            }
+        }
+        fireEvent(this, 'config-changed', { config: copy });
+    }
+    _timerChanged(ev) {
+        const value = ev.detail.value;
+        const copy = cloneDeep(this.config);
+        copy.timer = value === 'show' ? true : 'hide';
+        this.config = copy;
+        fireEvent(this, 'config-changed', { config: copy });
+    }
+    _configChanged(key, value) {
+        const copy = cloneDeep(this.config);
+        if (value === '' || value === undefined) {
+            delete copy[key];
+        }
+        else {
+            copy[key] = value;
+        }
+        this.config = copy;
+        fireEvent(this, 'config-changed', { config: copy });
+    }
+}
+SimpleThermostatEditor.styles = css_248z;
+__decorate([
+    n({ type: Object })
+], SimpleThermostatEditor.prototype, "config", void 0);
+__decorate([
+    n({ type: Object })
+], SimpleThermostatEditor.prototype, "hass", void 0);
+
+const copyProperty = (to, from, property, ignoreNonConfigurable) => {
+	// `Function#length` should reflect the parameters of `to` not `from` since we keep its body.
+	// `Function#prototype` is non-writable and non-configurable so can never be modified.
+	if (property === 'length' || property === 'prototype') {
+		return;
+	}
+
+	// `Function#arguments` and `Function#caller` should not be copied. They were reported to be present in `Reflect.ownKeys` for some devices in React Native (#41), so we explicitly ignore them here.
+	if (property === 'arguments' || property === 'caller') {
+		return;
+	}
+
+	const toDescriptor = Object.getOwnPropertyDescriptor(to, property);
+	const fromDescriptor = Object.getOwnPropertyDescriptor(from, property);
+
+	if (!canCopyProperty(toDescriptor, fromDescriptor) && ignoreNonConfigurable) {
+		return;
+	}
+
+	Object.defineProperty(to, property, fromDescriptor);
+};
+
+// `Object.defineProperty()` throws if the property exists, is not configurable and either:
+// - one its descriptors is changed
+// - it is non-writable and its value is changed
+const canCopyProperty = function (toDescriptor, fromDescriptor) {
+	return toDescriptor === undefined || toDescriptor.configurable || (
+		toDescriptor.writable === fromDescriptor.writable &&
+		toDescriptor.enumerable === fromDescriptor.enumerable &&
+		toDescriptor.configurable === fromDescriptor.configurable &&
+		(toDescriptor.writable || toDescriptor.value === fromDescriptor.value)
+	);
+};
+
+const changePrototype = (to, from) => {
+	const fromPrototype = Object.getPrototypeOf(from);
+	if (fromPrototype === Object.getPrototypeOf(to)) {
+		return;
+	}
+
+	Object.setPrototypeOf(to, fromPrototype);
+};
+
+const wrappedToString = (withName, fromBody) => `/* Wrapped ${withName}*/\n${fromBody}`;
+
+const toStringDescriptor = Object.getOwnPropertyDescriptor(Function.prototype, 'toString');
+const toStringName = Object.getOwnPropertyDescriptor(Function.prototype.toString, 'name');
+
+// We call `from.toString()` early (not lazily) to ensure `from` can be garbage collected.
+// We use `bind()` instead of a closure for the same reason.
+// Calling `from.toString()` early also allows caching it in case `to.toString()` is called several times.
+const changeToString = (to, from, name) => {
+	const withName = name === '' ? '' : `with ${name.trim()}() `;
+	const newToString = wrappedToString.bind(null, withName, from.toString());
+	// Ensure `to.toString.toString` is non-enumerable and has the same `same`
+	Object.defineProperty(newToString, 'name', toStringName);
+	Object.defineProperty(to, 'toString', {...toStringDescriptor, value: newToString});
+};
+
+function mimicFunction(to, from, {ignoreNonConfigurable = false} = {}) {
+	const {name} = to;
+
+	for (const property of Reflect.ownKeys(from)) {
+		copyProperty(to, from, property, ignoreNonConfigurable);
+	}
+
+	changePrototype(to, from);
+	changeToString(to, from, name);
+
+	return to;
+}
+
+const debounceFn = (inputFunction, options = {}) => {
+	if (typeof inputFunction !== 'function') {
+		throw new TypeError(`Expected the first argument to be a function, got \`${typeof inputFunction}\``);
+	}
+
+	const {
+		wait = 0,
+		maxWait = Number.POSITIVE_INFINITY,
+		before = false,
+		after = true,
+	} = options;
+
+	if (!before && !after) {
+		throw new Error('Both `before` and `after` are false, function wouldn\'t be called.');
+	}
+
+	let timeout;
+	let maxTimeout;
+	let result;
+
+	const debouncedFunction = function (...arguments_) {
+		const context = this; // eslint-disable-line unicorn/no-this-assignment
+
+		const later = () => {
+			timeout = undefined;
+
+			if (maxTimeout) {
+				clearTimeout(maxTimeout);
+				maxTimeout = undefined;
+			}
+
+			if (after) {
+				result = inputFunction.apply(context, arguments_);
+			}
+		};
+
+		const maxLater = () => {
+			maxTimeout = undefined;
+
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = undefined;
+			}
+
+			if (after) {
+				result = inputFunction.apply(context, arguments_);
+			}
+		};
+
+		const shouldCallNow = before && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+
+		if (maxWait > 0 && maxWait !== Number.POSITIVE_INFINITY && !maxTimeout) {
+			maxTimeout = setTimeout(maxLater, maxWait);
+		}
+
+		if (shouldCallNow) {
+			result = inputFunction.apply(context, arguments_);
+		}
+
+		return result;
+	};
+
+	mimicFunction(debouncedFunction, inputFunction);
+
+	debouncedFunction.cancel = () => {
+		if (timeout) {
+			clearTimeout(timeout);
+			timeout = undefined;
+		}
+
+		if (maxTimeout) {
+			clearTimeout(maxTimeout);
+			maxTimeout = undefined;
+		}
+	};
+
+	return debouncedFunction;
+};
+
+function isEqual(a, b) {
+    const keys = Object.keys(a);
+    if (keys.length !== Object.keys(b).length) {
+        return false;
+    }
+    return !keys.some((key) => a?.[key] !== b?.[key]);
+}
+
+function formatNumber(number, { decimals = 1, fallback = 'N/A' } = {}) {
+    const type = typeof number;
+    if (number === null ||
+        number === '' ||
+        ['boolean', 'undefined'].includes(type)) {
+        return fallback;
+    }
+    return Number(number).toFixed(decimals);
+}
+
+function renderHeader({ header, toggleEntityChanged, entity, openEntityPopover, }) {
+    if (header === false) {
+        return A;
+    }
+    const action = entity.attributes.hvac_action || entity.state;
+    let icon = header.icon;
+    if (typeof header.icon === 'object') {
+        icon = icon?.[action] ?? false;
+    }
+    const name = header?.name ?? false;
+    return b `
+    <header>
+      <div
+        style="display: flex;"
+        class="clickable"
+        @click=${() => openEntityPopover()}
+      >
+        ${renderIcon$1(icon)} ${renderName(name)}
+      </div>
+      ${renderFaults(header.faults, openEntityPopover)}
+      ${renderToggle(header.toggle, openEntityPopover, toggleEntityChanged)}
+    </header>
+  `;
+}
+function renderIcon$1(icon) {
+    return icon
+        ? b ` <ha-icon class="header__icon" .icon=${icon}></ha-icon> `
+        : A;
+}
+function renderName(name) {
+    return name ? b `<h2 class="header__title">${name}</h2>` : A;
+}
+function renderFaults(faults, openEntityPopover) {
+    if (!faults || faults.length === 0) {
+        return A;
+    }
+    const faultHtml = faults.map(({ icon, hide_inactive, state }) => {
+        return b ` <ha-icon
+      class="fault-icon ${state.state === 'on'
+            ? 'active'
+            : hide_inactive
+                ? ' hide'
+                : ''}"
+      icon="${icon || state.attributes.icon}"
+      @click="${() => openEntityPopover(state.entity_id)}"
+    ></ha-icon>`;
+    });
+    return b ` <div class="faults">${faultHtml}</div>`;
+}
+function renderToggle(toggle, openEntityPopover, toggleEntityChanged) {
+    if (!toggle)
+        return A;
+    return b `
+    <div style="margin-left: auto;">
+      <span
+        class="clickable toggle-label"
+        @click=${() => openEntityPopover(toggle.entity.entity_id)}
+        >${toggle.label}
+      </span>
+      <ha-switch
+        .checked=${toggle.entity?.state === 'on'}
+        @change=${toggleEntityChanged}
+      ></ha-switch>
+    </div>
+  `;
+}
+
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+var squirrelly_min = {exports: {}};
+
+(function (module, exports) {
+	!function(e,t){t(exports);}(commonjsGlobal,(function(e){function t(e){var n,r,a=new Error(e);return n=a,r=t.prototype,Object.setPrototypeOf?Object.setPrototypeOf(n,r):n.__proto__=r,a}function n(e,n,r){var a=n.slice(0,r).split(/\n/),i=a.length,s=a[i-1].length+1;throw t(e+=" at line "+i+" col "+s+":\n\n  "+n.split(/\n/)[i-1]+"\n  "+Array(s).join(" ")+"^")}t.prototype=Object.create(Error.prototype,{name:{value:"Squirrelly Error",enumerable:false}});var r=new Function("return this")().Promise,a=false;try{a=new Function("return (async function(){}).constructor")();}catch(e){if(!(e instanceof SyntaxError))throw e}function i(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function s(e,t,n){for(var r in t)i(t,r)&&(null==t[r]||"object"!=typeof t[r]||"storage"!==r&&"prefixes"!==r||n?e[r]=t[r]:e[r]=s({},t[r]));return e}var c=/^async +/,o=/`(?:\\[\s\S]|\${(?:[^{}]|{(?:[^{}]|{[^}]*})*})*}|(?!\${)[^\\`])*`/g,l=/'(?:\\[\s\w"'\\`]|[^\n\r'\\])*?'/g,f=/"(?:\\[\s\w"'\\`]|[^\n\r"\\])*?"/g,u=/[.*+\-?^${}()|[\]\\]/g;function p(e){return u.test(e)?e.replace(u,"\\$&"):e}function h(e,r){r.rmWhitespace&&(e=e.replace(/[\r\n]+/g,"\n").replace(/^\s+|\s+$/gm,"")),o.lastIndex=0,l.lastIndex=0,f.lastIndex=0;var a=r.prefixes,i=[a.h,a.b,a.i,a.r,a.c,a.e].reduce((function(e,t){return e&&t?e+"|"+p(t):t?p(t):e}),""),s=new RegExp("([|()]|=>)|('|\"|`|\\/\\*)|\\s*((\\/)?(-|_)?"+p(r.tags[1])+")","g"),u=new RegExp("([^]*?)"+p(r.tags[0])+"(-|_)?\\s*("+i+")?\\s*","g"),h=0,d=false;function g(t,a){var i,p={f:[]},g=0,v="c";function m(t){var a=e.slice(h,t),i=a.trim();if("f"===v)"safe"===i?p.raw=true:r.async&&c.test(i)?(i=i.replace(c,""),p.f.push([i,"",true])):p.f.push([i,""]);else if("fp"===v)p.f[p.f.length-1][1]+=i;else if("err"===v){if(i){var s=a.search(/\S/);n("invalid syntax",e,h+s);}}else p[v]=i;h=t+1;}for("h"===a||"b"===a||"c"===a?v="n":"r"===a&&(p.raw=true,a="i"),s.lastIndex=h;null!==(i=s.exec(e));){var y=i[1],x=i[2],b=i[3],w=i[4],F=i[5],S=i.index;if(y)"("===y?(0===g&&("n"===v?(m(S),v="p"):"f"===v&&(m(S),v="fp")),g++):")"===y?0===--g&&"c"!==v&&(m(S),v="err"):0===g&&"|"===y?(m(S),v="f"):"=>"===y&&(m(S),h+=1,v="res");else if(x){if("/*"===x){var I=e.indexOf("*/",s.lastIndex);-1===I&&n("unclosed comment",e,i.index),s.lastIndex=I+2;}else if("'"===x){l.lastIndex=i.index,l.exec(e)?s.lastIndex=l.lastIndex:n("unclosed string",e,i.index);}else if('"'===x){f.lastIndex=i.index,f.exec(e)?s.lastIndex=f.lastIndex:n("unclosed string",e,i.index);}else if("`"===x){o.lastIndex=i.index,o.exec(e)?s.lastIndex=o.lastIndex:n("unclosed string",e,i.index);}}else if(b)return m(S),h=S+i[0].length,u.lastIndex=h,d=F,w&&"h"===a&&(a="s"),p.t=a,p}return n("unclosed tag",e,t),p}var v=function i(s,o){s.b=[],s.d=[];var l,f=false,p=[];function v(e,t){e&&(e=function(e,t,n,r){var a,i;return "string"==typeof t.autoTrim?a=i=t.autoTrim:Array.isArray(t.autoTrim)&&(a=t.autoTrim[1],i=t.autoTrim[0]),(n||false===n)&&(a=n),(r||false===r)&&(i=r),"slurp"===a&&"slurp"===i?e.trim():("_"===a||"slurp"===a?e=String.prototype.trimLeft?e.trimLeft():e.replace(/^[\s\uFEFF\xA0]+/,""):"-"!==a&&"nl"!==a||(e=e.replace(/^(?:\n|\r|\r\n)/,"")),"_"===i||"slurp"===i?e=String.prototype.trimRight?e.trimRight():e.replace(/[\s\uFEFF\xA0]+$/,""):"-"!==i&&"nl"!==i||(e=e.replace(/(?:\n|\r|\r\n)$/,"")),e)}(e,r,d,t))&&(e=e.replace(/\\|'/g,"\\$&").replace(/\r\n|\n|\r/g,"\\n"),p.push(e));}for(;null!==(l=u.exec(e));){var m,y=l[1],x=l[2],b=l[3]||"";for(var w in a)if(a[w]===b){m=w;break}v(y,x),h=l.index+l[0].length,m||n("unrecognized tag type: "+b,e,h);var F=g(l.index,m),S=F.t;if("h"===S){var I=F.n||"";r.async&&c.test(I)&&(F.a=true,F.n=I.replace(c,"")),F=i(F),p.push(F);}else if("c"===S){if(s.n===F.n)return f?(f.d=p,s.b.push(f)):s.d=p,s;n("Helper start and end don't match",e,l.index+l[0].length);}else if("b"===S){f?(f.d=p,s.b.push(f)):s.d=p;var R=F.n||"";r.async&&c.test(R)&&(F.a=true,F.n=R.replace(c,"")),f=F,p=[];}else if("s"===S){var T=F.n||"";r.async&&c.test(T)&&(F.a=true,F.n=T.replace(c,"")),p.push(F);}else p.push(F);}if(!o)throw t('unclosed helper "'+s.n+'"');return v(e.slice(h,e.length),false),s.d=p,s}({f:[]},true);if(r.plugins)for(var m=0;m<r.plugins.length;m++){var y=r.plugins[m];y.processAST&&(v.d=y.processAST(v.d,r));}return v.d}function d(e,t){var n=h(e,t),r="var tR='';"+(t.useWith?"with("+t.varName+"||{}){":"")+x(n,t)+"if(cb){cb(null,tR)} return tR"+(t.useWith?"}":"");if(t.plugins)for(var a=0;a<t.plugins.length;a++){var i=t.plugins[a];i.processFnString&&(r=i.processFnString(r,t));}return r}function g(e,t){for(var n=0;n<t.length;n++){var r=t[n][0],a=t[n][1];e=(t[n][2]?"await ":"")+"c.l('F','"+r+"')("+e,a&&(e+=","+a),e+=")";}return e}function v(e,t,n,r,a,i){var s="{exec:"+(a?"async ":"")+y(n,t,e)+",params:["+r+"]";return i&&(s+=",name:'"+i+"'"),a&&(s+=",async:true"),s+="}"}function m(e,t){for(var n="[",r=0;r<e.length;r++){var a=e[r];n+=v(t,a.res||"",a.d,a.p||"",a.a,a.n),r<e.length&&(n+=",");}return n+="]"}function y(e,t,n){return "function("+t+"){var tR='';"+x(e,n)+"return tR}"}function x(e,t){for(var n=0,r=e.length,a="";n<r;n++){var i=e[n];if("string"==typeof i){a+="tR+='"+i+"';";}else {var s=i.t,c=i.c||"",o=i.f,l=i.n||"",f=i.p||"",u=i.res||"",p=i.b,h=!!i.a;if("i"===s){t.defaultFilter&&(c="c.l('F','"+t.defaultFilter+"')("+c+")");var d=g(c,o);!i.raw&&t.autoEscape&&(d="c.l('F','e')("+d+")"),a+="tR+="+d+";";}else if("h"===s)if(t.storage.nativeHelpers.get(l))a+=t.storage.nativeHelpers.get(l)(i,t);else {var y=(h?"await ":"")+"c.l('H','"+l+"')("+v(t,u,i.d,f,h);y+=p?","+m(p,t):",[]",a+="tR+="+g(y+=",c)",o)+";";}else "s"===s?a+="tR+="+g((h?"await ":"")+"c.l('H','"+l+"')({params:["+f+"]},[],c)",o)+";":"e"===s&&(a+=c+"\n");}}return a}var b=function(){function e(e){this.cache=e;}return e.prototype.define=function(e,t){this.cache[e]=t;},e.prototype.get=function(e){return this.cache[e]},e.prototype.remove=function(e){delete this.cache[e];},e.prototype.reset=function(){this.cache={};},e.prototype.load=function(e){s(this.cache,e,true);},e}();function w(e,n,r,a){if(n&&n.length>0)throw t((a?"Native":"")+"Helper '"+e+"' doesn't accept blocks");if(r&&r.length>0)throw t((a?"Native":"")+"Helper '"+e+"' doesn't accept filters")}var F={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"};function S(e){return F[e]}var I=new b({}),R=new b({each:function(e,t){var n="",r=e.params[0];if(w("each",t,false),e.async)return new Promise((function(t){!function e(t,n,r,a,i){r(t[n],n).then((function(s){a+=s,n===t.length-1?i(a):e(t,n+1,r,a,i);}));}(r,0,e.exec,n,t);}));for(var a=0;a<r.length;a++)n+=e.exec(r[a],a);return n},foreach:function(e,t){var n=e.params[0];if(w("foreach",t,false),e.async)return new Promise((function(t){!function e(t,n,r,a,i,s){a(n[r],t[n[r]]).then((function(c){i+=c,r===n.length-1?s(i):e(t,n,r+1,a,i,s);}));}(n,Object.keys(n),0,e.exec,"",t);}));var r="";for(var a in n)i(n,a)&&(r+=e.exec(a,n[a]));return r},include:function(e,n,r){w("include",n,false);var a=r.storage.templates.get(e.params[0]);if(!a)throw t('Could not fetch template "'+e.params[0]+'"');return a(e.params[1],r)},extends:function(e,n,r){var a=e.params[1]||{};a.content=e.exec();for(var i=0;i<n.length;i++){var s=n[i];a[s.name]=s.exec();}var c=r.storage.templates.get(e.params[0]);if(!c)throw t('Could not fetch template "'+e.params[0]+'"');return c(a,r)},useScope:function(e,t){return w("useScope",t,false),e.exec(e.params[0])}}),T=new b({if:function(e,t){w("if",false,e.f,true);var n="if("+e.p+"){"+x(e.d,t)+"}";if(e.b)for(var r=0;r<e.b.length;r++){var a=e.b[r];"else"===a.n?n+="else{"+x(a.d,t)+"}":"elif"===a.n&&(n+="else if("+a.p+"){"+x(a.d,t)+"}");}return n},try:function(e,n){if(w("try",false,e.f,true),!e.b||1!==e.b.length||"catch"!==e.b[0].n)throw t("native helper 'try' only accepts 1 block, 'catch'");var r="try{"+x(e.d,n)+"}",a=e.b[0];return r+="catch"+(a.res?"("+a.res+")":"")+"{"+x(a.d,n)+"}"},block:function(e,t){return w("block",e.b,e.f,true),"if(!"+t.varName+"["+e.p+"]){tR+=("+y(e.d,"",t)+")()}else{tR+="+t.varName+"["+e.p+"]}"}}),E=new b({e:function(e){var t=String(e);return /[&<>"']/.test(t)?t.replace(/[&<>"']/g,S):t}}),j={varName:"it",autoTrim:[false,"nl"],autoEscape:true,defaultFilter:false,tags:["{{","}}"],l:function(e,n){if("H"===e){var r=this.storage.helpers.get(n);if(r)return r;throw t("Can't find helper '"+n+"'")}if("F"===e){var a=this.storage.filters.get(n);if(a)return a;throw t("Can't find filter '"+n+"'")}},async:false,storage:{helpers:R,nativeHelpers:T,filters:E,templates:I},prefixes:{h:"@",b:"#",i:"",r:"*",c:"/",e:"!"},cache:false,plugins:[],useWith:false};function H(e,t){var n={};return s(n,j),t&&s(n,t),e&&s(n,e),n.l.bind(n),n}function O(e,n){var r=H(n||{}),i=Function;if(r.async){if(!a)throw t("This environment doesn't support async/await");i=a;}try{return new i(r.varName,"c","cb",d(e,r))}catch(n){throw n instanceof SyntaxError?t("Bad template syntax\n\n"+n.message+"\n"+Array(n.message.length+1).join("=")+"\n"+d(e,r)):n}}function _(e,t){var n;return t.cache&&t.name&&t.storage.templates.get(t.name)?t.storage.templates.get(t.name):(n="function"==typeof e?e:O(e,t),t.cache&&t.name&&t.storage.templates.define(t.name,n),n)}j.l.bind(j),e.compile=O,e.compileScope=x,e.compileScopeIntoFunction=y,e.compileToString=d,e.defaultConfig=j,e.filters=E,e.getConfig=H,e.helpers=R,e.nativeHelpers=T,e.parse=h,e.render=function(e,n,a,i){var s=H(a||{});if(!s.async)return _(e,s)(n,s);if(!i){if("function"==typeof r)return new r((function(t,r){try{t(_(e,s)(n,s));}catch(e){r(e);}}));throw t("Please provide a callback function, this env doesn't support Promises")}try{_(e,s)(n,s,i);}catch(e){return i(e)}},e.templates=I,Object.defineProperty(e,"__esModule",{value:true});}));
+	
+} (squirrelly_min, squirrelly_min.exports));
+
+var squirrelly_minExports = squirrelly_min.exports;
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t={CHILD:2},e$1=t=>(...e)=>({_$litDirective$:t,values:e});class i{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i;}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}}
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */class e extends i{constructor(i){if(super(i),this.it=A,i.type!==t.CHILD)throw Error(this.constructor.directiveName+"() can only be used in child bindings")}render(r){if(r===A||null==r)return this._t=void 0,this.it=r;if(r===E)return r;if("string"!=typeof r)throw Error(this.constructor.directiveName+"() called with a non-string value");if(r===this.it)return this._t;this.it=r;const s=[r];return s.raw=s,this._t={_$litType$:this.constructor.resultType,strings:s,values:[]}}}e.directiveName="unsafeHTML",e.resultType=1;const o=e$1(e);
+
+const renderIcon = (icon) => `<ha-icon icon="${icon}"></ha-icon>`;
+squirrelly_minExports.defaultConfig.autoEscape = false;
+squirrelly_minExports.filters.define('icon', renderIcon);
+squirrelly_minExports.filters.define('join', (arr, delimiter = ', ') => arr.join(delimiter));
+squirrelly_minExports.filters.define('css', (str, css) => {
+    const styles = Object.entries(css).reduce((memo, [key, val]) => `${memo}${key}:${val};`, '');
+    return `<span style="${styles}">${str}</span>`;
+});
+squirrelly_minExports.filters.define('debug', (data) => {
+    try {
+        return JSON.stringify(data);
+    }
+    catch {
+        return `Not able to read valid JSON object from: ${data}`;
+    }
+});
+function wrapSensors(config, content) {
+    const { type, labels: showLabels } = config?.layout?.sensors ?? { type: 'table', labels: true };
+    const classes = [
+        showLabels ? 'with-labels' : 'without-labels',
+        type === 'list' ? 'as-list' : 'as-table',
+    ];
+    return b ` <div class="sensors ${classes.join(' ')}">${content}</div> `;
+}
+function renderTemplated({ context, entityId, template = '{{state.text}}', label, hass, variables = {}, config, localize, openEntityPopover, }) {
+    const { state, attributes } = context;
+    const [domain] = entityId.split('.');
+    const lang = hass.selectedLanguage || hass.language;
+    const trPrefix = 'ui.card.climate.';
+    const translations = Object.entries(hass.resources[lang] || {}).reduce((memo, [key, value]) => {
+        if (key.startsWith(trPrefix))
+            memo[key.replace(trPrefix, '')] = value;
+        return memo;
+    }, {});
+    const data = {
+        ...attributes,
+        state: {
+            raw: state,
+            text: localize(state, `component.${domain}.state._.`),
+        },
+        ui: translations,
+        v: variables,
+    };
+    squirrelly_minExports.filters.define('formatNumber', (str, opts = { decimals: config.decimals }) => String(formatNumber(str, opts)));
+    squirrelly_minExports.filters.define('relativetime', (str) => `<ha-relative-time fwd-datetime=${str} with-hass></ha-relative-time>`);
+    squirrelly_minExports.filters.define('translate', (str, prefix = '') => {
+        if (!prefix && (domain === 'climate' || domain === 'humidifier')) {
+            return localize(str, `state_attributes.${domain}.${str}`);
+        }
+        return localize(str, prefix);
+    });
+    const render = (tmpl) => squirrelly_minExports.render(tmpl, data, { useWith: true });
+    const value = render(template);
+    if (label === false || config?.layout?.sensors?.labels === false) {
+        return b `<div class="sensor-value">${o(value)}</div>`;
+    }
+    const safeLabel = label || '{{friendly_name}}';
+    const heading = safeLabel.match(/^(mdi|hass):.*/)
+        ? renderIcon(safeLabel)
+        : render(safeLabel);
+    return b `
+    <div class="sensor-heading">${o(heading)}</div>
+    <div class="sensor-value">${o(value)}</div>
+  `;
+}
+
+function renderInfoItem({ hide = false, hass, state, details, localize, openEntityPopover, }) {
+    if (hide || typeof state === 'undefined')
+        return A;
+    const { type, heading, icon, unit, decimals } = details;
+    if (type === 'relativetime') {
+        return b `
+      <div class="sensor-value">
+        <ha-relative-time .datetime=${state} .hass=${hass}></ha-relative-time>
+      </div>
+    `;
+    }
+    if (typeof state === 'object') {
+        const [domain] = state.entity_id.split('.');
+        const prefix = [
+            'component', domain, 'state',
+            state.attributes?.device_class ?? '_',
+            '',
+        ].join('.');
+        let value = localize(state.state, prefix);
+        if (typeof decimals === 'number') {
+            value = formatNumber(value, { decimals });
+        }
+        return b `
+      <div
+        class="sensor-value clickable"
+        @click=${() => openEntityPopover && openEntityPopover(state.entity_id)}
+      >
+        ${value} ${unit || state.attributes.unit_of_measurement}
+      </div>
+    `;
+    }
+    let value = typeof decimals === 'number' ? formatNumber(state, { decimals }) : state;
+    return b `<div class="sensor-value">${value}${unit || ''}</div>`;
+}
+
+function renderSensors({ _hide, entity, unit, hass, sensors, config, localize, openEntityPopover, }) {
+    const { state, attributes: { hvac_action: action, current_temperature: current }, } = entity;
+    const showLabels = config?.layout?.sensors?.labels ?? true;
+    // 获取中文状态名
+    const getZhState = (s) => {
+        const map = {
+            off: '关闭',
+            heat: '制热',
+            cool: '制冷',
+            auto: '自动',
+            dry: '除湿',
+            fan_only: '送风',
+            heat_cool: '冷热',
+            idle: '待机',
+            heating: '加热中',
+            cooling: '制冷中',
+            drying: '除湿中',
+            fan: '送风中',
+        };
+        return map[s] ?? s;
+    };
+    let stateString = getZhState(state);
+    const sensorHtml = [
+        renderInfoItem({
+            hide: _hide.temperature,
+            state: `${formatNumber(current, config)}${unit || ''}`,
+            hass,
+            details: {
+                heading: showLabels
+                    ? config?.label?.temperature ?? '当前温度'
+                    : false,
+            },
+        }),
+        renderInfoItem({
+            hide: _hide.state,
+            state: stateString,
+            hass,
+            details: {
+                heading: showLabels
+                    ? config?.label?.state ?? '运行状态'
+                    : false,
+            },
+        }),
+        ...(sensors.map(({ name, state, ...rest }) => {
+            return renderInfoItem({
+                state,
+                hass,
+                localize,
+                openEntityPopover,
+                details: {
+                    ...rest,
+                    heading: showLabels && name,
+                },
+            });
+        }) || null),
+    ].filter((it) => it !== null);
+    return b `${wrapSensors(config, sensorHtml)}`;
+}
+
+var HVAC_MODES;
+(function (HVAC_MODES) {
+    HVAC_MODES["OFF"] = "off";
+    HVAC_MODES["HEAT"] = "heat";
+    HVAC_MODES["COOL"] = "cool";
+    HVAC_MODES["HEAT_COOL"] = "heat_cool";
+    HVAC_MODES["AUTO"] = "auto";
+    HVAC_MODES["DRY"] = "dry";
+    HVAC_MODES["FAN_ONLY"] = "fan_only";
+})(HVAC_MODES || (HVAC_MODES = {}));
+
+// 中文本地化映射（覆盖上游英文 key）
+const ZH_MODE_NAMES = {
+    // HVAC 模式
+    off: '关闭',
+    heat: '制热',
+    cool: '制冷',
+    auto: '自动',
+    dry: '除湿',
+    fan_only: '送风',
+    heat_cool: '冷热',
+    // 预设模式
+    none: '无',
+    eco: '节能',
+    away: '离家',
+    boost: '增强',
+    comfort: '舒适',
+    home: '在家',
+    sleep: '睡眠',
+    activity: '活动',
+    // swing 模式
+    vertical: '上下摆风',
+    horizontal: '左右摆风',
+    both: '全方位摆风',
+    // fan 模式
+    low: '低速',
+    medium: '中速',
+    high: '高速',
+    auto_mode: '自动',
+};
+function renderModeType({ state, mode: options, modeOptions, localize, setMode, }) {
+    const { type, hide_when_off, mode = 'none', list, name } = options;
+    if (list.length === 0 || (hide_when_off && state === HVAC_MODES.OFF)) {
+        return A;
+    }
+    const getZhName = (value) => {
+        return ZH_MODE_NAMES[value] ?? localize(value);
+    };
+    const getHeadingTitle = () => {
+        if (name)
+            return typeof name === 'string' ? name : '';
+        const headingMap = {
+            hvac: '运行模式',
+            preset: '预设模式',
+            fan: '风速模式',
+            swing: '摆风模式',
+            swing_horizontal: '左右摆风',
+        };
+        return headingMap[type] ?? `${type}_mode`;
+    };
+    const maybeRenderName = (modeName) => {
+        if (modeName === false)
+            return A;
+        if (modeOptions?.names === false)
+            return A;
+        return b `${modeName}`;
+    };
+    const maybeRenderIcon = (icon) => {
+        if (!icon)
+            return A;
+        if (modeOptions?.icons === false)
+            return A;
+        return b ` <ha-icon class="mode-icon" .icon=${icon}></ha-icon> `;
+    };
+    const title = getHeadingTitle();
+    const headings = modeOptions?.headings ?? true;
+    return b `
+    <div class="modes ${headings ? 'heading' : ''}">
+      ${headings ? b ` <div class="mode-title">${title}</div> ` : A}
+      ${list.map(({ value, icon }) => b `
+          <div
+            class="mode-item ${value === mode ? 'active ' + value : ''}"
+            @click=${() => setMode(type, value)}
+          >
+            ${maybeRenderIcon(icon)} ${maybeRenderName(getZhName(value))}
+          </div>
+        `)}
+    </div>
+  `;
+}
+
+const STATE_ICONS = {
+    auto: 'mdi:autorenew',
+    cooling: 'mdi:snowflake',
+    fan: 'mdi:fan',
+    heating: 'mdi:fire',
+    idle: 'mdi:air-conditioner',
+    off: 'mdi:air-conditioner',
+    drying: 'mdi:water-percent',
+};
+const MODE_ICONS = {
+    // HVAC 模式
+    auto: 'mdi:autorenew',
+    cool: 'mdi:snowflake',
+    dry: 'mdi:water-percent',
+    fan_only: 'mdi:fan',
+    heat_cool: 'mdi:autorenew',
+    heat: 'mdi:fire',
+    off: 'mdi:power',
+    // swing 模式
+    swing_horizontal: 'mdi:fan',
+    swing: 'mdi:fan-sync',
+    // preset 预设模式
+    none: 'mdi:cancel',
+    eco: 'mdi:leaf',
+    away: 'mdi:account-arrow-right',
+    boost: 'mdi:rocket-launch',
+    comfort: 'mdi:sofa',
+    home: 'mdi:home',
+    sleep: 'mdi:sleep',
+    activity: 'mdi:run',
+    // fan 风速模式
+    silent: 'mdi:fan-chevron-down',
+    low: 'mdi:fan-speed-1',
+    medium_low: 'mdi:fan-speed-1',
+    medium: 'mdi:fan-speed-2',
+    medium_high: 'mdi:fan-speed-2',
+    high: 'mdi:fan-speed-3',
+    highest: 'mdi:fan-speed-3',
+    full: 'mdi:fan-chevron-up',
+    auto_mode: 'mdi:fan-auto',
+    // 定时器
+    timer_off: 'mdi:timer-off',
+    timer_30: 'mdi:timer-outline',
+    timer_60: 'mdi:timer-outline',
+    timer_90: 'mdi:timer-outline',
+    timer_120: 'mdi:timer-outline',
+};
+function parseHeaderConfig(config, entity, hass) {
+    if (config === false)
+        return false;
+    let name;
+    if (typeof config?.name === 'string') {
+        name = config.name;
+    }
+    else if (config?.name === false) {
+        name = false;
+    }
+    else {
+        name = entity.attributes.friendly_name;
+    }
+    let icon = entity.attributes.hvac_action ? STATE_ICONS : MODE_ICONS;
+    if (typeof config?.icon !== 'undefined') {
+        icon = config.icon;
+    }
+    return {
+        name,
+        icon,
+        toggle: config?.toggle ? parseToggle(config.toggle, hass) : null,
+        faults: parseFaults(config?.faults, hass),
+    };
+}
+function parseToggle(config, hass) {
+    const entity = hass.states[config.entity];
+    let label = '';
+    if (config?.name === true) {
+        label = entity.attributes.name;
+    }
+    else {
+        label = config?.name ?? '';
+    }
+    return { entity, label };
+}
+function parseFaults(config, hass) {
+    if (Array.isArray(config)) {
+        return config.map(({ entity, ...rest }) => {
+            return {
+                ...rest,
+                state: hass.states[entity],
+                entity,
+            };
+        });
+    }
+    return [];
+}
+
+const DUAL$1 = 'dual';
+const SINGLE = 'single';
+function getEntityType(attributes) {
+    if (typeof attributes.target_temp_high === 'number' &&
+        typeof attributes.target_temp_low === 'number') {
+        return DUAL$1;
+    }
+    return SINGLE;
+}
+
+const DUAL = 'dual';
+function parseSetpoints(setpoints, attributes) {
+    if (setpoints === false) {
+        return {};
+    }
+    if (setpoints) {
+        const def = Object.keys(setpoints);
+        return def.reduce((result, name) => {
+            const sp = setpoints[name];
+            if (sp?.hide)
+                return result;
+            return {
+                ...result,
+                [name]: attributes?.[name],
+            };
+        }, {});
+    }
+    const entityType = getEntityType(attributes);
+    if (entityType === DUAL) {
+        return {
+            target_temp_low: attributes.target_temp_low,
+            target_temp_high: attributes.target_temp_high,
+        };
+    }
+    return {
+        temperature: attributes.temperature,
+    };
+}
+
+function parseService(service) {
+    if (service === false) {
+        return { domain: 'climate', service: 'set_temperature' };
+    }
+    return service;
+}
+
+var MODES;
+(function (MODES) {
+    MODES["HVAC"] = "hvac";
+    MODES["FAN"] = "fan";
+    MODES["PRESET"] = "preset";
+    MODES["SWING"] = "swing";
+    // 新增水平摆风模式支持
+    MODES["SWING_HORIZONTAL"] = "swing_horizontal";
+})(MODES || (MODES = {}));
+
+const DEBOUNCE_TIMEOUT = 500;
+const STEP_SIZE = 0.5;
+const DECIMALS = 1;
+const MODE_TYPES = Object.values(MODES);
+const DEFAULT_CONTROL = [MODES.HVAC, MODES.PRESET];
+const ICONS = {
+    UP: 'mdi:chevron-up',
+    DOWN: 'mdi:chevron-down',
+    PLUS: 'mdi:plus',
+    MINUS: 'mdi:minus',
+};
+const DEFAULT_HIDE = {
+    temperature: false,
+    state: false,
+};
+// 定时器选项
+const TIMER_OPTIONS = [
+    { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
+    { value: 'timer_30', label: '30分', minutes: 30, icon: 'mdi:timer-outline' },
+    { value: 'timer_60', label: '1时', minutes: 60, icon: 'mdi:timer-outline' },
+    { value: 'timer_90', label: '1.5时', minutes: 90, icon: 'mdi:timer-outline' },
+    { value: 'timer_120', label: '2时', minutes: 120, icon: 'mdi:timer-outline' },
+];
+function shouldShowModeControl(modeOption, config) {
+    if (typeof config[modeOption] === 'object') {
+        const obj = config[modeOption];
+        return obj.include !== false;
+    }
+    return config?.[modeOption] ?? true;
+}
+function getModeList(type, attributes, specification = {}) {
+    return attributes[`${type}_modes`]
+        .filter((modeOption) => shouldShowModeControl(modeOption, specification))
+        .map((modeOption) => {
+        const values = typeof specification[modeOption] === 'object'
+            ? specification[modeOption]
+            : {};
+        return {
+            icon: MODE_ICONS[modeOption] || 'mdi:air-conditioner',
+            value: modeOption,
+            name: modeOption,
+            ...values,
+        };
+    });
+}
+class SimpleThermostat extends i$1 {
+    constructor() {
+        super(...arguments);
+        this.config = {};
+        this.header = false;
+        this.service = {};
+        this.modes = [];
+        this._hass = {};
+        this.entity = undefined;
+        this.sensors = [];
+        this.showSensors = true;
+        this.name = '';
+        this.stepSize = STEP_SIZE;
+        this._values = {};
+        this._updatingValues = false;
+        this._hide = DEFAULT_HIDE;
+        // 定时器相关属性
+        this._timerValue = 'timer_off';
+        this._timerRemaining = 0;
+        this._timerTotal = 0;
+        // 前端 UI 刷新定时器（仅刷新显示，不管理倒计时逻辑）
+        this._uiRefreshInterval = null;
+        // HA 事件订阅取消函数
+        this._unsubTimerFinished = null;
+        // 防止重复创建 timer
+        this._timerCreating = false;
+        this._debouncedSetTemperature = debounceFn((values) => {
+            const { domain, service, data = {} } = this.service;
+            this._hass.callService(domain, service, {
+                entity_id: this.config.entity,
+                ...data,
+                ...values,
+            });
+        }, { wait: DEBOUNCE_TIMEOUT });
+        this.localize = (label, prefix = '') => {
+            const lang = this._hass.selectedLanguage || this._hass.language;
+            const key = `${prefix}${label}`;
+            const translations = this._hass.resources[lang];
+            return translations?.[key] ?? label;
+        };
+        this.toggleEntityChanged = (ev) => {
+            if (!this.header || !this?.header?.toggle)
+                return;
+            const el = ev.target;
+            this._hass.callService('homeassistant', el.checked ? 'turn_on' : 'turn_off', { entity_id: this.header?.toggle?.entity?.entity_id });
+        };
+        this.setMode = (type, mode) => {
+            if (type && mode) {
+                this._hass.callService('climate', `set_${type}_mode`, {
+                    entity_id: this.config.entity,
+                    [`${type}_mode`]: mode,
+                });
+                fireEvent(this, 'haptic', 'light');
+            }
+            else {
+                fireEvent(this, 'haptic', 'failure');
+            }
+        };
+        this.openEntityPopover = (entityId = null) => {
+            fireEvent(this, 'hass-more-info', {
+                entityId: entityId || this.config.entity,
+            });
+        };
+    }
+    static getConfigElement() {
+        return window.document.createElement(`${name}-editor`);
+    }
+    setConfig(config) {
+        if (config.entity && !config.entity.startsWith('climate.')) {
+            throw new Error(`实体必须是 climate 域，当前: ${config.entity}`);
+        }
+        this.config = {
+            decimals: DECIMALS,
+            ...config,
+        };
+    }
+    updated() {
+        const patchHass = Array.from(this.renderRoot.querySelectorAll('[with-hass]'));
+        for (const child of Array.from(patchHass)) {
+            Array.from(child.attributes).forEach((attr) => {
+                if (attr.name.startsWith('fwd-')) {
+                    child[attr.name.replace('fwd-', '')] = attr.value;
+                }
+            });
+            child.hass = this._hass;
+        }
+    }
+    set hass(hass) {
+        this._hass = hass;
+        if (!this.config?.entity)
+            return;
+        const entity = hass.states[this.config.entity];
+        if (!entity)
+            return;
+        if (this.entity !== entity) {
+            this.entity = entity;
+        }
+        this.header = parseHeaderConfig(this.config.header, entity, hass);
+        this.service = parseService(this.config?.service ?? false);
+        const attributes = entity.attributes;
+        let values = parseSetpoints(this.config?.setpoints ?? null, attributes);
+        if (this._updatingValues && isEqual(values, this._values)) {
+            this._updatingValues = false;
+        }
+        else if (!this._updatingValues) {
+            this._values = values;
+        }
+        const supportedModeType = (type) => MODE_TYPES.includes(type) && attributes[`${type}_modes`];
+        const buildBasicModes = (items) => {
+            return items.filter(supportedModeType).map((type) => ({
+                type,
+                hide_when_off: false,
+                list: getModeList(type, attributes),
+            }));
+        };
+        let controlModes = [];
+        if (this.config.control === false) {
+            controlModes = [];
+        }
+        else if (Array.isArray(this.config.control)) {
+            controlModes = buildBasicModes(this.config.control);
+        }
+        else if (typeof this.config.control === 'object') {
+            const entries = Object.entries(this.config.control);
+            if (entries.length > 0) {
+                controlModes = entries
+                    .filter(([type]) => supportedModeType(type))
+                    .map(([type, definition]) => {
+                    const { _name, _hide_when_off, ...controlField } = definition;
+                    return {
+                        type,
+                        hide_when_off: _hide_when_off,
+                        name: _name,
+                        list: getModeList(type, attributes, controlField),
+                    };
+                });
+            }
+            else {
+                controlModes = buildBasicModes(DEFAULT_CONTROL);
+            }
+        }
+        else {
+            controlModes = buildBasicModes(DEFAULT_CONTROL);
+        }
+        this.modes = controlModes.map((values) => {
+            if (values.type === MODES.HVAC) {
+                const sortedList = [];
+                const hvacModeValues = Object.values(HVAC_MODES);
+                values.list.forEach((item) => {
+                    const index = hvacModeValues.indexOf(item.value);
+                    sortedList[index] = item;
+                });
+                return {
+                    ...values,
+                    list: sortedList,
+                    mode: entity.state,
+                };
+            }
+            const mode = attributes[`${values.type}_mode`];
+            return { ...values, mode };
+        });
+        if (this.config.step_size) {
+            this.stepSize = +this.config.step_size;
+        }
+        if (this.config.hide) {
+            this._hide = { ...this._hide, ...this.config.hide };
+        }
+        // 定时器开启但未配置 timer_entity 时，自动创建
+        if (this.config?.timer && this.config.timer !== 'hide' && !this.config?.timer_entity) {
+            this._autoCreateTimerEntity();
+        }
+        // 定时器隐藏时，删除 timer 实体并清理配置
+        if ((!this.config?.timer || this.config.timer === 'hide') && this.config?.timer_entity) {
+            this._deleteTimerEntity(this.config.timer_entity);
+        }
+        // 同步 HA timer 实体状态
+        this._syncTimerEntity();
+        // 空调被关闭时，取消正在运行的定时器
+        if (entity.state === 'off' && this._timerValue !== 'timer_off') {
+            const timerEntityId = this.config?.timer_entity;
+            if (timerEntityId && this._hass.states?.[timerEntityId]?.state === 'active') {
+                this._hass.callService('timer', 'cancel', { entity_id: timerEntityId });
+                this._unsubscribeTimerFinished();
+            }
+        }
+        if (this.config.sensors === false) {
+            this.showSensors = false;
+        }
+        else if (this.config.version === 3 && Array.isArray(this.config.sensors)) {
+            this.sensors = [];
+            const customSensors = this.config.sensors.map((sensor, index) => {
+                const entityId = sensor?.entity ?? this.config.entity;
+                let context = this.entity;
+                if (sensor?.entity) {
+                    context = this._hass.states[sensor.entity];
+                }
+                return {
+                    id: sensor?.id ?? String(index),
+                    label: sensor?.label,
+                    template: sensor.template,
+                    show: sensor?.show !== false,
+                    entityId,
+                    context,
+                };
+            });
+            const ids = customSensors.map((s) => s.id);
+            const builtins = [];
+            if (!ids.includes('state')) {
+                builtins.push({
+                    id: 'state',
+                    label: '当前状态',
+                    template: '{{state.text}}',
+                    entityId: this.config.entity,
+                    context: this.entity,
+                });
+            }
+            if (!ids.includes('temperature')) {
+                builtins.push({
+                    id: 'temperature',
+                    label: '当前温度',
+                    template: '{{current_temperature|formatNumber}}°',
+                    entityId: this.config.entity,
+                    context: this.entity,
+                });
+            }
+            this.sensors = [...builtins, ...customSensors];
+        }
+        else if (this.config.sensors) {
+            this.sensors = this.config.sensors.map(({ name, entity, attribute, unit = '', ...rest }) => {
+                let state;
+                const names = [name];
+                if (entity) {
+                    state = hass.states[entity];
+                    names.push(state?.attributes?.friendly_name);
+                    if (attribute) {
+                        state = state.attributes[attribute];
+                    }
+                }
+                else if (attribute && attribute in this.entity.attributes) {
+                    state = this.entity.attributes[attribute];
+                    names.push(attribute);
+                }
+                names.push(entity);
+                return {
+                    ...rest,
+                    name: names.find((n) => !!n),
+                    state,
+                    entity,
+                    unit,
+                };
+            });
+        }
+    }
+    render() {
+        const warnings = [];
+        if (this.stepSize < 1 && this.config.decimals === 0) {
+            warnings.push(b `
+        <hui-warning>
+          小数位设为0但步进值小于1，点击减温可能失效，请调整设置。
+        </hui-warning>
+      `);
+        }
+        if (!this.entity) {
+            return b `<hui-warning> 实体不可用: ${this.config.entity} </hui-warning>`;
+        }
+        const { attributes: { min_temp: minTemp = null, max_temp: maxTemp = null, hvac_action: action, }, } = this.entity;
+        const unit = this.getUnit();
+        const stepLayout = this.config?.layout?.step ?? 'column';
+        const row = stepLayout === 'row';
+        const classes = [!this.header && 'no-header', action].filter((cx) => !!cx);
+        let sensorsHtml;
+        if (this.config.version === 3) {
+            sensorsHtml = this.sensors
+                .filter((spec) => spec.show !== false)
+                .map((spec) => {
+                return renderTemplated({
+                    ...spec,
+                    variables: this.config.variables,
+                    hass: this._hass,
+                    config: this.config,
+                    localize: this.localize,
+                    openEntityPopover: this.openEntityPopover,
+                });
+            });
+            sensorsHtml = wrapSensors(this.config, sensorsHtml);
+        }
+        else {
+            sensorsHtml = this.showSensors
+                ? renderSensors({
+                    _hide: this._hide,
+                    unit,
+                    hass: this._hass,
+                    entity: this.entity,
+                    sensors: this.sensors,
+                    config: this.config,
+                    localize: this.localize,
+                    openEntityPopover: this.openEntityPopover,
+                })
+                : '';
+        }
+        return b `
+      <ha-card class="${classes.join(' ')}">
+        ${warnings}
+        ${renderHeader({
+            header: this.header,
+            toggleEntityChanged: this.toggleEntityChanged,
+            entity: this.entity,
+            openEntityPopover: this.openEntityPopover,
+        })}
+        <section class="body">
+          ${sensorsHtml}
+          ${Object.entries(this._values).map(([field, value]) => {
+            const hasValue = ['string', 'number'].includes(typeof value);
+            const showUnit = unit !== false && hasValue;
+            return b `
+              <div class="current-wrapper ${stepLayout}">
+                <ha-icon-button
+                  ?disabled=${maxTemp !== null && value >= maxTemp}
+                  class="thermostat-trigger"
+                  @click=${() => this.setTemperature(this.stepSize, field)}
+                >
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                </ha-icon-button>
+
+                <h3
+                  class="current--value ${this._updatingValues ? 'updating' : ''}"
+                  @click=${() => this.openEntityPopover()}
+                >
+                  ${formatNumber(value, this.config)}
+                  ${showUnit ? b `<span class="current--unit">${unit}</span>` : A}
+                </h3>
+
+                <ha-icon-button
+                  ?disabled=${minTemp !== null && value <= minTemp}
+                  class="thermostat-trigger"
+                  @click=${() => this.setTemperature(-this.stepSize, field)}
+                >
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                </ha-icon-button>
+              </div>
+            `;
+        })}
+        </section>
+
+        ${this.modes.map((mode) => renderModeType({
+            state: this.entity.state,
+            mode,
+            localize: this.localize,
+            modeOptions: this.config?.layout?.mode ?? {},
+            setMode: this.setMode,
+        }))}
+
+        ${this._renderTimer()}
+      </ha-card>
+    `;
+    }
+    setTemperature(change, field) {
+        this._updatingValues = true;
+        const previousValue = this._values[field];
+        const newValue = Number(previousValue) + change;
+        const { decimals } = this.config;
+        this._values = {
+            ...this._values,
+            [field]: +formatNumber(newValue, { decimals }),
+        };
+        this._debouncedSetTemperature(this._values);
+    }
+    getCardSize() {
+        return 3;
+    }
+    getUnit() {
+        if (['boolean', 'string'].includes(typeof this.config.unit)) {
+            return this.config?.unit;
+        }
+        return this._hass.config?.unit_system?.temperature ?? false;
+    }
+    // ========== 定时器功能 ==========
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this._stopUIRefresh();
+        this._unsubscribeTimerFinished();
+    }
+    /** 渲染定时器 UI */
+    _renderTimer() {
+        const timerConfig = this.config?.timer;
+        if (!timerConfig || timerConfig === 'hide')
+            return A;
+        // 没有配置 timer_entity 时提示用户
+        if (!this.config?.timer_entity) {
+            return b `
+        <div class="timer-hint">请在配置中指定定时器实体（timer.xxx）</div>
+      `;
+        }
+        const headings = this.config?.layout?.mode?.headings ?? true;
+        const showNames = this.config?.layout?.mode?.names !== false;
+        const showIcons = this.config?.layout?.mode?.icons !== false;
+        // 进度条：倒计时中显示
+        const showProgress = this._timerRemaining > 0 && this._timerTotal > 0;
+        const progressPercent = showProgress
+            ? Math.max(0, (this._timerRemaining / this._timerTotal) * 100)
+            : 0;
+        return b `
+      <div class="modes ${headings ? 'heading' : ''}">
+        ${headings ? b `<div class="mode-title">定时关机</div>` : A}
+        ${TIMER_OPTIONS.map((opt) => {
+            const isActive = this._timerValue === opt.value;
+            return b `
+            <div
+              class="mode-item ${isActive ? 'active' : ''}"
+              @click=${() => this._setTimer(opt.value)}
+            >
+              ${showIcons && opt.icon ? b `<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : A}
+              ${showNames ? b `${opt.label}` : A}
+            </div>
+          `;
+        })}
+      </div>
+      ${showProgress ? b `
+        <div class="timer-progress-bar">
+          <div class="timer-progress-fill" style="width: ${progressPercent}%">
+            <span class="timer-progress-text">${this._formatRemaining(this._timerRemaining)} 后关机</span>
+          </div>
+        </div>
+      ` : A}
+    `;
+    }
+    /** 从 HA timer 实体同步状态到卡片 */
+    _syncTimerEntity() {
+        const timerEntityId = this.config?.timer_entity;
+        if (!timerEntityId)
+            return;
+        const timerEntity = this._hass.states?.[timerEntityId];
+        if (!timerEntity)
+            return;
+        const timerState = timerEntity.state; // idle / active / paused
+        if (timerState === 'active') {
+            // 从 finishes_at 计算剩余时间
+            const finishesAt = timerEntity.attributes?.finishes_at;
+            if (finishesAt) {
+                const endTime = new Date(finishesAt).getTime();
+                const now = Date.now();
+                const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+                this._timerRemaining = remaining;
+                // 从 duration 属性获取总时长
+                const duration = timerEntity.attributes?.duration;
+                if (duration) {
+                    this._timerTotal = this._parseDuration(duration);
+                }
+                else if (this._timerTotal === 0) {
+                    this._timerTotal = remaining;
+                }
+            }
+            // 匹配当前定时选项
+            this._timerValue = this._matchTimerOption(this._timerRemaining);
+            // 启动 UI 刷新定时器（每秒刷新显示）
+            this._startUIRefresh();
+            // 订阅 timer.finished 事件（用于自动关空调）
+            this._subscribeTimerFinished();
+        }
+        else if (timerState === 'paused') {
+            // 暂停时从 remaining 属性读取
+            const remaining = timerEntity.attributes?.remaining;
+            if (remaining) {
+                this._timerRemaining = this._parseDuration(remaining);
+            }
+            this._timerValue = this._matchTimerOption(this._timerRemaining);
+            this._stopUIRefresh();
+        }
+        else {
+            // idle
+            this._timerRemaining = 0;
+            this._timerTotal = 0;
+            this._timerValue = 'timer_off';
+            this._stopUIRefresh();
+        }
+    }
+    /** 订阅 timer.finished 事件，倒计时结束时自动关空调 */
+    _subscribeTimerFinished() {
+        if (this._unsubTimerFinished)
+            return; // 已订阅
+        const timerEntityId = this.config?.timer_entity;
+        if (!timerEntityId)
+            return;
+        const conn = this._hass?.connection;
+        if (!conn?.subscribeEvents)
+            return;
+        this._unsubTimerFinished = conn.subscribeEvents((ev) => {
+            const eventData = ev.data;
+            // 只处理当前 timer 实体的 finished 事件
+            if (eventData?.entity_id === timerEntityId) {
+                // 倒计时自然结束，关闭空调
+                this._hass.callService('climate', 'turn_off', {
+                    entity_id: this.config.entity,
+                });
+                // 取消订阅
+                this._unsubscribeTimerFinished();
+            }
+        }, 'timer.finished');
+    }
+    /** 取消订阅 timer.finished 事件 */
+    _unsubscribeTimerFinished() {
+        if (this._unsubTimerFinished) {
+            this._unsubTimerFinished();
+            this._unsubTimerFinished = null;
+        }
+    }
+    /** 匹配当前剩余时间对应的定时选项 */
+    _matchTimerOption(remainingSeconds) {
+        // 优先精确匹配
+        const minutes = Math.round(remainingSeconds / 60);
+        const match = TIMER_OPTIONS.find((o) => o.minutes === minutes);
+        if (match)
+            return match.value;
+        // 未精确匹配时保留当前选中项（倒计时进行中）
+        if (this._timerValue !== 'timer_off')
+            return this._timerValue;
+        return 'timer_off';
+    }
+    /** 解析 HA duration 格式（HH:MM:SS 或秒数）为总秒数 */
+    _parseDuration(duration) {
+        if (typeof duration === 'number')
+            return duration;
+        const parts = String(duration).split(':').map(Number);
+        if (parts.length === 3) {
+            return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        }
+        else if (parts.length === 2) {
+            return parts[0] * 60 + parts[1];
+        }
+        return parseInt(String(duration), 10) || 0;
+    }
+    /** 启动 UI 刷新定时器 */
+    _startUIRefresh() {
+        if (this._uiRefreshInterval)
+            return;
+        this._uiRefreshInterval = setInterval(() => {
+            const timerEntityId = this.config?.timer_entity;
+            if (!timerEntityId)
+                return;
+            const timerEntity = this._hass.states?.[timerEntityId];
+            if (!timerEntity || timerEntity.state !== 'active')
+                return;
+            const finishesAt = timerEntity.attributes?.finishes_at;
+            if (finishesAt) {
+                const endTime = new Date(finishesAt).getTime();
+                const now = Date.now();
+                this._timerRemaining = Math.max(0, Math.floor((endTime - now) / 1000));
+            }
+            this.requestUpdate();
+        }, 1000);
+    }
+    /** 停止 UI 刷新定时器 */
+    _stopUIRefresh() {
+        if (this._uiRefreshInterval) {
+            clearInterval(this._uiRefreshInterval);
+            this._uiRefreshInterval = null;
+        }
+    }
+    /** 设置定时器 */
+    _setTimer(value) {
+        const timerEntityId = this.config?.timer_entity;
+        if (!timerEntityId)
+            return;
+        if (value === 'timer_off') {
+            // 取消定时器（手动取消不关空调）
+            this._hass.callService('timer', 'cancel', {
+                entity_id: timerEntityId,
+            });
+            // 取消事件订阅，防止 cancel 后收到误触发
+            this._unsubscribeTimerFinished();
+            return;
+        }
+        const opt = TIMER_OPTIONS.find((o) => o.value === value);
+        if (!opt)
+            return;
+        // 格式化 duration 为 HH:MM:SS
+        const hours = Math.floor(opt.minutes / 60);
+        const mins = opt.minutes % 60;
+        const durationStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
+        // 启动 HA timer
+        this._hass.callService('timer', 'start', {
+            entity_id: timerEntityId,
+            duration: durationStr,
+        });
+        // 立即更新 UI 状态
+        this._timerValue = value;
+        this._timerTotal = opt.minutes * 60;
+        this._timerRemaining = this._timerTotal;
+        this.requestUpdate();
+    }
+    /** 格式化剩余时间 */
+    _formatRemaining(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    /** 自动创建 timer（带防重复） */
+    async _autoCreateTimerEntity() {
+        if (this._timerCreating)
+            return;
+        this._timerCreating = true;
+        try {
+            const entityId = await this._createTimerEntity();
+            if (entityId) {
+                this.config = { ...this.config, timer_entity: entityId };
+                fireEvent(this, 'config-changed', { config: this.config });
+            }
+        }
+        finally {
+            this._timerCreating = false;
+        }
+    }
+    /** 删除 timer 实体并清理配置 */
+    async _deleteTimerEntity(entityId) {
+        // 先取消正在运行的定时器
+        const timerEntity = this._hass.states?.[entityId];
+        if (timerEntity?.state === 'active') {
+            this._hass.callService('timer', 'cancel', { entity_id: entityId });
+        }
+        this._stopUIRefresh();
+        this._unsubscribeTimerFinished();
+        // 通过 HA API 删除 timer 实体
+        try {
+            const conn = this._hass?.connection;
+            if (conn) {
+                // 先通过 entity registry 找到该 entity 对应的 config entry
+                const entityReg = await conn.sendMessagePromise({
+                    type: 'config/entity_registry/get',
+                    entity_id: entityId,
+                });
+                const entryId = entityReg?.config_entry_id;
+                if (entryId) {
+                    await conn.sendMessagePromise({
+                        type: 'config_entries/remove',
+                        entry_id: entryId,
+                    });
+                }
+            }
+        }
+        catch (err) {
+            console.warn('小空调：删除 timer 实体失败', err);
+        }
+        // 清理配置中的 timer_entity
+        const newConfig = { ...this.config };
+        delete newConfig.timer_entity;
+        this.config = newConfig;
+        fireEvent(this, 'config-changed', { config: newConfig });
+        // 重置 UI 状态
+        this._timerValue = 'timer_off';
+        this._timerRemaining = 0;
+        this._timerTotal = 0;
+    }
+    /** 自动创建 HA timer helper 实体 */
+    async _createTimerEntity() {
+        const conn = this._hass?.connection;
+        if (!conn)
+            return null;
+        try {
+            // 1. 发起 config flow
+            const initResult = await conn.sendMessagePromise({
+                type: 'config_entries/flow/initiate',
+                handler: 'timer',
+                show_advanced: false,
+            });
+            const flowId = initResult.flow_id;
+            // 2. 提交 flow step（填写 timer 名称等）
+            const entityName = `小空调定时器_${this.config.entity?.split('.').pop() || 'unknown'}`;
+            const stepResult = await conn.sendMessagePromise({
+                type: 'config_entries/flow/step',
+                flow_id: flowId,
+                user_input: {
+                    name: entityName,
+                    duration: '00:30:00',
+                    restore: true,
+                },
+            });
+            // 3. 从结果中提取 entity_id
+            if (stepResult.result?.entity_id) {
+                return stepResult.result.entity_id;
+            }
+            // 如果 result 不在 step 中，尝试从 hass.states 中查找
+            const timerStates = Object.keys(this._hass.states).filter((id) => id.startsWith('timer.') && id.includes('xiao_kong_tiao'));
+            return timerStates.length > 0 ? timerStates[0] : null;
+        }
+        catch (err) {
+            console.error('小空调：创建 timer 失败', err);
+            return null;
+        }
+    }
+}
+SimpleThermostat.styles = css_248z;
+__decorate([
+    n({ type: Object })
+], SimpleThermostat.prototype, "config", void 0);
+__decorate([
+    n({ type: Object })
+], SimpleThermostat.prototype, "header", void 0);
+__decorate([
+    n({ type: Object })
+], SimpleThermostat.prototype, "service", void 0);
+__decorate([
+    n({ type: Array })
+], SimpleThermostat.prototype, "modes", void 0);
+__decorate([
+    n({ type: Object })
+], SimpleThermostat.prototype, "entity", void 0);
+__decorate([
+    n({ type: Array })
+], SimpleThermostat.prototype, "sensors", void 0);
+__decorate([
+    n({ type: Boolean })
+], SimpleThermostat.prototype, "showSensors", void 0);
+__decorate([
+    n({ type: String })
+], SimpleThermostat.prototype, "name", void 0);
+__decorate([
+    n({ type: Object })
+], SimpleThermostat.prototype, "_values", void 0);
+__decorate([
+    n({ type: Boolean })
+], SimpleThermostat.prototype, "_updatingValues", void 0);
+__decorate([
+    n({ type: Object })
+], SimpleThermostat.prototype, "_hide", void 0);
+__decorate([
+    n({ type: String })
+], SimpleThermostat.prototype, "_timerValue", void 0);
+__decorate([
+    n({ type: Number })
+], SimpleThermostat.prototype, "_timerRemaining", void 0);
+__decorate([
+    n({ type: Number })
+], SimpleThermostat.prototype, "_timerTotal", void 0);
+
+customElements.define(name, SimpleThermostat);
+customElements.define(`${name}-editor`, SimpleThermostatEditor);
+console.info(`%c${name}: ${version}`, 'font-weight: bold');
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: name,
+    name: '小空调',
+    preview: false,
+    description: 'Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）',
+});
