@@ -125,7 +125,7 @@ sensors:
 
 ## 更新日志
 
-### v3.1.0
+### v3.0.12
 
 - 定时关机功能：基于 HA timer 实体，服务端运行，刷新页面不丢失
 - 通过 `hass.connection.subscribeEvents` 监听 `timer.finished` 事件自动关空调

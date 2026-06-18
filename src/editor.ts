@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit'
+import { LitElement, html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import styles from './styles.css'
 import fireEvent from './fireEvent'
@@ -17,9 +17,18 @@ function setValue(obj: any, path: string, value: any) {
   o[pathFragments[0]] = value
 }
 
-const OptionsDecimals = [0, 1]
-const OptionsStepSize = [0.5, 1]
-const OptionsStepLayout = ['column', 'row']
+const OptionsDecimals = [
+  { value: '0', label: '0' },
+  { value: '1', label: '1' },
+]
+const OptionsStepSize = [
+  { value: '0.5', label: '0.5' },
+  { value: '1', label: '1' },
+]
+const OptionsStepLayout = [
+  { value: 'column', label: 'column' },
+  { value: 'row', label: 'row' },
+]
 const OPTIONS_SHOW_HIDE = [
   { value: 'show', label: '显示' },
   { value: 'hide', label: '隐藏' },
@@ -117,15 +126,12 @@ export default class SimpleThermostatEditor extends LitElement {
             <ha-select
               label="小数位数（可选）"
               .configValue="decimals"
+              .value=${String(this.config.decimals ?? '')}
+              .options=${OptionsDecimals}
               @selected=${this.valueChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsDecimals.map(
-                (item) =>
-                  html`<ha-list-item .value=${String(item)} ?selected=${this.config.decimals === item}>${item}</ha-list-item>`
-              )}
-            </ha-select>
+            ></ha-select>
 
             <ha-textfield
               label="单位（可选）"
@@ -139,28 +145,22 @@ export default class SimpleThermostatEditor extends LitElement {
             <ha-select
               label="布局方向（可选）"
               .configValue="layout.step"
+              .value=${this.config.layout?.step ?? ''}
+              .options=${OptionsStepLayout}
               @selected=${this.valueChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsStepLayout.map(
-                (item) =>
-                  html`<ha-list-item .value=${item} ?selected=${this.config.layout?.step === item}>${item}</ha-list-item>`
-              )}
-            </ha-select>
+            ></ha-select>
 
             <ha-select
               label="步进值（可选）"
               .configValue="step_size"
+              .value=${String(this.config.step_size ?? '')}
+              .options=${OptionsStepSize}
               @selected=${this.valueChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
-            >
-              ${OptionsStepSize.map(
-                (item) =>
-                  html`<ha-list-item .value=${String(item)} ?selected=${this.config.step_size === item}>${item}</ha-list-item>`
-              )}
-            </ha-select>
+            ></ha-select>
           </div>
 
           <div class="side-by-side">
@@ -214,14 +214,16 @@ export default class SimpleThermostatEditor extends LitElement {
     const { target } = ev
     const copy = cloneDeep(this.config)
 
-    // ha-select uses @selected event, value is in target.value
-    // ha-textfield uses @input event, value is in target.value
-    // ha-entity-picker uses @change event, value is in target.value
     const configValue = target.configValue
     if (configValue) {
-      const value = target.value
+      // ha-select 使用 @selected 事件，值在 ev.detail.value
+      // ha-textfield 使用 @input 事件，值在 target.value
+      // ha-entity-picker 使用 @change 事件，值在 target.value
+      const value = target.tagName === 'HA-SELECT'
+        ? ev.detail?.value ?? target.value
+        : target.value
       if (value === '' || value === undefined) {
-        // For ha-select, don't delete on empty - only for text fields
+        // ha-select 不在空值时删除配置
         if (target.tagName !== 'HA-SELECT') {
           delete copy[configValue]
         }

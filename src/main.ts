@@ -37,8 +37,8 @@ const MODE_TYPES: Array<string> = Object.values(MODES)
 const DEFAULT_CONTROL = [MODES.HVAC, MODES.PRESET]
 
 const ICONS = {
-  UP: 'hass:chevron-up',
-  DOWN: 'hass:chevron-down',
+  UP: 'mdi:chevron-up',
+  DOWN: 'mdi:chevron-down',
   PLUS: 'mdi:plus',
   MINUS: 'mdi:minus',
 }
@@ -81,7 +81,7 @@ function getModeList(
           ? specification[modeOption]
           : {}
       return {
-        icon: MODE_ICONS[modeOption] || 'hass:radiator',
+        icon: MODE_ICONS[modeOption] || 'mdi:air-conditioner',
         value: modeOption,
         name: modeOption,
         ...values,
@@ -115,7 +115,7 @@ export default class SimpleThermostat extends LitElement {
   _hass: HASS = {}
 
   @property({ type: Object })
-  entity: LooseObject = {}
+  entity: LooseObject | undefined = undefined
 
   @property({ type: Array })
   sensors: Array<Sensor | PreparedSensor> = []
@@ -173,6 +173,9 @@ export default class SimpleThermostat extends LitElement {
   }
 
   setConfig(config: CardConfig) {
+    if (config.entity && !config.entity.startsWith('climate.')) {
+      throw new Error(`实体必须是 climate 域，当前: ${config.entity}`)
+    }
     this.config = {
       decimals: DECIMALS,
       ...config,
@@ -454,7 +457,7 @@ export default class SimpleThermostat extends LitElement {
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(this.stepSize, field)}
                 >
-                  <ha-icon icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.PLUS : ICONS.UP}></ha-icon>
                 </ha-icon-button>
 
                 <h3
@@ -470,7 +473,7 @@ export default class SimpleThermostat extends LitElement {
                   class="thermostat-trigger"
                   @click=${() => this.setTemperature(-this.stepSize, field)}
                 >
-                  <ha-icon icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
+                  <ha-icon .icon=${row ? ICONS.MINUS : ICONS.DOWN}></ha-icon>
                 </ha-icon-button>
               </div>
             `
@@ -810,19 +813,16 @@ export default class SimpleThermostat extends LitElement {
     try {
       const conn = (this._hass as any)?.connection
       if (conn) {
-        const configEntries = await conn.sendMessagePromise({
-          type: 'config_entries/get',
-          domain: 'timer',
+        // 先通过 entity registry 找到该 entity 对应的 config entry
+        const entityReg = await conn.sendMessagePromise({
+          type: 'config/entity_registry/get',
+          entity_id: entityId,
         })
-        const entry = (configEntries || []).find((e: any) => {
-          // 通过 entity_id 匹配
-          const entryEntityId = e.entry_id
-          return entryEntityId
-        })
-        if (entry?.entry_id) {
+        const entryId = entityReg?.config_entry_id
+        if (entryId) {
           await conn.sendMessagePromise({
             type: 'config_entries/remove',
-            entry_id: entry.entry_id,
+            entry_id: entryId,
           })
         }
       }

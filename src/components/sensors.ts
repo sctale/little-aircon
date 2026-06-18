@@ -62,9 +62,6 @@ export default function renderSensors({
   }
 
   let stateString = getZhState(state)
-  if (action) {
-    stateString = `${getZhAction(action)} (${stateString})`
-  }
 
   const sensorHtml = [
     renderInfoItem({

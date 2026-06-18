@@ -15,25 +15,52 @@ export interface Fault {
 }
 
 export const STATE_ICONS: Record<string, string> = {
-  auto: 'mdi:radiator',
+  auto: 'mdi:autorenew',
   cooling: 'mdi:snowflake',
   fan: 'mdi:fan',
-  heating: 'mdi:radiator',
-  idle: 'mdi:radiator-disabled',
-  off: 'mdi:radiator-off',
+  heating: 'mdi:fire',
+  idle: 'mdi:air-conditioner',
+  off: 'mdi:air-conditioner',
+  drying: 'mdi:water-percent',
 }
 
 export const MODE_ICONS: Record<string, string> = {
-  auto: 'hass:autorenew',
-  cool: 'hass:snowflake',
-  dry: 'hass:water-percent',
-  fan_only: 'hass:fan',
-  heat_cool: 'hass:autorenew',
-  heat: 'hass:fire',
-  off: 'hass:power',
-  // 新增 swing_horizontal 模式
+  // HVAC 模式
+  auto: 'mdi:autorenew',
+  cool: 'mdi:snowflake',
+  dry: 'mdi:water-percent',
+  fan_only: 'mdi:fan',
+  heat_cool: 'mdi:autorenew',
+  heat: 'mdi:fire',
+  off: 'mdi:power',
+  // swing 模式
   swing_horizontal: 'mdi:fan',
   swing: 'mdi:fan-sync',
+  // preset 预设模式
+  none: 'mdi:cancel',
+  eco: 'mdi:leaf',
+  away: 'mdi:account-arrow-right',
+  boost: 'mdi:rocket-launch',
+  comfort: 'mdi:sofa',
+  home: 'mdi:home',
+  sleep: 'mdi:sleep',
+  activity: 'mdi:run',
+  // fan 风速模式
+  silent: 'mdi:fan-chevron-down',
+  low: 'mdi:fan-speed-1',
+  medium_low: 'mdi:fan-speed-1',
+  medium: 'mdi:fan-speed-2',
+  medium_high: 'mdi:fan-speed-2',
+  high: 'mdi:fan-speed-3',
+  highest: 'mdi:fan-speed-3',
+  full: 'mdi:fan-chevron-up',
+  auto_mode: 'mdi:fan-auto',
+  // 定时器
+  timer_off: 'mdi:timer-off',
+  timer_30: 'mdi:timer-outline',
+  timer_60: 'mdi:timer-outline',
+  timer_90: 'mdi:timer-outline',
+  timer_120: 'mdi:timer-outline',
 }
 
 type Icon = string | false | LooseObject

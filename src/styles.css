@@ -135,7 +135,8 @@ header {
   flex-wrap: wrap;
 
   &.row {
-    flex-direction: row-reverse;
+    flex-direction: row;
+    gap: 4px;
   }
 }
 .current--value {
