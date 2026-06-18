@@ -121,7 +121,20 @@ sensors:
 
 ## 更新日志
 
-### v3.0.58
+### v3.1.4
+
+- 定时关机功能正式启用（基于 HA timer 实体，服务端运行，刷新页面不丢失）
+- 自动创建/删除 timer helper 实体（零配置）
+- 监听 timer.finished 事件自动关空调，手动取消不关
+- 进度条展示倒计时剩余时间
+- 空调关闭时自动取消定时器
+- fireEvent 使用 CustomEvent 确保 detail 正确传递
+- 升降温按钮逻辑修正
+- 编辑器重写为 side-by-side 布局
+- 图标修正（off → mdi:power，swing 简化）
+- 状态名改为"制冷中/制热中/除湿中/送风中"
+
+### v3.0.57
 
 - 全面升级至 lit v3，兼容 Home Assistant 2026.x
 - 升级 TypeScript 5.3 + Rollup 4.x

@@ -33,7 +33,7 @@ type ModeControl = {
 }
 
 interface CardConfig {
-  entity: string
+  entity?: string
   header: false | HeaderConfig
   control?: false | ModeControl | string[]
   sensors?: false | Array<ConfigSensor & TemplatedSensor>

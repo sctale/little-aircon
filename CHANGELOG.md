@@ -1,5 +1,27 @@
 # 更新日志
 
+## v3.1.4 (2026-06-18)
+
+### 新增
+- 定时关机功能正式启用（基于 HA timer 实体，服务端运行，刷新页面不丢失）
+- 自动创建 timer helper 实体（零配置）
+- 隐藏定时关机时自动删除 timer 实体，防止残留
+- 通过 hass.connection.subscribeEvents 监听 timer.finished 事件自动关空调
+- 手动取消定时不会关空调
+- 进度条展示倒计时剩余时间
+- 空调被关闭时自动取消定时器
+- 编辑器新增定时关机开关和 timer_entity 显示
+
+### 改进
+- fireEvent 使用 CustomEvent 确保 detail 正确传递
+- 升降温按钮逻辑修正（+/- 方向正确）
+- 默认布局改为 column
+- entity 可用判断简化
+- 编辑器重写为 side-by-side 布局，统一 valueChanged 处理
+- 图标修正：off → mdi:power，swing 图标简化
+- 状态名改为"制冷中/制热中/除湿中/送风中"
+- .gitignore 移除 dist 排除，HACS 可下载构建产物
+
 ## v3.1.3 (2026-06-18)
 
 ### 修复

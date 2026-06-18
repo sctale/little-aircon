@@ -15,5 +15,5 @@ interface InfoItemOptions {
     openEntityPopover?: any;
     details: InfoItemDetails;
 }
-export default function renderInfoItem({ hide, hass, state, details, localize, openEntityPopover, }: InfoItemOptions): typeof nothing | import("lit-html").TemplateResult<1>;
+export default function renderInfoItem({ hide, hass, state, details, localize, openEntityPopover, }: InfoItemOptions): import("lit-html").TemplateResult<1> | typeof nothing;
 export {};

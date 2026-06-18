@@ -14,10 +14,10 @@ export default function fireEvent(
   options = options || {}
   detail = detail === null || detail === undefined ? {} : detail
   const event = new CustomEvent(type, {
+    detail,
     bubbles: options.bubbles === undefined ? true : options.bubbles,
     cancelable: Boolean(options.cancelable),
     composed: options.composed === undefined ? true : options.composed,
-    detail,
   }) as HAEvent
   node.dispatchEvent(event)
   return event

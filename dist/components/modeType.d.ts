@@ -7,5 +7,5 @@ interface ModeTypeOptions {
     localize: any;
     setMode: any;
 }
-export default function renderModeType({ state, mode: options, modeOptions, localize, setMode, }: ModeTypeOptions): typeof nothing | import("lit-html").TemplateResult<1>;
+export default function renderModeType({ state, mode: options, modeOptions, localize, setMode, }: ModeTypeOptions): import("lit-html").TemplateResult<1> | typeof nothing;
 export {};

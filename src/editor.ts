@@ -1,371 +1,259 @@
 import { LitElement, html, nothing } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import styles from './styles.css'
 import fireEvent from './fireEvent'
 import { name } from '../package.json'
 import { CardConfig } from './config/card'
 import { HASS } from './types'
 
+function setValue(obj: any, path: string, value: any) {
+  const pathFragments = path.split('.')
+  let o = obj
+  while (pathFragments.length - 1) {
+    const fragment = pathFragments.shift()!
+    if (!o.hasOwnProperty(fragment)) o[fragment] = {}
+    o = o[fragment]
+  }
+  o[pathFragments[0]] = value
+}
+
+const OptionsDecimals = [
+  { value: '0', label: '0' },
+  { value: '1', label: '1' },
+]
+const OptionsStepSize = [
+  { value: '0.5', label: '0.5' },
+  { value: '1', label: '1' },
+]
+const OptionsStepLayout = [
+  { value: 'column', label: 'column' },
+  { value: 'row', label: 'row' },
+]
+const OPTIONS_SHOW_HIDE = [
+  { value: 'show', label: '显示' },
+  { value: 'hide', label: '隐藏' },
+]
 const includeDomains = ['climate']
 const sensorIncludeDomains = ['sensor']
 const timerIncludeDomains = ['timer']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
+const stub: any = {
+  header: {},
+  layout: { mode: {} },
+}
+
 const cloneDeep = (obj: any) => JSON.parse(JSON.stringify(obj))
 
-const OPTIONS_DECIMALS = [
-  { value: '0', label: '0' },
-  { value: '1', label: '1' },
-]
-
-const OPTIONS_STEP_SIZE = [
-  { value: '0.5', label: '0.5' },
-  { value: '1', label: '1' },
-]
-
-const OPTIONS_STEP_LAYOUT = [
-  { value: 'column', label: '上下' },
-  { value: 'row', label: '左右' },
-]
-
-const OPTIONS_SHOW_HIDE = [
-  { value: 'show', label: '显示' },
-  { value: 'hide', label: '隐藏' },
-]
-
 export default class SimpleThermostatEditor extends LitElement {
-  @property({ attribute: false }) hass!: HASS
-  @state() private _config!: CardConfig
+  @property({ type: Object }) config: CardConfig = {} as CardConfig
+  @property({ type: Object }) hass!: HASS
 
   static styles = styles
 
   static getStubConfig() {
-    return { header: {}, layout: { mode: {} } }
+    return { ...stub }
   }
 
   setConfig(config: CardConfig) {
-    this._config = config
+    this.config = config || { ...stub }
   }
 
   _openLink() {
     window.open(GithubReadMe)
   }
 
-  protected render() {
-    if (!this.hass || !this._config) {
-      return nothing
-    }
-
-    const config = this._config as any
-    // 获取当前 control 列表（用于判断预设/风速是否显示）
-    let controlList: string[]
-    if (Array.isArray(config.control)) {
-      controlList = config.control
-    } else if (typeof config.control === 'object' && config.control !== null) {
-      controlList = Object.keys(config.control)
-    } else {
-      controlList = ['hvac', 'preset']  // 默认值
-    }
+  render() {
+    if (!this.hass) return html``
 
     return html`
       <div class="card-config">
-        <div class="form-group">
-          <div class="group-title">基本设置</div>
-          <ha-entity-picker
-            label="实体（必选）"
-            .hass=${this.hass}
-            .value=${config.entity || ''}
-            .includeDomains=${includeDomains}
-            @value-changed=${this._entityPicked}
-            allow-custom-entity
-          ></ha-entity-picker>
-          <div class="row">
-            <ha-textfield
-              label="名称"
-              .value=${config.header?.name || ''}
-              @input=${(ev) => this._configChanged('header.name', ev.target.value)}
-            ></ha-textfield>
-            <ha-textfield
-              label="图标"
-              .value=${config.header?.icon || ''}
-              @input=${(ev) => this._configChanged('header.icon', ev.target.value)}
-            ></ha-textfield>
+        <div class="overall-config">
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="实体（必选）"
+              .hass=${this.hass}
+              .value=${this.config.entity || ''}
+              .configValue="entity"
+              .includeDomains=${includeDomains}
+              @change=${this.valueChanged}
+              allow-custom-entity
+            ></ha-entity-picker>
           </div>
-          <ha-entity-picker
-            label="室内温度传感器（可选）"
-            .hass=${this.hass}
-            .value=${config.sensor_entity || ''}
-            .includeDomains=${sensorIncludeDomains}
-            @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
-            allow-custom-entity
-          ></ha-entity-picker>
-          <div class="row">
-            <ha-textfield
-              label="占位文本"
-              .value=${config.fallback || ''}
-              @input=${(ev) => this._configChanged('fallback', ev.target.value)}
-            ></ha-textfield>
-            <ha-textfield
-              label="单位"
-              .value=${config.unit || ''}
-              @input=${(ev) => this._configChanged('unit', ev.target.value)}
-            ></ha-textfield>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <div class="group-title">温度与布局</div>
-          <div class="row">
-            <ha-select
-              label="小数位数"
-              .value=${config.decimals != null ? String(config.decimals) : ''}
-              .options=${OPTIONS_DECIMALS}
-              @selected=${this._decimalsChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
-            <ha-select
-              label="步进值"
-              .value=${config.step_size != null ? String(config.step_size) : ''}
-              .options=${OPTIONS_STEP_SIZE}
-              @selected=${this._stepSizeChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
+          <div class="side-by-side">
+            <ha-textfield
+              label="名称（可选）"
+              .value=${this.config.header?.name || ''}
+              .configValue="header.name"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+            <ha-textfield
+              label="图标（可选）"
+              .value=${this.config.header?.icon || ''}
+              .configValue="header.icon"
+              @input=${this.valueChanged}
+            ></ha-textfield>
           </div>
-          <div class="row">
-            <ha-select
-              label="布局方向"
-              .value=${config.layout?.step ?? ''}
-              .options=${OPTIONS_STEP_LAYOUT}
-              @selected=${this._stepLayoutChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <div class="group-title">模式控制</div>
-          <div class="row">
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="开关实体（可选）"
+              .hass=${this.hass}
+              .value=${this.config?.header?.toggle?.entity || ''}
+              .configValue="header.toggle.entity"
+              @change=${this.valueChanged}
+              allow-custom-entity
+            ></ha-entity-picker>
+            <ha-textfield
+              label="开关标签"
+              .value=${this.config?.header?.toggle?.name || ''}
+              .configValue="header.toggle.name"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
+            <ha-textfield
+              label="占位文本（可选）"
+              .value=${this.config.fallback || ''}
+              .configValue="fallback"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
             <ha-select
-              label="预设模式"
-              .value=${controlList.includes('preset') ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._presetControlChanged}
+              label="小数位数（可选）"
+              .configValue="decimals"
+              .value=${String(this.config.decimals ?? '')}
+              .options=${OptionsDecimals}
+              @selected=${this.valueChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
+
+            <ha-textfield
+              label="单位（可选）"
+              .value=${this.config.unit || ''}
+              .configValue="unit"
+              @input=${this.valueChanged}
+            ></ha-textfield>
+          </div>
+
+          <div class="side-by-side">
             <ha-select
-              label="风速模式"
-              .value=${controlList.includes('fan') ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._fanControlChanged}
+              label="布局方向（可选）"
+              .configValue="layout.step"
+              .value=${this.config.layout?.step ?? ''}
+              .options=${OptionsStepLayout}
+              @selected=${this.valueChanged}
+              @closed=${(ev) => ev.stopPropagation()}
+              fixedMenuPosition
+            ></ha-select>
+
+            <ha-select
+              label="步进值（可选）"
+              .configValue="step_size"
+              .value=${String(this.config.step_size ?? '')}
+              .options=${OptionsStepSize}
+              @selected=${this.valueChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
           </div>
-          <div class="row">
-            <ha-select
-              label="模式文字"
-              .value=${config.layout?.mode?.names !== false ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._modeNamesChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
-            <ha-select
-              label="模式图标"
-              .value=${config.layout?.mode?.icons !== false ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._modeIconsChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
+
+          <div class="side-by-side">
+            <ha-entity-picker
+              label="室内温度传感器（可选）"
+              .hass=${this.hass}
+              .value=${this.config.sensor_entity || ''}
+              .includeDomains=${sensorIncludeDomains}
+              @value-changed=${(ev: any) => this._configChanged('sensor_entity', ev.detail.value)}
+              allow-custom-entity
+            ></ha-entity-picker>
           </div>
-          <div class="row">
-            <ha-select
-              label="模式标题"
-              .value=${config.layout?.mode?.headings !== false ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._modeHeadingsChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
+
+          <div class="side-by-side">
             <ha-select
               label="定时关机"
-              .value=${config.timer === true || config.timer === 'show' ? 'show' : 'hide'}
+              .value=${this.config.timer === true || this.config.timer === 'show' ? 'show' : 'hide'}
               .options=${OPTIONS_SHOW_HIDE}
               @selected=${this._timerChanged}
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
           </div>
-          ${config.timer === true || config.timer === 'show' ? html`
-            ${config.timer_entity
-              ? html`<ha-textfield
-                  label="定时器实体（已自动创建）"
-                  .value=${config.timer_entity}
-                  disabled
-                ></ha-textfield>`
-              : html`<span class="hint">定时器实体将自动创建...</span>`
-            }
+
+          ${this.config.timer === true || this.config.timer === 'show' ? html`
+            <div class="side-by-side">
+              ${this.config.timer_entity
+                ? html`<ha-textfield
+                    label="定时器实体（已自动创建）"
+                    .value=${this.config.timer_entity}
+                    disabled
+                  ></ha-textfield>`
+                : html`<span class="hint">定时器实体将自动创建...</span>`
+              }
+            </div>
           ` : nothing}
-        </div>
 
-        <div class="form-group">
-          <div class="group-title">开关</div>
-          <ha-entity-picker
-            label="开关实体（可选）"
-            .hass=${this.hass}
-            .value=${config.header?.toggle?.entity || ''}
-            @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
-            allow-custom-entity
-          ></ha-entity-picker>
-          <div class="row">
-            <ha-textfield
-              label="开关标签"
-              .value=${config.header?.toggle?.name || ''}
-              @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
-            ></ha-textfield>
+          <div class="side-by-side">
+            <ha-button @click=${this._openLink}>
+              配置选项说明
+            </ha-button>
+            <span>标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
           </div>
-        </div>
-
-        <div class="form-group">
-          <ha-button @click=${this._openLink}>
-            配置选项说明
-          </ha-button>
-          <span class="hint">标签、控制、传感器、故障和隐藏选项只能在代码编辑器中配置</span>
         </div>
       </div>
     `
   }
 
-  private _entityPicked(ev: any) {
-    const value = ev.detail?.value ?? ev.target?.value
-    if (value === undefined) return
-    this._configChanged('entity', value)
-  }
+  valueChanged(ev: any) {
+    if (!this.config || !this.hass) return
+    const { target } = ev
+    const copy = cloneDeep(this.config)
 
-  private _decimalsChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('decimals', Number(value))
-  }
-
-  private _stepLayoutChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('layout.step', value)
-  }
-
-  private _stepSizeChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('step_size', Number(value))
-  }
-
-  private _modeNamesChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('layout.mode.names', value === 'hide' ? false : true)
-  }
-
-  private _modeIconsChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('layout.mode.icons', value === 'hide' ? false : true)
-  }
-
-  private _modeHeadingsChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('layout.mode.headings', value === 'hide' ? false : true)
-  }
-
-  private _timerChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('timer', value === 'show' ? true : 'hide')
-  }
-
-  private _presetControlChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._updateControlList('preset', value === 'show')
-  }
-
-  private _fanControlChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._updateControlList('fan', value === 'show')
-  }
-
-  private _updateControlList(modeType: string, show: boolean) {
-    if (!this._config || !this.hass) return
-    const config = this._config as any
-
-    // 获取当前 control 列表
-    let controlList: string[]
-    if (Array.isArray(config.control)) {
-      controlList = [...config.control]
-    } else if (typeof config.control === 'object' && config.control !== null) {
-      // 对象格式：提取 key 列表
-      controlList = Object.keys(config.control)
-    } else {
-      // 未设置或 false：使用默认值
-      controlList = ['hvac', 'preset']
-    }
-
-    if (show && !controlList.includes(modeType)) {
-      controlList.push(modeType)
-    } else if (!show) {
-      controlList = controlList.filter((m) => m !== modeType)
-    }
-
-    // 确保 hvac 始终存在
-    if (!controlList.includes('hvac')) {
-      controlList.unshift('hvac')
-    }
-
-    this._configChanged('control', controlList)
-  }
-
-  private _configChanged(path: string, value: any) {
-    if (!this._config || !this.hass) return
-    const copy = cloneDeep(this._config)
-
-    if (value === '' || value === undefined || value === null) {
-      if (path !== 'entity') {
-        deleteNestedKey(copy, path)
+    const configValue = target.configValue
+    if (configValue) {
+      // ha-select 使用 @selected 事件，值在 ev.detail.value
+      // ha-textfield 使用 @input 事件，值在 target.value
+      // ha-entity-picker 使用 @change 事件，值在 target.value
+      const value = target.tagName === 'HA-SELECT'
+        ? ev.detail?.value ?? target.value
+        : target.value
+      if (value === '' || value === undefined) {
+        // ha-select 不在空值时删除配置
+        if (target.tagName !== 'HA-SELECT') {
+          delete copy[configValue]
+        }
+      } else {
+        setValue(
+          copy,
+          configValue,
+          target.checked !== undefined ? target.checked : value
+        )
       }
-    } else {
-      setNestedValue(copy, path, value)
     }
-
-    this._config = copy
     fireEvent(this, 'config-changed', { config: copy })
   }
-}
 
-function setNestedValue(obj: any, path: string, value: any) {
-  const parts = path.split('.')
-  let o = obj
-  while (parts.length > 1) {
-    const part = parts.shift()!
-    if (!o[part]) o[part] = {}
-    o = o[part]
+  _timerChanged(ev: any) {
+    const value = ev.detail.value
+    const copy = cloneDeep(this.config)
+    copy.timer = value === 'show' ? true : 'hide'
+    this.config = copy
+    fireEvent(this, 'config-changed', { config: copy })
   }
-  o[parts[0]] = value
-}
 
-function deleteNestedKey(obj: any, path: string) {
-  const parts = path.split('.')
-  let o = obj
-  while (parts.length > 1) {
-    const part = parts.shift()!
-    if (!o[part]) return
-    o = o[part]
+  _configChanged(key: string, value: any) {
+    const copy = cloneDeep(this.config)
+    if (value === '' || value === undefined) {
+      delete copy[key]
+    } else {
+      ;(copy as any)[key] = value
+    }
+    this.config = copy
+    fireEvent(this, 'config-changed', { config: copy })
   }
-  delete o[parts[0]]
 }

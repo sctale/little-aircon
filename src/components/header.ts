@@ -58,12 +58,12 @@ function renderFaults(faults, openEntityPopover) {
   }
   const faultHtml = faults.map(({ icon, hide_inactive, state }) => {
     return html` <ha-icon
-      class="fault-icon ${state?.state === 'on'
+      class="fault-icon ${state.state === 'on'
         ? 'active'
         : hide_inactive
         ? ' hide'
         : ''}"
-      .icon=${icon || state?.attributes?.icon}
+      icon="${icon || state.attributes.icon}"
       @click="${() => openEntityPopover(state.entity_id)}"
     ></ha-icon>`
   })
