@@ -21,7 +21,6 @@ export default class SimpleThermostatEditor extends LitElement {
     private _modeNamesChanged;
     private _modeIconsChanged;
     private _modeHeadingsChanged;
-    private _timerChanged;
     private _presetControlChanged;
     private _fanControlChanged;
     private _updateControlList;

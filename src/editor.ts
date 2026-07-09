@@ -8,7 +8,6 @@ import { HASS } from './types'
 
 const includeDomains = ['climate']
 const sensorIncludeDomains = ['sensor']
-const timerIncludeDomains = ['timer']
 const GithubReadMe = 'https://github.com/sctale/little-aircon/blob/master/README.md'
 
 const cloneDeep = (obj: any) => JSON.parse(JSON.stringify(obj))
@@ -192,25 +191,7 @@ export default class SimpleThermostatEditor extends LitElement {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-            <ha-select
-              label="定时关机"
-              .value=${config.timer === true || config.timer === 'show' ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._timerChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
           </div>
-          ${config.timer === true || config.timer === 'show' ? html`
-            ${config.timer_entity
-              ? html`<ha-textfield
-                  label="定时器实体（已自动创建）"
-                  .value=${config.timer_entity}
-                  disabled
-                ></ha-textfield>`
-              : html`<span class="hint">定时器实体将自动创建...</span>`
-            }
-          ` : nothing}
         </div>
 
         <div class="form-group">
@@ -281,12 +262,6 @@ export default class SimpleThermostatEditor extends LitElement {
     const value = ev.detail?.value
     if (value === undefined) return
     this._configChanged('layout.mode.headings', value === 'hide' ? false : true)
-  }
-
-  private _timerChanged(ev: any) {
-    const value = ev.detail?.value
-    if (value === undefined) return
-    this._configChanged('timer', value === 'show' ? true : 'hide')
   }
 
   private _presetControlChanged(ev: any) {

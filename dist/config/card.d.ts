@@ -60,7 +60,5 @@ interface CardConfig {
         state?: string;
     };
     sensor_entity?: string;
-    timer?: boolean | 'show' | 'hide';
-    timer_entity?: string;
 }
 export { CardConfig };

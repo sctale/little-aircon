@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.4";
+var version = "3.0.62";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -391,40 +391,6 @@ ha-switch {
   opacity: 0.4;
   pointer-events: none;
 }
-.timer-progress-bar {
-  margin: 4px 16px 0;
-  background: var(--secondary-background-color);
-  border-radius: 10px;
-  overflow: hidden;
-  height: 22px;
-}
-.timer-progress-fill {
-  height: 100%;
-  background: var(--st-mode-active-background, var(--primary-color));
-  border-radius: 10px;
-  transition: width 1s linear;
-  display: flex;
-  align-items: center;
-  min-width: 80px;
-  padding: 0 8px;
-  box-sizing: border-box;
-}
-.timer-progress-text {
-  color: var(--text-primary-color);
-  font-size: var(--ha-font-size-s);
-  white-space: nowrap;
-  font-weight: 500;
-}
-.mode-title.timer-active {
-  color: var(--st-mode-active-background, var(--primary-color));
-  font-weight: 500;
-}
-.timer-hint {
-  padding: 8px 16px;
-  font-size: var(--ha-font-size-s);
-  color: var(--secondary-text-color);
-  text-align: center;
-}
 `;
 styleInject(css_248z);
 
@@ -612,24 +578,7 @@ class SimpleThermostatEditor extends i$1 {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-            <ha-select
-              label="定时关机"
-              .value=${config.timer === true || config.timer === 'show' ? 'show' : 'hide'}
-              .options=${OPTIONS_SHOW_HIDE}
-              @selected=${this._timerChanged}
-              @closed=${(ev) => ev.stopPropagation()}
-              fixedMenuPosition
-            ></ha-select>
           </div>
-          ${config.timer === true || config.timer === 'show' ? b `
-            ${config.timer_entity
-            ? b `<ha-textfield
-                  label="定时器实体（已自动创建）"
-                  .value=${config.timer_entity}
-                  disabled
-                ></ha-textfield>`
-            : b `<span class="hint">定时器实体将自动创建...</span>`}
-          ` : A}
         </div>
 
         <div class="form-group">
@@ -700,12 +649,6 @@ class SimpleThermostatEditor extends i$1 {
         if (value === undefined)
             return;
         this._configChanged('layout.mode.headings', value === 'hide' ? false : true);
-    }
-    _timerChanged(ev) {
-        const value = ev.detail?.value;
-        if (value === undefined)
-            return;
-        this._configChanged('timer', value === 'show' ? true : 'hide');
     }
     _presetControlChanged(ev) {
         const value = ev.detail?.value;
@@ -1267,12 +1210,6 @@ const ZH_MODE_NAMES = {
     horizontal: '左右摆风',
     both: '全方位摆风',
     on: '开',
-    // 定时器
-    timer_off: '关闭',
-    timer_30: '30分钟',
-    timer_60: '60分钟',
-    timer_90: '90分钟',
-    timer_120: '120分钟',
 };
 function renderModeType({ state, mode: options, modeOptions, localize, setMode, }) {
     const { type, hide_when_off, mode = 'none', list, name } = options;
@@ -1375,12 +1312,6 @@ const MODE_ICONS = {
     swing_horizontal: 'mdi:arrow-left-right',
     swing: 'mdi:arrow-up-down',
     on: 'mdi:toggle-switch',
-    // 定时器
-    timer_off: 'mdi:timer-off',
-    timer_30: 'mdi:timer-outline',
-    timer_60: 'mdi:timer-outline',
-    timer_90: 'mdi:timer-outline',
-    timer_120: 'mdi:timer-outline',
 };
 function parseHeaderConfig(config, entity, hass) {
     if (config === false)
@@ -1497,13 +1428,6 @@ const ICONS = {
     PLUS: 'mdi:plus',
     MINUS: 'mdi:minus',
 };
-const TIMER_OPTIONS = [
-    { value: 'timer_off', label: '关闭', minutes: 0, icon: 'mdi:timer-off' },
-    { value: 'timer_30', label: '30分', minutes: 30, icon: 'mdi:timer-outline' },
-    { value: 'timer_60', label: '1时', minutes: 60, icon: 'mdi:timer-outline' },
-    { value: 'timer_90', label: '1.5时', minutes: 90, icon: 'mdi:timer-outline' },
-    { value: 'timer_120', label: '2时', minutes: 120, icon: 'mdi:timer-outline' },
-];
 const DEFAULT_HIDE = {
     temperature: false,
     state: false,
@@ -1558,14 +1482,6 @@ class SimpleThermostat extends i$1 {
         this._values = {};
         this._updatingValues = false;
         this._hide = DEFAULT_HIDE;
-        // 定时器相关：从 HA timer 实体读取状态
-        this._timerValue = 'timer_off';
-        this._timerRemaining = 0;
-        this._timerTotal = 0;
-        // 前端 UI 刷新定时器（仅刷新显示，不管理倒计时逻辑）
-        this._uiRefreshInterval = null;
-        // HA 事件订阅取消函数
-        this._unsubTimerFinished = null;
         this._debouncedSetTemperature = debounceFn((values) => {
             const { domain, service, data = {} } = this.service;
             this._hass.callService(domain, service, {
@@ -1580,8 +1496,6 @@ class SimpleThermostat extends i$1 {
             const translations = this._hass.resources[lang];
             return translations?.[key] ?? label;
         };
-        // 防止重复创建 timer
-        this._timerCreating = false;
         this.toggleEntityChanged = (ev) => {
             if (!this.header || !this?.header?.toggle)
                 return;
@@ -1708,24 +1622,6 @@ class SimpleThermostat extends i$1 {
         }
         if (this.config.hide) {
             this._hide = { ...this._hide, ...this.config.hide };
-        }
-        // 定时器开启但未配置 timer_entity 时，自动创建
-        if (this.config?.timer && this.config.timer !== 'hide' && !this.config?.timer_entity) {
-            this._autoCreateTimerEntity();
-        }
-        // 定时器隐藏时，删除 timer 实体并清理配置
-        if ((!this.config?.timer || this.config.timer === 'hide') && this.config?.timer_entity) {
-            this._deleteTimerEntity(this.config.timer_entity);
-        }
-        // 同步 HA timer 实体状态
-        this._syncTimerEntity();
-        // 空调被关闭时，取消正在运行的定时器
-        if (entity.state === 'off' && this._timerValue !== 'timer_off') {
-            const timerEntityId = this.config?.timer_entity;
-            if (timerEntityId && this._hass.states?.[timerEntityId]?.state === 'active') {
-                this._hass.callService('timer', 'cancel', { entity_id: timerEntityId });
-                this._unsubscribeTimerFinished();
-            }
         }
         if (this.config.sensors === false) {
             this.showSensors = false;
@@ -1895,294 +1791,11 @@ class SimpleThermostat extends i$1 {
             modeOptions: this.config?.layout?.mode ?? {},
             setMode: this.setMode,
         }))}
-
-        ${this._renderTimer()}
       </ha-card>
     `;
     }
-    /** 渲染定时器 UI */
-    _renderTimer() {
-        const timerConfig = this.config?.timer;
-        if (!timerConfig || timerConfig === 'hide')
-            return A;
-        if (!this.config?.timer_entity) {
-            return b `
-        <div class="timer-hint">定时器实体将自动创建...</div>
-      `;
-        }
-        const headings = this.config?.layout?.mode?.headings ?? true;
-        const showNames = this.config?.layout?.mode?.names !== false;
-        const showIcons = this.config?.layout?.mode?.icons !== false;
-        const showProgress = this._timerRemaining > 0 && this._timerTotal > 0;
-        const progressPercent = showProgress
-            ? Math.max(0, (this._timerRemaining / this._timerTotal) * 100)
-            : 0;
-        return b `
-      <div class="modes ${headings ? 'heading' : ''}">
-        ${headings ? b `<div class="mode-title">定时关机</div>` : A}
-        ${TIMER_OPTIONS.map((opt) => {
-            const isActive = this._timerValue === opt.value;
-            return b `
-            <div
-              class="mode-item ${isActive ? 'active' : ''}"
-              @click=${() => this._setTimer(opt.value)}
-            >
-              ${showIcons && opt.icon ? b `<ha-icon class="mode-icon" .icon=${opt.icon}></ha-icon>` : A}
-              ${showNames ? b `${opt.label}` : A}
-            </div>
-          `;
-        })}
-      </div>
-      ${showProgress ? b `
-        <div class="timer-progress-bar">
-          <div class="timer-progress-fill" style="width: ${progressPercent}%">
-            <span class="timer-progress-text">${this._formatRemaining(this._timerRemaining)} 后关机</span>
-          </div>
-        </div>
-      ` : A}
-    `;
-    }
-    /** 从 HA timer 实体同步状态到卡片 */
-    _syncTimerEntity() {
-        const timerEntityId = this.config?.timer_entity;
-        if (!timerEntityId)
-            return;
-        const timerEntity = this._hass.states?.[timerEntityId];
-        if (!timerEntity)
-            return;
-        const timerState = timerEntity.state;
-        if (timerState === 'active') {
-            const finishesAt = timerEntity.attributes?.finishes_at;
-            if (finishesAt) {
-                const endTime = new Date(finishesAt).getTime();
-                const now = Date.now();
-                const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
-                this._timerRemaining = remaining;
-                const duration = timerEntity.attributes?.duration;
-                if (duration) {
-                    this._timerTotal = this._parseDuration(duration);
-                }
-                else if (this._timerTotal === 0) {
-                    this._timerTotal = remaining;
-                }
-            }
-            this._timerValue = this._matchTimerOption(this._timerRemaining);
-            this._startUIRefresh();
-            this._subscribeTimerFinished();
-        }
-        else if (timerState === 'paused') {
-            const remaining = timerEntity.attributes?.remaining;
-            if (remaining) {
-                this._timerRemaining = this._parseDuration(remaining);
-            }
-            this._timerValue = this._matchTimerOption(this._timerRemaining);
-            this._stopUIRefresh();
-        }
-        else {
-            this._timerRemaining = 0;
-            this._timerTotal = 0;
-            this._timerValue = 'timer_off';
-            this._stopUIRefresh();
-        }
-    }
-    /** 订阅 timer.finished 事件，倒计时结束时自动关空调 */
-    _subscribeTimerFinished() {
-        if (this._unsubTimerFinished)
-            return;
-        const timerEntityId = this.config?.timer_entity;
-        if (!timerEntityId)
-            return;
-        const conn = this._hass?.connection;
-        if (!conn?.subscribeEvents)
-            return;
-        this._unsubTimerFinished = conn.subscribeEvents((ev) => {
-            const eventData = ev.data;
-            if (eventData?.entity_id === timerEntityId) {
-                this._hass.callService('climate', 'turn_off', {
-                    entity_id: this.config.entity,
-                });
-                this._unsubscribeTimerFinished();
-            }
-        }, 'timer.finished');
-    }
-    /** 取消订阅 timer.finished 事件（定时器功能暂未启用） */
-    _unsubscribeTimerFinished() {
-        if (this._unsubTimerFinished) {
-            this._unsubTimerFinished();
-            this._unsubTimerFinished = null;
-        }
-    }
-    /** 匹配当前剩余时间对应的定时选项（定时器功能暂未启用） */
-    _matchTimerOption(remainingSeconds) {
-        const minutes = Math.round(remainingSeconds / 60);
-        const match = TIMER_OPTIONS.find((o) => o.minutes === minutes);
-        return match ? match.value : 'timer_off';
-    }
-    /** 解析 HA duration 格式（HH:MM:SS 或秒数）为总秒数（定时器功能暂未启用） */
-    _parseDuration(duration) {
-        if (typeof duration === 'number')
-            return duration;
-        const parts = String(duration).split(':').map(Number);
-        if (parts.length === 3) {
-            return parts[0] * 3600 + parts[1] * 60 + parts[2];
-        }
-        else if (parts.length === 2) {
-            return parts[0] * 60 + parts[1];
-        }
-        return parseInt(String(duration), 10) || 0;
-    }
-    /** 启动 UI 刷新定时器（定时器功能暂未启用） */
-    _startUIRefresh() {
-        if (this._uiRefreshInterval)
-            return;
-        this._uiRefreshInterval = setInterval(() => {
-            const timerEntityId = this.config?.timer_entity;
-            if (!timerEntityId)
-                return;
-            const timerEntity = this._hass.states?.[timerEntityId];
-            if (!timerEntity || timerEntity.state !== 'active')
-                return;
-            const finishesAt = timerEntity.attributes?.finishes_at;
-            if (finishesAt) {
-                const endTime = new Date(finishesAt).getTime();
-                const now = Date.now();
-                this._timerRemaining = Math.max(0, Math.floor((endTime - now) / 1000));
-            }
-            this.requestUpdate();
-        }, 1000);
-    }
-    /** 停止 UI 刷新定时器（定时器功能暂未启用） */
-    _stopUIRefresh() {
-        if (this._uiRefreshInterval) {
-            clearInterval(this._uiRefreshInterval);
-            this._uiRefreshInterval = null;
-        }
-    }
-    /** 设置定时器 */
-    _setTimer(value) {
-        const timerEntityId = this.config?.timer_entity;
-        if (!timerEntityId)
-            return;
-        if (value === 'timer_off') {
-            this._hass.callService('timer', 'cancel', {
-                entity_id: timerEntityId,
-            });
-            this._unsubscribeTimerFinished();
-            return;
-        }
-        const opt = TIMER_OPTIONS.find((o) => o.value === value);
-        if (!opt)
-            return;
-        const hours = Math.floor(opt.minutes / 60);
-        const mins = opt.minutes % 60;
-        const durationStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
-        this._hass.callService('timer', 'start', {
-            entity_id: timerEntityId,
-            duration: durationStr,
-        });
-        this._timerValue = value;
-        this._timerTotal = opt.minutes * 60;
-        this._timerRemaining = this._timerTotal;
-        this.requestUpdate();
-    }
-    /** 格式化剩余时间 */
-    _formatRemaining(seconds) {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
-    }
-    /** 自动创建 timer（带防重复） */
-    async _autoCreateTimerEntity() {
-        if (this._timerCreating)
-            return;
-        this._timerCreating = true;
-        try {
-            const entityId = await this._createTimerEntity();
-            if (entityId) {
-                this.config = { ...this.config, timer_entity: entityId };
-                fireEvent(this, 'config-changed', { config: this.config });
-            }
-        }
-        finally {
-            this._timerCreating = false;
-        }
-    }
-    /** 删除 timer 实体并清理配置 */
-    async _deleteTimerEntity(entityId) {
-        const timerEntity = this._hass.states?.[entityId];
-        if (timerEntity?.state === 'active') {
-            this._hass.callService('timer', 'cancel', { entity_id: entityId });
-        }
-        this._stopUIRefresh();
-        this._unsubscribeTimerFinished();
-        try {
-            const conn = this._hass?.connection;
-            if (conn) {
-                // 通过 entity registry 找到该 entity 对应的 config entry
-                const entityReg = await conn.sendMessagePromise({
-                    type: 'config/entity_registry/get',
-                    entity_id: entityId,
-                });
-                const entryId = entityReg?.config_entry_id;
-                if (entryId) {
-                    await conn.sendMessagePromise({
-                        type: 'config_entries/remove',
-                        entry_id: entryId,
-                    });
-                }
-            }
-        }
-        catch (err) {
-            console.warn('小空调：删除 timer 实体失败', err);
-        }
-        // 清理配置中的 timer_entity
-        const newConfig = { ...this.config };
-        delete newConfig.timer_entity;
-        this.config = newConfig;
-        fireEvent(this, 'config-changed', { config: newConfig });
-        // 重置 UI 状态
-        this._timerValue = 'timer_off';
-        this._timerRemaining = 0;
-        this._timerTotal = 0;
-    }
-    /** 自动创建 HA timer helper 实体 */
-    async _createTimerEntity() {
-        const conn = this._hass?.connection;
-        if (!conn)
-            return null;
-        try {
-            const initResult = await conn.sendMessagePromise({
-                type: 'config_entries/flow/initiate',
-                handler: 'timer',
-                show_advanced: false,
-            });
-            const flowId = initResult.flow_id;
-            const entityName = `小空调定时器_${this.config.entity?.split('.').pop() || 'unknown'}`;
-            const stepResult = await conn.sendMessagePromise({
-                type: 'config_entries/flow/step',
-                flow_id: flowId,
-                user_input: {
-                    name: entityName,
-                    duration: '00:30:00',
-                    restore: true,
-                },
-            });
-            if (stepResult.result?.entity_id) {
-                return stepResult.result.entity_id;
-            }
-            // 如果 result 不在 step 中，尝试从 hass.states 中查找
-            const timerStates = Object.keys(this._hass.states).filter((id) => id.startsWith('timer.') && id.includes('xiao_kong_tiao'));
-            return timerStates.length > 0 ? timerStates[0] : null;
-        }
-        catch (err) {
-            console.error('小空调：创建 timer 失败', err);
-            return null;
-        }
-    }
     disconnectedCallback() {
         super.disconnectedCallback();
-        this._stopUIRefresh();
-        this._unsubscribeTimerFinished();
     }
     setTemperature(change, field) {
         this._updatingValues = true;
@@ -2239,15 +1852,6 @@ __decorate([
 __decorate([
     n({ type: Object })
 ], SimpleThermostat.prototype, "_hide", void 0);
-__decorate([
-    n({ type: String })
-], SimpleThermostat.prototype, "_timerValue", void 0);
-__decorate([
-    n({ type: Number })
-], SimpleThermostat.prototype, "_timerRemaining", void 0);
-__decorate([
-    n({ type: Number })
-], SimpleThermostat.prototype, "_timerTotal", void 0);
 
 customElements.define(name, SimpleThermostat);
 customElements.define(`${name}-editor`, SimpleThermostatEditor);
