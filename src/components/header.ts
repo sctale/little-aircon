@@ -71,20 +71,26 @@ function renderFaults(faults, openEntityPopover) {
   return html` <div class="faults">${faultHtml}</div>`
 }
 
-function renderToggle(toggle, openEntityPopover, toggleEntityChanged) {
-  if (!toggle) return nothing
+function renderToggle(toggles, openEntityPopover, toggleEntityChanged) {
+  // 兼容旧的单对象格式：统一转为数组
+  const list = Array.isArray(toggles) ? toggles : (toggles ? [toggles] : [])
+  if (list.length === 0) return nothing
 
   return html`
-    <div style="margin-left: auto;">
-      <span
-        class="clickable toggle-label"
-        @click=${() => openEntityPopover(toggle.entity.entity_id)}
-        >${toggle.label}
-      </span>
-      <ha-switch
-        .checked=${toggle.entity?.state === 'on'}
-        @change=${toggleEntityChanged}
-      ></ha-switch>
+    <div class="toggle-group">
+      ${list.map((toggle) => html`
+        <div class="toggle-item">
+          <span
+            class="clickable toggle-label"
+            @click=${() => openEntityPopover(toggle.entity.entity_id)}
+            >${toggle.label}
+          </span>
+          <ha-switch
+            .checked=${toggle.entity?.state === 'on'}
+            @change=${(ev) => toggleEntityChanged(ev, toggle.entity.entity_id)}
+          ></ha-switch>
+        </div>
+      `)}
     </div>
   `
 }

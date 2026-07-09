@@ -74,14 +74,14 @@ export interface HeaderConfig {
   name?: Name
   icon?: Icon
   faults?: Array<Fault>
-  toggle?: ToggleConfig
+  toggle?: ToggleConfig | ToggleConfig[]
 }
 
 export interface HeaderData {
   name?: Name
   icon: Icon
   faults?: Array<Fault>
-  toggle?: Toggle
+  toggle?: Toggle[]
 }
 
 export interface Toggle {
@@ -120,17 +120,21 @@ export default function parseHeaderConfig(
   }
 }
 
-function parseToggle(config: ToggleConfig, hass: HASS): Toggle {
-  const entity: HAState = hass.states![config.entity]
-
-  let label = ''
-  if (config?.name === true) {
-    label = entity.attributes.name
-  } else {
-    label = (config?.name as string) ?? ''
-  }
-
-  return { entity, label }
+// 支持单个对象或数组，统一返回数组（向后兼容旧的单对象配置）
+function parseToggle(config: ToggleConfig | ToggleConfig[], hass: HASS): Toggle[] {
+  const configs = Array.isArray(config) ? config : [config]
+  return configs
+    .filter((c) => c?.entity && hass.states?.[c.entity])
+    .map((c) => {
+      const entity: HAState = hass.states![c.entity]
+      let label = ''
+      if (c?.name === true) {
+        label = entity.attributes.name
+      } else {
+        label = (c?.name as string) ?? ''
+      }
+      return { entity, label }
+    })
 }
 
 function parseFaults(config: Array<Fault>, hass: HASS) {

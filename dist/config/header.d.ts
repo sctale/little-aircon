@@ -19,13 +19,13 @@ export interface HeaderConfig {
     name?: Name;
     icon?: Icon;
     faults?: Array<Fault>;
-    toggle?: ToggleConfig;
+    toggle?: ToggleConfig | ToggleConfig[];
 }
 export interface HeaderData {
     name?: Name;
     icon: Icon;
     faults?: Array<Fault>;
-    toggle?: Toggle;
+    toggle?: Toggle[];
 }
 export interface Toggle {
     entity: HAState;

@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.4";
+var version = "3.0.59";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -138,6 +138,19 @@ ha-card.no-header {
     --st-font-size-toggle-label,
     var(--ha-font-size-m)
   );
+}
+
+/* 多开关分组容器：横向并排，靠右对齐 */
+.toggle-group {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+
+.toggle-item {
+  display: flex;
+  align-items: center;
 }
 
 .faults {
@@ -651,6 +664,18 @@ class SimpleThermostatEditor extends i$1 {
         </div>
 
         <div class="form-group">
+          <div class="group-title">防直吹</div>
+          <ha-entity-picker
+            label="防直吹开关实体（可选）"
+            .hass=${this.hass}
+            .value=${this._getToggleEntityByLabel('防直吹')}
+            @value-changed=${(ev) => this._setToggleItem('防直吹', ev.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <span class="hint">选择防直吹开关实体后，开关会显示在卡片右上角</span>
+        </div>
+
+        <div class="form-group">
           <ha-button @click=${this._openLink}>
             配置选项说明
           </ha-button>
@@ -759,6 +784,44 @@ class SimpleThermostatEditor extends i$1 {
         }
         else {
             setNestedValue(copy, path, value);
+        }
+        this._config = copy;
+        fireEvent(this, 'config-changed', { config: copy });
+    }
+    // 从 toggle 数组中按标签查找实体（兼容旧的单对象格式）
+    _getToggleEntityByLabel(label) {
+        const header = this._config?.header;
+        const toggles = header && header !== false ? header.toggle : undefined;
+        if (!toggles)
+            return '';
+        const list = Array.isArray(toggles) ? toggles : [toggles];
+        const found = list.find((t) => t?.name === label);
+        return found?.entity || '';
+    }
+    // 设置 toggle 数组中指定标签的实体（自动维护数组结构）
+    _setToggleItem(label, entity) {
+        if (!this._config || !this.hass)
+            return;
+        const copy = cloneDeep(this._config);
+        const header = copy.header;
+        const toggles = header && header !== false ? header.toggle : undefined;
+        // 统一转为数组，保留现有的其他开关
+        let list = Array.isArray(toggles) ? [...toggles] : (toggles ? [toggles] : []);
+        // 移除旧的防直吹项
+        list = list.filter((t) => t?.name !== label);
+        // 添加新的（如果 entity 非空）
+        if (entity) {
+            list.push({ entity, name: label });
+        }
+        // 写回配置：空数组则删除字段
+        if (list.length > 0) {
+            if (!copy.header || copy.header === false)
+                copy.header = {};
+            copy.header.toggle = list.length === 1 ? list[0] : list;
+        }
+        else {
+            if (copy.header && copy.header !== false && copy.header.toggle)
+                delete copy.header.toggle;
         }
         this._config = copy;
         fireEvent(this, 'config-changed', { config: copy });
@@ -1014,20 +1077,26 @@ function renderFaults(faults, openEntityPopover) {
     });
     return b ` <div class="faults">${faultHtml}</div>`;
 }
-function renderToggle(toggle, openEntityPopover, toggleEntityChanged) {
-    if (!toggle)
+function renderToggle(toggles, openEntityPopover, toggleEntityChanged) {
+    // 兼容旧的单对象格式：统一转为数组
+    const list = Array.isArray(toggles) ? toggles : (toggles ? [toggles] : []);
+    if (list.length === 0)
         return A;
     return b `
-    <div style="margin-left: auto;">
-      <span
-        class="clickable toggle-label"
-        @click=${() => openEntityPopover(toggle.entity.entity_id)}
-        >${toggle.label}
-      </span>
-      <ha-switch
-        .checked=${toggle.entity?.state === 'on'}
-        @change=${toggleEntityChanged}
-      ></ha-switch>
+    <div class="toggle-group">
+      ${list.map((toggle) => b `
+        <div class="toggle-item">
+          <span
+            class="clickable toggle-label"
+            @click=${() => openEntityPopover(toggle.entity.entity_id)}
+            >${toggle.label}
+          </span>
+          <ha-switch
+            .checked=${toggle.entity?.state === 'on'}
+            @change=${(ev) => toggleEntityChanged(ev, toggle.entity.entity_id)}
+          ></ha-switch>
+        </div>
+      `)}
     </div>
   `;
 }
@@ -1406,16 +1475,22 @@ function parseHeaderConfig(config, entity, hass) {
         faults: parseFaults(config?.faults, hass),
     };
 }
+// 支持单个对象或数组，统一返回数组（向后兼容旧的单对象配置）
 function parseToggle(config, hass) {
-    const entity = hass.states[config.entity];
-    let label = '';
-    if (config?.name === true) {
-        label = entity.attributes.name;
-    }
-    else {
-        label = config?.name ?? '';
-    }
-    return { entity, label };
+    const configs = Array.isArray(config) ? config : [config];
+    return configs
+        .filter((c) => c?.entity && hass.states?.[c.entity])
+        .map((c) => {
+        const entity = hass.states[c.entity];
+        let label = '';
+        if (c?.name === true) {
+            label = entity.attributes.name;
+        }
+        else {
+            label = c?.name ?? '';
+        }
+        return { entity, label };
+    });
 }
 function parseFaults(config, hass) {
     if (Array.isArray(config)) {
@@ -1582,11 +1657,15 @@ class SimpleThermostat extends i$1 {
         };
         // 防止重复创建 timer
         this._timerCreating = false;
-        this.toggleEntityChanged = (ev) => {
+        this.toggleEntityChanged = (ev, entityId) => {
             if (!this.header || !this?.header?.toggle)
                 return;
             const el = ev.target;
-            this._hass.callService('homeassistant', el.checked ? 'turn_on' : 'turn_off', { entity_id: this.header?.toggle?.entity?.entity_id });
+            // 支持多开关：优先使用传入的 entityId，否则回退到第一个开关（向后兼容）
+            const targetEntityId = entityId || this.header?.toggle?.[0]?.entity?.entity_id;
+            if (!targetEntityId)
+                return;
+            this._hass.callService('homeassistant', el.checked ? 'turn_on' : 'turn_off', { entity_id: targetEntityId });
         };
         this.setMode = (type, mode) => {
             if (type && mode) {

@@ -232,6 +232,18 @@ export default class SimpleThermostatEditor extends LitElement {
         </div>
 
         <div class="form-group">
+          <div class="group-title">防直吹</div>
+          <ha-entity-picker
+            label="防直吹开关实体（可选）"
+            .hass=${this.hass}
+            .value=${this._getToggleEntityByLabel('防直吹')}
+            @value-changed=${(ev) => this._setToggleItem('防直吹', ev.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <span class="hint">选择防直吹开关实体后，开关会显示在卡片右上角</span>
+        </div>
+
+        <div class="form-group">
           <ha-button @click=${this._openLink}>
             配置选项说明
           </ha-button>
@@ -343,6 +355,41 @@ export default class SimpleThermostatEditor extends LitElement {
       setNestedValue(copy, path, value)
     }
 
+    this._config = copy
+    fireEvent(this, 'config-changed', { config: copy })
+  }
+
+  // 从 toggle 数组中按标签查找实体（兼容旧的单对象格式）
+  private _getToggleEntityByLabel(label: string): string {
+    const header = this._config?.header
+    const toggles = header && header !== false ? header.toggle : undefined
+    if (!toggles) return ''
+    const list = Array.isArray(toggles) ? toggles : [toggles]
+    const found = list.find((t: any) => t?.name === label)
+    return found?.entity || ''
+  }
+
+  // 设置 toggle 数组中指定标签的实体（自动维护数组结构）
+  private _setToggleItem(label: string, entity: string) {
+    if (!this._config || !this.hass) return
+    const copy = cloneDeep(this._config)
+    const header = copy.header
+    const toggles = header && header !== false ? header.toggle : undefined
+    // 统一转为数组，保留现有的其他开关
+    let list: any[] = Array.isArray(toggles) ? [...toggles] : (toggles ? [toggles] : [])
+    // 移除旧的防直吹项
+    list = list.filter((t: any) => t?.name !== label)
+    // 添加新的（如果 entity 非空）
+    if (entity) {
+      list.push({ entity, name: label })
+    }
+    // 写回配置：空数组则删除字段
+    if (list.length > 0) {
+      if (!copy.header || copy.header === false) copy.header = {}
+      copy.header.toggle = list.length === 1 ? list[0] : list
+    } else {
+      if (copy.header && copy.header !== false && copy.header.toggle) delete copy.header.toggle
+    }
     this._config = copy
     fireEvent(this, 'config-changed', { config: copy })
   }

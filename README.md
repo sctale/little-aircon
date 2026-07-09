@@ -90,6 +90,22 @@ sensors:
     label: 今日能耗
 ```
 
+### 多开关（防直吹 + 童锁）
+
+```yaml
+type: custom:little-aircon
+entity: climate.hvac
+header:
+  name: 客厅空调
+  toggle:
+    - entity: switch.display_lock
+      name: 童锁
+    - entity: switch.prevent_direct_blow
+      name: 防直吹
+```
+
+> `header.toggle` 支持数组格式，可同时配置多个开关（如童锁、防直吹），开关会并排显示在卡片右上角。也兼容旧的单对象格式。
+
 ## 配置参数
 
 | 参数 | 类型 | 说明 |
@@ -120,6 +136,13 @@ sensors:
 | 构建工具 | Rollup 2.x | Rollup 4.x |
 
 ## 更新日志
+
+### v3.0.59
+
+- 新增防直吹开关功能，复用 toggle 样式，支持多个开关并存
+- `header.toggle` 支持数组格式，可同时配置童锁、防直吹等多个开关
+- 编辑器新增「防直吹」配置分组
+- 向后兼容旧的单对象 toggle 配置
 
 ### v3.0.58
 

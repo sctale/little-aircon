@@ -1,6 +1,6 @@
 {
   "name": "little-aircon",
-  "version": "3.0.58",
+  "version": "3.0.59",
   "description": "小空调卡片 - Home Assistant Lovelace 温控卡片（lit v3 / HASS 2025.5+ 兼容，中文本地化）",
   "main": "dist/simple-thermostat.js",
   "repository": "git@github.com:sctale/hass-xiaokongtiao.git",

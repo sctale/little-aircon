@@ -803,13 +803,16 @@ export default class SimpleThermostat extends LitElement {
     this._unsubscribeTimerFinished()
   }
 
-  toggleEntityChanged = (ev: Event) => {
+  toggleEntityChanged = (ev: Event, entityId?: string) => {
     if (!this.header || !this?.header?.toggle) return
     const el = ev.target as HTMLInputElement
+    // 支持多开关：优先使用传入的 entityId，否则回退到第一个开关（向后兼容）
+    const targetEntityId = entityId || this.header?.toggle?.[0]?.entity?.entity_id
+    if (!targetEntityId) return
     this._hass.callService(
       'homeassistant',
       el.checked ? 'turn_on' : 'turn_off',
-      { entity_id: this.header?.toggle?.entity?.entity_id }
+      { entity_id: targetEntityId }
     )
   }
 

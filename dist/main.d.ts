@@ -64,7 +64,7 @@ export default class SimpleThermostat extends LitElement {
     /** 自动创建 HA timer helper 实体 */
     private _createTimerEntity;
     disconnectedCallback(): void;
-    toggleEntityChanged: (ev: Event) => void;
+    toggleEntityChanged: (ev: Event, entityId?: string) => void;
     setTemperature(change: number, field: string): void;
     setMode: (type: string, mode: string) => void;
     openEntityPopover: (entityId?: string | null) => void;

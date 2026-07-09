@@ -51,6 +51,19 @@ ha-card.no-header {
   );
 }
 
+/* 多开关分组容器：横向并排，靠右对齐 */
+.toggle-group {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--st-spacing, var(--st-default-spacing)) * 2);
+}
+
+.toggle-item {
+  display: flex;
+  align-items: center;
+}
+
 .faults {
   display: flex;
   flex-direction: row;

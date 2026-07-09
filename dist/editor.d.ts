@@ -26,4 +26,6 @@ export default class SimpleThermostatEditor extends LitElement {
     private _fanControlChanged;
     private _updateControlList;
     private _configChanged;
+    private _getToggleEntityByLabel;
+    private _setToggleItem;
 }
