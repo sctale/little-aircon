@@ -311,6 +311,26 @@ ha-switch {
             @value-changed=${this._entityPicked}
             allow-custom-entity
           ></ha-entity-picker>
+          <ha-entity-picker
+            label="室内温度传感器（可选）"
+            .hass=${this.hass}
+            .value=${t.sensor_entity||""}
+            .includeDomains=${gt}
+            @value-changed=${t=>this._configChanged("sensor_entity",t.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <ha-entity-picker
+            label="开关实体（可选）"
+            .hass=${this.hass}
+            .value=${t.header?.toggle?.entity||""}
+            @value-changed=${t=>this._configChanged("header.toggle.entity",t.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <ha-textfield
+            label="开关标签"
+            .value=${t.header?.toggle?.name||""}
+            @input=${t=>this._configChanged("header.toggle.name",t.target.value)}
+          ></ha-textfield>
           <div class="row">
             <ha-textfield
               label="名称"
@@ -323,14 +343,6 @@ ha-switch {
               @input=${t=>this._configChanged("header.icon",t.target.value)}
             ></ha-textfield>
           </div>
-          <ha-entity-picker
-            label="室内温度传感器（可选）"
-            .hass=${this.hass}
-            .value=${t.sensor_entity||""}
-            .includeDomains=${gt}
-            @value-changed=${t=>this._configChanged("sensor_entity",t.detail.value)}
-            allow-custom-entity
-          ></ha-entity-picker>
           <div class="row">
             <ha-textfield
               label="占位文本"
@@ -424,24 +436,6 @@ ha-switch {
               @closed=${t=>t.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="group-title">开关</div>
-          <ha-entity-picker
-            label="开关实体（可选）"
-            .hass=${this.hass}
-            .value=${t.header?.toggle?.entity||""}
-            @value-changed=${t=>this._configChanged("header.toggle.entity",t.detail.value)}
-            allow-custom-entity
-          ></ha-entity-picker>
-          <div class="row">
-            <ha-textfield
-              label="开关标签"
-              .value=${t.header?.toggle?.name||""}
-              @input=${t=>this._configChanged("header.toggle.name",t.target.value)}
-            ></ha-textfield>
           </div>
         </div>
 
@@ -549,4 +543,4 @@ ha-switch {
 
         ${this.modes.map(t=>Lt({state:this.entity.state,mode:t,localize:this.localize,modeOptions:this.config?.layout?.mode??{},setMode:this.setMode}))}
       </ha-card>
-    `}disconnectedCallback(){super.disconnectedCallback()}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],s=Number(i)+t,{decimals:n}=this.config;this._values={...this._values,[e]:+Pt(s,{decimals:n})},this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){return["boolean","string"].includes(typeof this.config.unit)?this.config?.unit:this._hass.config?.unit_system?.temperature??!1}}se.styles=ut,e([dt({type:Object})],se.prototype,"config",void 0),e([dt({type:Object})],se.prototype,"header",void 0),e([dt({type:Object})],se.prototype,"service",void 0),e([dt({type:Array})],se.prototype,"modes",void 0),e([dt({type:Object})],se.prototype,"entity",void 0),e([dt({type:Array})],se.prototype,"sensors",void 0),e([dt({type:Boolean})],se.prototype,"showSensors",void 0),e([dt({type:String})],se.prototype,"name",void 0),e([dt({type:Object})],se.prototype,"_values",void 0),e([dt({type:Boolean})],se.prototype,"_updatingValues",void 0),e([dt({type:Object})],se.prototype,"_hide",void 0),customElements.define(t,se),customElements.define(`${t}-editor`,$t),console.info(`%c${t}: 3.0.63`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"小空调",preview:!1,description:"Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）"});
+    `}disconnectedCallback(){super.disconnectedCallback()}setTemperature(t,e){this._updatingValues=!0;const i=this._values[e],s=Number(i)+t,{decimals:n}=this.config;this._values={...this._values,[e]:+Pt(s,{decimals:n})},this._debouncedSetTemperature(this._values)}getCardSize(){return 3}getUnit(){return["boolean","string"].includes(typeof this.config.unit)?this.config?.unit:this._hass.config?.unit_system?.temperature??!1}}se.styles=ut,e([dt({type:Object})],se.prototype,"config",void 0),e([dt({type:Object})],se.prototype,"header",void 0),e([dt({type:Object})],se.prototype,"service",void 0),e([dt({type:Array})],se.prototype,"modes",void 0),e([dt({type:Object})],se.prototype,"entity",void 0),e([dt({type:Array})],se.prototype,"sensors",void 0),e([dt({type:Boolean})],se.prototype,"showSensors",void 0),e([dt({type:String})],se.prototype,"name",void 0),e([dt({type:Object})],se.prototype,"_values",void 0),e([dt({type:Boolean})],se.prototype,"_updatingValues",void 0),e([dt({type:Object})],se.prototype,"_hide",void 0),customElements.define(t,se),customElements.define(`${t}-editor`,$t),console.info(`%c${t}: 3.0.64`,"font-weight: bold"),window.customCards=window.customCards||[],window.customCards.push({type:t,name:"小空调",preview:!1,description:"Home Assistant 温控卡片（lit v3 / HASS 2026.x 兼容，中文界面）"});

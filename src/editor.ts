@@ -78,6 +78,26 @@ export default class SimpleThermostatEditor extends LitElement {
             @value-changed=${this._entityPicked}
             allow-custom-entity
           ></ha-entity-picker>
+          <ha-entity-picker
+            label="室内温度传感器（可选）"
+            .hass=${this.hass}
+            .value=${config.sensor_entity || ''}
+            .includeDomains=${sensorIncludeDomains}
+            @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <ha-entity-picker
+            label="开关实体（可选）"
+            .hass=${this.hass}
+            .value=${config.header?.toggle?.entity || ''}
+            @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
+            allow-custom-entity
+          ></ha-entity-picker>
+          <ha-textfield
+            label="开关标签"
+            .value=${config.header?.toggle?.name || ''}
+            @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
+          ></ha-textfield>
           <div class="row">
             <ha-textfield
               label="名称"
@@ -90,14 +110,6 @@ export default class SimpleThermostatEditor extends LitElement {
               @input=${(ev) => this._configChanged('header.icon', ev.target.value)}
             ></ha-textfield>
           </div>
-          <ha-entity-picker
-            label="室内温度传感器（可选）"
-            .hass=${this.hass}
-            .value=${config.sensor_entity || ''}
-            .includeDomains=${sensorIncludeDomains}
-            @value-changed=${(ev) => this._configChanged('sensor_entity', ev.detail.value)}
-            allow-custom-entity
-          ></ha-entity-picker>
           <div class="row">
             <ha-textfield
               label="占位文本"
@@ -191,24 +203,6 @@ export default class SimpleThermostatEditor extends LitElement {
               @closed=${(ev) => ev.stopPropagation()}
               fixedMenuPosition
             ></ha-select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="group-title">开关</div>
-          <ha-entity-picker
-            label="开关实体（可选）"
-            .hass=${this.hass}
-            .value=${config.header?.toggle?.entity || ''}
-            @value-changed=${(ev) => this._configChanged('header.toggle.entity', ev.detail.value)}
-            allow-custom-entity
-          ></ha-entity-picker>
-          <div class="row">
-            <ha-textfield
-              label="开关标签"
-              .value=${config.header?.toggle?.name || ''}
-              @input=${(ev) => this._configChanged('header.toggle.name', ev.target.value)}
-            ></ha-textfield>
           </div>
         </div>
 
