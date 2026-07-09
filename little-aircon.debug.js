@@ -11,7 +11,7 @@
 })();
 
 var name = "little-aircon";
-var version = "3.0.64";
+var version = "3.0.65";
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
